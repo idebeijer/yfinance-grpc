@@ -159,6 +159,28 @@ This will demonstrate:
 - Retrieving dividends and news
 - Accessing option chains
 
+### Using with grpcurl (Reflection Enabled)
+
+The server supports gRPC reflection, so you can use `grpcurl` without proto files:
+
+```bash
+# List all services
+grpcurl -plaintext localhost:50059 list
+
+# List methods
+grpcurl -plaintext localhost:50059 list yfinance_grpc.v1.TickerService
+
+# Get ticker info
+grpcurl -plaintext -d '{"ticker": "AAPL"}' \
+  localhost:50059 yfinance_grpc.v1.TickerService.GetInfo
+
+# Get historical data
+grpcurl -plaintext -d '{"ticker": "AAPL", "period": "5d", "interval": "1d"}' \
+  localhost:50059 yfinance_grpc.v1.TickerService.GetHistory
+```
+
+See [docs/grpcurl.md](docs/grpcurl.md) for more examples.
+
 ### Using from Other Languages
 
 The protocol buffer definitions are in `api/proto/yfinance/v1/ticker.proto`. Use `buf` to generate client code for your language:

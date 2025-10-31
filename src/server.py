@@ -19,6 +19,7 @@ import logging
 from datetime import datetime
 from typing import Optional
 from dateutil import parser as date_parser
+from grpc_reflection.v1alpha import reflection
 
 import yfinance as yf
 import pandas as pd
@@ -724,14 +725,22 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
 
 
 def serve(port: int = 50051, max_workers: int = 10):
-    """Start the gRPC server"""
+    """Start the gRPC server with reflection enabled"""
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     ticker_pb2_grpc.add_TickerServiceServicer_to_server(
         TickerServiceServicer(), server
     )
+    
+    # Enable reflection for grpcurl and other tools
+    SERVICE_NAMES = (
+        ticker_pb2.DESCRIPTOR.services_by_name['TickerService'].full_name,
+        reflection.SERVICE_NAME,
+    )
+    reflection.enable_server_reflection(SERVICE_NAMES, server)
+    
     server.add_insecure_port(f'0.0.0.0:{port}')
     server.start()
-    logger.info(f"Server started on port {port}")
+    logger.info(f"Server started on port {port} with reflection enabled")
     
     try:
         server.wait_for_termination()
