@@ -1,0 +1,48 @@
+name: Proto Generation Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "api/proto/**/*.proto"
+      - "buf.yaml"
+      - "buf.gen.yaml"
+
+jobs:
+  check-generated:
+    name: Check Generated Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Generate proto files
+        run: buf generate
+
+      - name: Check if generated files are up to date
+        run: |
+          if ! git diff --exit-code gen/; then
+            echo "❌ Generated proto files are out of date!"
+            echo "Please run 'buf generate' and commit the changes."
+            git diff gen/
+            exit 1
+          else
+            echo "✅ Generated proto files are up to date"
+          fi
