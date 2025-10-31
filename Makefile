@@ -46,6 +46,18 @@ run: ## Run the gRPC server locally
 test: ## Run the client example
 	uv run python -m examples.client_example
 
+.PHONY: test-unit
+test-unit: ## Run unit tests
+	uv run pytest tests/test_server.py -v
+
+.PHONY: test-integration
+test-integration: ## Run integration tests (requires running server)
+	uv run pytest tests/test_integration.py -v
+
+.PHONY: test-all
+test-all: ## Run all tests
+	uv run pytest tests/ -v
+
 .PHONY: lint
 lint: ## Run buf lint on proto files
 	buf lint
