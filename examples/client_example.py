@@ -181,6 +181,45 @@ def run_examples():
     except grpc.RpcError as e:
         print(f"Error: {e.details()}")
     
+    # Example 8: Get Multiple Tickers Info
+    print(f"\n9. GetMultipleInfo - Information for multiple tickers")
+    print("-" * 80)
+    try:
+        request = ticker_pb2.GetMultipleInfoRequest(tickers=["AAPL", "MSFT", "GOOGL"])
+        response = stub.GetMultipleInfo(request)
+        
+        if response.info:
+            for ticker, info in response.info.items():
+                print(f"\n{ticker}:")
+                print(f"  Name: {info.long_name}")
+                print(f"  Price: ${info.current_price:.2f}")
+                print(f"  Market Cap: ${info.market_cap:,}")
+                print(f"  P/E Ratio: {info.trailing_pe:.2f}")
+        else:
+            print("No data available")
+    except grpc.RpcError as e:
+        print(f"Error: {e.details()}")
+    
+    # Example 9: Download History for Multiple Tickers (Streaming)
+    print(f"\n10. DownloadHistory - Bulk download for multiple tickers (streaming)")
+    print("-" * 80)
+    try:
+        request = ticker_pb2.DownloadHistoryRequest(
+            tickers=["AAPL", "MSFT", "GOOGL"],
+            period="5d",
+            interval="1d"
+        )
+        
+        print("Streaming historical data...")
+        for response in stub.DownloadHistory(request):
+            print(f"\n{response.ticker}: {len(response.rows)} data points received")
+            if response.rows:
+                last_row = response.rows[-1]
+                date_str = datetime.fromtimestamp(last_row.date.seconds).strftime('%Y-%m-%d')
+                print(f"  Latest ({date_str}): Close=${last_row.close:.2f}, Volume={last_row.volume:,}")
+    except grpc.RpcError as e:
+        print(f"Error: {e.details()}")
+    
     print(f"\n{'='*80}")
     print("Examples completed!")
     print(f"{'='*80}\n")

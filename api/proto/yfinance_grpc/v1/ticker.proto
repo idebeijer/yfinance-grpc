@@ -56,6 +56,12 @@ service TickerService {
   
   // GetMutualFundHolders returns mutual fund holders information
   rpc GetMutualFundHolders(GetMutualFundHoldersRequest) returns (GetMutualFundHoldersResponse);
+  
+  // GetMultipleInfo returns information for multiple tickers at once
+  rpc GetMultipleInfo(GetMultipleInfoRequest) returns (GetMultipleInfoResponse);
+  
+  // DownloadHistory streams historical data for multiple tickers
+  rpc DownloadHistory(DownloadHistoryRequest) returns (stream DownloadHistoryResponse);
 }
 
 // ========== GetInfo ==========
@@ -465,4 +471,30 @@ message MutualFundHolder {
   google.protobuf.Timestamp date_reported = 3;
   double pct_out = 4;
   double value = 5;
+}
+
+// ========== GetMultipleInfo ==========
+
+message GetMultipleInfoRequest {
+  repeated string tickers = 1; // List of ticker symbols (e.g., ["AAPL", "MSFT", "GOOGL"])
+}
+
+message GetMultipleInfoResponse {
+  map<string, TickerInfo> info = 1; // Map of ticker symbol to info
+}
+
+// ========== DownloadHistory ==========
+
+message DownloadHistoryRequest {
+  repeated string tickers = 1; // List of ticker symbols to download
+  optional string period = 2; // Period (e.g., "1d", "5d", "1mo", "3mo", "1y")
+  optional string interval = 3; // Interval (e.g., "1d", "1h", "5m")
+  optional google.protobuf.Timestamp start = 4; // Start date (optional)
+  optional google.protobuf.Timestamp end = 5; // End date (optional)
+  optional bool auto_adjust = 6; // Auto adjust prices (default: true)
+}
+
+message DownloadHistoryResponse {
+  string ticker = 1; // Which ticker this data is for
+  repeated HistoryRow rows = 2; // Historical data rows
 }

@@ -638,3 +638,46 @@ class MutualFundHolder(_message.Message):
     pct_out: float
     value: float
     def __init__(self, holder: _Optional[str] = ..., shares: _Optional[int] = ..., date_reported: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., pct_out: _Optional[float] = ..., value: _Optional[float] = ...) -> None: ...
+
+class GetMultipleInfoRequest(_message.Message):
+    __slots__ = ()
+    TICKERS_FIELD_NUMBER: _ClassVar[int]
+    tickers: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, tickers: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class GetMultipleInfoResponse(_message.Message):
+    __slots__ = ()
+    class InfoEntry(_message.Message):
+        __slots__ = ()
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: TickerInfo
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[TickerInfo, _Mapping]] = ...) -> None: ...
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    info: _containers.MessageMap[str, TickerInfo]
+    def __init__(self, info: _Optional[_Mapping[str, TickerInfo]] = ...) -> None: ...
+
+class DownloadHistoryRequest(_message.Message):
+    __slots__ = ()
+    TICKERS_FIELD_NUMBER: _ClassVar[int]
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    INTERVAL_FIELD_NUMBER: _ClassVar[int]
+    START_FIELD_NUMBER: _ClassVar[int]
+    END_FIELD_NUMBER: _ClassVar[int]
+    AUTO_ADJUST_FIELD_NUMBER: _ClassVar[int]
+    tickers: _containers.RepeatedScalarFieldContainer[str]
+    period: str
+    interval: str
+    start: _timestamp_pb2.Timestamp
+    end: _timestamp_pb2.Timestamp
+    auto_adjust: bool
+    def __init__(self, tickers: _Optional[_Iterable[str]] = ..., period: _Optional[str] = ..., interval: _Optional[str] = ..., start: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., auto_adjust: _Optional[bool] = ...) -> None: ...
+
+class DownloadHistoryResponse(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    rows: _containers.RepeatedCompositeFieldContainer[HistoryRow]
+    def __init__(self, ticker: _Optional[str] = ..., rows: _Optional[_Iterable[_Union[HistoryRow, _Mapping]]] = ...) -> None: ...

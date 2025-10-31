@@ -100,6 +100,16 @@ class TickerServiceStub(object):
                 request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMutualFundHoldersRequest.SerializeToString,
                 response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMutualFundHoldersResponse.FromString,
                 _registered_method=True)
+        self.GetMultipleInfo = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetMultipleInfo',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMultipleInfoRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMultipleInfoResponse.FromString,
+                _registered_method=True)
+        self.DownloadHistory = channel.unary_stream(
+                '/yfinance_grpc.v1.TickerService/DownloadHistory',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryResponse.FromString,
+                _registered_method=True)
 
 
 class TickerServiceServicer(object):
@@ -225,6 +235,20 @@ class TickerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetMultipleInfo(self, request, context):
+        """GetMultipleInfo returns information for multiple tickers at once
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DownloadHistory(self, request, context):
+        """DownloadHistory streams historical data for multiple tickers
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TickerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -312,6 +336,16 @@ def add_TickerServiceServicer_to_server(servicer, server):
                     servicer.GetMutualFundHolders,
                     request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMutualFundHoldersRequest.FromString,
                     response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMutualFundHoldersResponse.SerializeToString,
+            ),
+            'GetMultipleInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetMultipleInfo,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMultipleInfoRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetMultipleInfoResponse.SerializeToString,
+            ),
+            'DownloadHistory': grpc.unary_stream_rpc_method_handler(
+                    servicer.DownloadHistory,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -774,6 +808,60 @@ class TickerService(object):
             '/yfinance_grpc.v1.TickerService/GetMutualFundHolders',
             yfinance__grpc_dot_v1_dot_ticker__pb2.GetMutualFundHoldersRequest.SerializeToString,
             yfinance__grpc_dot_v1_dot_ticker__pb2.GetMutualFundHoldersResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetMultipleInfo(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetMultipleInfo',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetMultipleInfoRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetMultipleInfoResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DownloadHistory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/DownloadHistory',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryResponse.FromString,
             options,
             channel_credentials,
             insecure,

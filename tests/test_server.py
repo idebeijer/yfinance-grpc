@@ -428,5 +428,119 @@ class TestTickerServiceGetOptionChain:
         assert response.puts[0].last_price == 2.5
 
 
+class TestTickerServiceGetMultipleInfo:
+    """Test GetMultipleInfo endpoint"""
+
+    @patch('src.server.yf.Tickers')
+    def test_get_multiple_info_success(self, mock_tickers_class):
+        """Test successful GetMultipleInfo call"""
+        # Setup mock
+        mock_tickers = Mock()
+        mock_tickers_class.return_value = mock_tickers
+        
+        # Create mock ticker objects
+        mock_aapl = Mock()
+        mock_aapl.info = {
+            'symbol': 'AAPL',
+            'longName': 'Apple Inc.',
+            'currentPrice': 150.0,
+            'marketCap': 2500000000000,
+        }
+        
+        mock_msft = Mock()
+        mock_msft.info = {
+            'symbol': 'MSFT',
+            'longName': 'Microsoft Corporation',
+            'currentPrice': 300.0,
+            'marketCap': 2200000000000,
+        }
+        
+        mock_tickers.tickers = {
+            'AAPL': mock_aapl,
+            'MSFT': mock_msft,
+        }
+        
+        servicer = TickerServiceServicer()
+        context = Mock()
+        request = ticker_pb2.GetMultipleInfoRequest(tickers=["AAPL", "MSFT"])
+        
+        response = servicer.GetMultipleInfo(request, context)
+        
+        assert len(response.info) == 2
+        assert 'AAPL' in response.info
+        assert 'MSFT' in response.info
+        assert response.info['AAPL'].long_name == 'Apple Inc.'
+        assert response.info['MSFT'].long_name == 'Microsoft Corporation'
+
+
+class TestTickerServiceDownloadHistory:
+    """Test DownloadHistory endpoint"""
+
+    @patch('src.server.yf.download')
+    def test_download_history_single_ticker(self, mock_download):
+        """Test DownloadHistory with a single ticker"""
+        # Setup mock
+        dates = pd.date_range('2025-01-01', periods=3, freq='D')
+        mock_data = pd.DataFrame({
+            'Open': [100.0, 101.0, 102.0],
+            'High': [105.0, 106.0, 107.0],
+            'Low': [99.0, 100.0, 101.0],
+            'Close': [104.0, 105.0, 106.0],
+            'Volume': [1000000, 1100000, 1200000]
+        }, index=dates)
+        mock_download.return_value = mock_data
+        
+        servicer = TickerServiceServicer()
+        context = Mock()
+        request = ticker_pb2.DownloadHistoryRequest(
+            tickers=["AAPL"],
+            period="3d",
+            interval="1d"
+        )
+        
+        # Collect streaming responses
+        responses = list(servicer.DownloadHistory(request, context))
+        
+        assert len(responses) == 1
+        assert responses[0].ticker == 'AAPL'
+        assert len(responses[0].rows) == 3
+        assert responses[0].rows[0].open == 100.0
+
+    @patch('src.server.yf.download')
+    def test_download_history_multiple_tickers(self, mock_download):
+        """Test DownloadHistory with multiple tickers"""
+        # Setup mock - multi-level columns
+        dates = pd.date_range('2025-01-01', periods=2, freq='D')
+        mock_data = pd.DataFrame({
+            ('AAPL', 'Open'): [100.0, 101.0],
+            ('AAPL', 'High'): [105.0, 106.0],
+            ('AAPL', 'Low'): [99.0, 100.0],
+            ('AAPL', 'Close'): [104.0, 105.0],
+            ('AAPL', 'Volume'): [1000000, 1100000],
+            ('MSFT', 'Open'): [200.0, 201.0],
+            ('MSFT', 'High'): [205.0, 206.0],
+            ('MSFT', 'Low'): [199.0, 200.0],
+            ('MSFT', 'Close'): [204.0, 205.0],
+            ('MSFT', 'Volume'): [2000000, 2100000],
+        }, index=dates)
+        mock_download.return_value = mock_data
+        
+        servicer = TickerServiceServicer()
+        context = Mock()
+        request = ticker_pb2.DownloadHistoryRequest(
+            tickers=["AAPL", "MSFT"],
+            period="2d",
+            interval="1d"
+        )
+        
+        # Collect streaming responses
+        responses = list(servicer.DownloadHistory(request, context))
+        
+        assert len(responses) == 2
+        tickers = [r.ticker for r in responses]
+        assert 'AAPL' in tickers
+        assert 'MSFT' in tickers
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])

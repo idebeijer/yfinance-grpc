@@ -20,7 +20,9 @@ The gRPC service provides access to the following yfinance functionality:
 ### Ticker Information
 
 - **GetInfo**: Get comprehensive ticker information (price, market cap, P/E ratios, dividends, etc.)
+- **GetMultipleInfo**: Get information for multiple tickers at once (bulk operation)
 - **GetHistory**: Get historical price data with configurable intervals and date ranges
+- **DownloadHistory**: Stream historical data for multiple tickers efficiently (streaming RPC)
 - **GetDividends**: Get dividend payment history
 - **GetSplits**: Get stock split history
 - **GetActions**: Get all corporate actions (dividends, splits, capital gains)

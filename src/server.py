@@ -70,6 +70,85 @@ def safe_str(value) -> str:
     return str(value)
 
 
+def create_ticker_info(info: dict, symbol: str) -> ticker_pb2.TickerInfo:
+    """Create a TickerInfo message from info dict"""
+    return ticker_pb2.TickerInfo(
+        symbol=safe_str(info.get('symbol', symbol)),
+        short_name=safe_str(info.get('shortName')),
+        long_name=safe_str(info.get('longName')),
+        industry=safe_str(info.get('industry')),
+        sector=safe_str(info.get('sector')),
+        country=safe_str(info.get('country')),
+        city=safe_str(info.get('city')),
+        state=safe_str(info.get('state')),
+        zip=safe_str(info.get('zip')),
+        website=safe_str(info.get('website')),
+        long_business_summary=safe_str(info.get('longBusinessSummary')),
+        
+        previous_close=safe_float(info.get('previousClose')),
+        open=safe_float(info.get('open')),
+        day_low=safe_float(info.get('dayLow')),
+        day_high=safe_float(info.get('dayHigh')),
+        regular_market_previous_close=safe_float(info.get('regularMarketPreviousClose')),
+        regular_market_open=safe_float(info.get('regularMarketOpen')),
+        regular_market_day_low=safe_float(info.get('regularMarketDayLow')),
+        regular_market_day_high=safe_float(info.get('regularMarketDayHigh')),
+        current_price=safe_float(info.get('currentPrice')),
+        
+        volume=safe_int(info.get('volume')),
+        regular_market_volume=safe_int(info.get('regularMarketVolume')),
+        average_volume=safe_int(info.get('averageVolume')),
+        average_volume_10days=safe_int(info.get('averageVolume10days')),
+        shares_outstanding=safe_int(info.get('sharesOutstanding')),
+        float_shares=safe_int(info.get('floatShares')),
+        
+        market_cap=safe_int(info.get('marketCap')),
+        enterprise_value=safe_float(info.get('enterpriseValue')),
+        trailing_pe=safe_float(info.get('trailingPE')),
+        forward_pe=safe_float(info.get('forwardPE')),
+        price_to_book=safe_float(info.get('priceToBook')),
+        price_to_sales_trailing_12months=safe_float(info.get('priceToSalesTrailing12Months')),
+        enterprise_to_revenue=safe_float(info.get('enterpriseToRevenue')),
+        enterprise_to_ebitda=safe_float(info.get('enterpriseToEbitda')),
+        
+        dividend_rate=safe_float(info.get('dividendRate')),
+        dividend_yield=safe_float(info.get('dividendYield')),
+        ex_dividend_date=safe_int(info.get('exDividendDate', 0)),
+        payout_ratio=safe_float(info.get('payoutRatio')),
+        five_year_avg_dividend_yield=safe_float(info.get('fiveYearAvgDividendYield')),
+        
+        beta=safe_float(info.get('beta')),
+        trailing_eps=safe_float(info.get('trailingEps')),
+        forward_eps=safe_float(info.get('forwardEps')),
+        book_value=safe_float(info.get('bookValue')),
+        profit_margins=safe_float(info.get('profitMargins')),
+        revenue_per_share=safe_float(info.get('revenuePerShare')),
+        return_on_assets=safe_float(info.get('returnOnAssets')),
+        return_on_equity=safe_float(info.get('returnOnEquity')),
+        revenue_growth=safe_float(info.get('revenueGrowth')),
+        earnings_growth=safe_float(info.get('earningsGrowth')),
+        operating_margins=safe_float(info.get('operatingMargins')),
+        ebitda_margins=safe_float(info.get('ebitdaMargins')),
+        
+        fifty_two_week_low=safe_float(info.get('fiftyTwoWeekLow')),
+        fifty_two_week_high=safe_float(info.get('fiftyTwoWeekHigh')),
+        fifty_day_average=safe_float(info.get('fiftyDayAverage')),
+        two_hundred_day_average=safe_float(info.get('twoHundredDayAverage')),
+        
+        target_high_price=safe_float(info.get('targetHighPrice')),
+        target_low_price=safe_float(info.get('targetLowPrice')),
+        target_mean_price=safe_float(info.get('targetMeanPrice')),
+        target_median_price=safe_float(info.get('targetMedianPrice')),
+        number_of_analyst_opinions=safe_int(info.get('numberOfAnalystOpinions')),
+        
+        currency=safe_str(info.get('currency')),
+        exchange=safe_str(info.get('exchange')),
+        quote_type=safe_str(info.get('quoteType')),
+        financial_currency=safe_str(info.get('financialCurrency')),
+        price_hint=safe_int(info.get('priceHint', 2)),
+    )
+
+
 class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
     """Implementation of the TickerService gRPC service"""
 
@@ -81,81 +160,7 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
             info = ticker.info
             
             response = ticker_pb2.GetInfoResponse(
-                info=ticker_pb2.TickerInfo(
-                    symbol=safe_str(info.get('symbol', request.ticker)),
-                    short_name=safe_str(info.get('shortName')),
-                    long_name=safe_str(info.get('longName')),
-                    industry=safe_str(info.get('industry')),
-                    sector=safe_str(info.get('sector')),
-                    country=safe_str(info.get('country')),
-                    city=safe_str(info.get('city')),
-                    state=safe_str(info.get('state')),
-                    zip=safe_str(info.get('zip')),
-                    website=safe_str(info.get('website')),
-                    long_business_summary=safe_str(info.get('longBusinessSummary')),
-                    
-                    previous_close=safe_float(info.get('previousClose')),
-                    open=safe_float(info.get('open')),
-                    day_low=safe_float(info.get('dayLow')),
-                    day_high=safe_float(info.get('dayHigh')),
-                    regular_market_previous_close=safe_float(info.get('regularMarketPreviousClose')),
-                    regular_market_open=safe_float(info.get('regularMarketOpen')),
-                    regular_market_day_low=safe_float(info.get('regularMarketDayLow')),
-                    regular_market_day_high=safe_float(info.get('regularMarketDayHigh')),
-                    current_price=safe_float(info.get('currentPrice')),
-                    
-                    volume=safe_int(info.get('volume')),
-                    regular_market_volume=safe_int(info.get('regularMarketVolume')),
-                    average_volume=safe_int(info.get('averageVolume')),
-                    average_volume_10days=safe_int(info.get('averageVolume10days')),
-                    shares_outstanding=safe_int(info.get('sharesOutstanding')),
-                    float_shares=safe_int(info.get('floatShares')),
-                    
-                    market_cap=safe_int(info.get('marketCap')),
-                    enterprise_value=safe_float(info.get('enterpriseValue')),
-                    trailing_pe=safe_float(info.get('trailingPE')),
-                    forward_pe=safe_float(info.get('forwardPE')),
-                    price_to_book=safe_float(info.get('priceToBook')),
-                    price_to_sales_trailing_12months=safe_float(info.get('priceToSalesTrailing12Months')),
-                    enterprise_to_revenue=safe_float(info.get('enterpriseToRevenue')),
-                    enterprise_to_ebitda=safe_float(info.get('enterpriseToEbitda')),
-                    
-                    dividend_rate=safe_float(info.get('dividendRate')),
-                    dividend_yield=safe_float(info.get('dividendYield')),
-                    ex_dividend_date=safe_int(info.get('exDividendDate', 0)),
-                    payout_ratio=safe_float(info.get('payoutRatio')),
-                    five_year_avg_dividend_yield=safe_float(info.get('fiveYearAvgDividendYield')),
-                    
-                    beta=safe_float(info.get('beta')),
-                    trailing_eps=safe_float(info.get('trailingEps')),
-                    forward_eps=safe_float(info.get('forwardEps')),
-                    book_value=safe_float(info.get('bookValue')),
-                    profit_margins=safe_float(info.get('profitMargins')),
-                    revenue_per_share=safe_float(info.get('revenuePerShare')),
-                    return_on_assets=safe_float(info.get('returnOnAssets')),
-                    return_on_equity=safe_float(info.get('returnOnEquity')),
-                    revenue_growth=safe_float(info.get('revenueGrowth')),
-                    earnings_growth=safe_float(info.get('earningsGrowth')),
-                    operating_margins=safe_float(info.get('operatingMargins')),
-                    ebitda_margins=safe_float(info.get('ebitdaMargins')),
-                    
-                    fifty_two_week_low=safe_float(info.get('fiftyTwoWeekLow')),
-                    fifty_two_week_high=safe_float(info.get('fiftyTwoWeekHigh')),
-                    fifty_day_average=safe_float(info.get('fiftyDayAverage')),
-                    two_hundred_day_average=safe_float(info.get('twoHundredDayAverage')),
-                    
-                    target_high_price=safe_float(info.get('targetHighPrice')),
-                    target_low_price=safe_float(info.get('targetLowPrice')),
-                    target_mean_price=safe_float(info.get('targetMeanPrice')),
-                    target_median_price=safe_float(info.get('targetMedianPrice')),
-                    number_of_analyst_opinions=safe_int(info.get('numberOfAnalystOpinions')),
-                    
-                    currency=safe_str(info.get('currency')),
-                    exchange=safe_str(info.get('exchange')),
-                    quote_type=safe_str(info.get('quoteType')),
-                    financial_currency=safe_str(info.get('financialCurrency')),
-                    price_hint=safe_int(info.get('priceHint', 2)),
-                )
+                info=create_ticker_info(info, request.ticker)
             )
             
             return response
@@ -722,6 +727,147 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Error fetching mutual fund holders: {str(e)}")
             return ticker_pb2.GetMutualFundHoldersResponse()
+
+    def GetMultipleInfo(self, request, context):
+        """Get information for multiple tickers at once"""
+        try:
+            tickers_str = ' '.join(request.tickers)
+            logger.info(f"GetMultipleInfo called for tickers: {tickers_str}")
+            
+            tickers_obj = yf.Tickers(tickers_str)
+            info_map = {}
+            
+            for symbol, ticker in tickers_obj.tickers.items():
+                try:
+                    info = ticker.info
+                    info_map[symbol] = create_ticker_info(info, symbol)
+                    
+                except Exception as e:
+                    logger.error(f"Error fetching info for {symbol}: {str(e)}")
+                    # Continue with other tickers even if one fails
+                    continue
+            
+            return ticker_pb2.GetMultipleInfoResponse(info=info_map)
+            
+        except Exception as e:
+            logger.error(f"Error in GetMultipleInfo: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching multiple ticker info: {str(e)}")
+            return ticker_pb2.GetMultipleInfoResponse()
+
+    def DownloadHistory(self, request, context):
+        """Stream historical data for multiple tickers"""
+        try:
+            tickers_str = ' '.join(request.tickers)
+            logger.info(f"DownloadHistory called for tickers: {tickers_str}")
+            
+            # Build download parameters
+            kwargs = {
+                'group_by': 'ticker',
+                'auto_adjust': request.auto_adjust if request.HasField('auto_adjust') else True,
+                'threads': True,  # Use threading for faster downloads
+            }
+            
+            # Handle period or start/end dates
+            if request.HasField('period'):
+                kwargs['period'] = request.period
+            else:
+                if request.HasField('start'):
+                    kwargs['start'] = datetime.fromtimestamp(request.start.seconds)
+                if request.HasField('end'):
+                    kwargs['end'] = datetime.fromtimestamp(request.end.seconds)
+            
+            if request.HasField('interval'):
+                kwargs['interval'] = request.interval
+            
+            # Download data
+            data = yf.download(tickers_str, **kwargs)
+
+            # Handle empty data
+            if data.empty:
+                logger.warning(f"No data returned for {tickers_str}")
+                context.set_code(grpc.StatusCode.NOT_FOUND)
+                context.set_details(f"No historical data found for {tickers_str}")
+                return
+            
+            # Handle single ticker vs multiple tickers
+            if len(request.tickers) == 1:
+                ticker = request.tickers[0]
+                rows = []
+                
+                for idx, row in data.iterrows():
+                    # For single ticker with group_by='ticker', columns are MultiIndex (ticker, price_type)
+                    # Access using the ticker name as first level
+                    if isinstance(data.columns, pd.MultiIndex):
+                        open_val = safe_float(row.get((ticker, 'Open'), 0))
+                        high_val = safe_float(row.get((ticker, 'High'), 0))
+                        low_val = safe_float(row.get((ticker, 'Low'), 0))
+                        close_val = safe_float(row.get((ticker, 'Close'), 0))
+                        volume_val = safe_int(row.get((ticker, 'Volume'), 0))
+                    else:
+                        # Fallback for regular columns
+                        open_val = safe_float(row.get('Open', 0))
+                        high_val = safe_float(row.get('High', 0))
+                        low_val = safe_float(row.get('Low', 0))
+                        close_val = safe_float(row.get('Close', 0))
+                        volume_val = safe_int(row.get('Volume', 0))
+                    
+                    rows.append(ticker_pb2.HistoryRow(
+                        date=datetime_to_timestamp(idx),
+                        open=open_val,
+                        high=high_val,
+                        low=low_val,
+                        close=close_val,
+                        volume=volume_val
+                    ))
+                
+                # Validate that we have at least some valid price data
+                valid_rows = [r for r in rows if r.open > 0 or r.close > 0]
+                if not valid_rows:
+                    logger.warning(f"No valid price data returned for {ticker}. Check ticker symbol is correct.")
+                    context.set_code(grpc.StatusCode.NOT_FOUND)
+                    context.set_details(f"No valid price data found for '{ticker}'. Ticker may be invalid or data unavailable.")
+                    return
+                
+                yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=rows)
+            else:
+                # Multiple tickers - group by ticker and stream each
+                for ticker in request.tickers:
+                    try:
+                        ticker_data = data[ticker]
+                        rows = []
+                        
+                        for idx, row in ticker_data.iterrows():
+                            rows.append(ticker_pb2.HistoryRow(
+                                date=datetime_to_timestamp(idx),
+                                open=safe_float(row.get('Open', 0)),
+                                high=safe_float(row.get('High', 0)),
+                                low=safe_float(row.get('Low', 0)),
+                                close=safe_float(row.get('Close', 0)),
+                                volume=safe_int(row.get('Volume', 0))
+                            ))
+                        
+                        # Validate that we have at least some valid price data
+                        valid_rows = [r for r in rows if r.open > 0 or r.close > 0]
+                        if not valid_rows:
+                            logger.warning(f"No valid price data returned for {ticker}. Skipping.")
+                            continue
+                        
+                        yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=rows)
+                        
+                    except KeyError as e:
+                        logger.error(f"Ticker '{ticker}' not found in data. Check ticker symbol is correct.")
+                        # Continue with other tickers
+                        continue
+                    except Exception as e:
+                        logger.error(f"Error processing data for {ticker}: {str(e)}")
+                        # Continue with other tickers
+                        continue
+            
+        except Exception as e:
+            logger.error(f"Error in DownloadHistory: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error downloading history: {str(e)}")
 
 
 def serve(port: int = 50051, max_workers: int = 10):
