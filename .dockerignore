@@ -32,8 +32,7 @@ env/
 LICENSE
 docs/
 
-# Tests and examples (optional - uncomment if you don't want them in the image)
-# client_example.py
+examples/
 # tests/
 
 # CI/CD
@@ -50,6 +49,5 @@ docker-compose.yml
 
 # Keep only what's needed
 !gen/
-!server.py
-!main.py
+!src/
 !pyproject.toml

@@ -40,11 +40,11 @@ proto: generate ## Alias for generate
 
 .PHONY: run
 run: ## Run the gRPC server locally
-	uv run python main.py
+	uv run python -m src.main
 
 .PHONY: test
 test: ## Run the client example
-	uv run python client_example.py
+	uv run python -m examples.client_example
 
 .PHONY: lint
 lint: ## Run buf lint on proto files

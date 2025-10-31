@@ -25,7 +25,7 @@ RUN apk add --no-cache libstdc++ && \
 # Copy dependencies and code
 COPY --from=builder /app/deps /app/deps
 COPY gen/ ./gen/
-COPY server.py main.py ./
+COPY src/ ./src/
 
 ENV PYTHONPATH=/app/deps
 ENV PYTHONUNBUFFERED=1
@@ -35,4 +35,4 @@ USER appuser
 
 EXPOSE 50059
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "src.main"]
