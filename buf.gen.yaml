@@ -6,6 +6,8 @@ plugins:
     out: gen
   - remote: buf.build/grpc/python
     out: gen
+    opt:
+      - grpc_2_0
   - remote: buf.build/protocolbuffers/pyi
     out: gen
 inputs:

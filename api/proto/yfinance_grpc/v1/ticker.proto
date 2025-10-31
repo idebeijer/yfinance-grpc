@@ -1,0 +1,468 @@
+syntax = "proto3";
+
+package yfinance_grpc.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// TickerService provides access to Yahoo Finance ticker data
+service TickerService {
+  // GetInfo returns general information about a ticker
+  rpc GetInfo(GetInfoRequest) returns (GetInfoResponse);
+  
+  // GetHistory returns historical market data for a ticker
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  
+  // GetDividends returns dividend history for a ticker
+  rpc GetDividends(GetDividendsRequest) returns (GetDividendsResponse);
+  
+  // GetSplits returns stock split history for a ticker
+  rpc GetSplits(GetSplitsRequest) returns (GetSplitsResponse);
+  
+  // GetActions returns all corporate actions (dividends, splits, capital gains)
+  rpc GetActions(GetActionsRequest) returns (GetActionsResponse);
+  
+  // GetFinancials returns financial statements (income statement)
+  rpc GetFinancials(GetFinancialsRequest) returns (GetFinancialsResponse);
+  
+  // GetBalanceSheet returns balance sheet data
+  rpc GetBalanceSheet(GetBalanceSheetRequest) returns (GetBalanceSheetResponse);
+  
+  // GetCashFlow returns cash flow statement data
+  rpc GetCashFlow(GetCashFlowRequest) returns (GetCashFlowResponse);
+  
+  // GetEarnings returns earnings data
+  rpc GetEarnings(GetEarningsRequest) returns (GetEarningsResponse);
+  
+  // GetRecommendations returns analyst recommendations
+  rpc GetRecommendations(GetRecommendationsRequest) returns (GetRecommendationsResponse);
+  
+  // GetOptions returns available option expiration dates
+  rpc GetOptions(GetOptionsRequest) returns (GetOptionsResponse);
+  
+  // GetOptionChain returns option chain data for a specific expiration date
+  rpc GetOptionChain(GetOptionChainRequest) returns (GetOptionChainResponse);
+  
+  // GetCalendar returns upcoming events, earnings, and dividends
+  rpc GetCalendar(GetCalendarRequest) returns (GetCalendarResponse);
+  
+  // GetNews returns recent news articles for a ticker
+  rpc GetNews(GetNewsRequest) returns (GetNewsResponse);
+  
+  // GetMajorHolders returns major holders information
+  rpc GetMajorHolders(GetMajorHoldersRequest) returns (GetMajorHoldersResponse);
+  
+  // GetInstitutionalHolders returns institutional holders information
+  rpc GetInstitutionalHolders(GetInstitutionalHoldersRequest) returns (GetInstitutionalHoldersResponse);
+  
+  // GetMutualFundHolders returns mutual fund holders information
+  rpc GetMutualFundHolders(GetMutualFundHoldersRequest) returns (GetMutualFundHoldersResponse);
+}
+
+// ========== GetInfo ==========
+
+message GetInfoRequest {
+  string ticker = 1; // Ticker symbol (e.g., "AAPL")
+}
+
+message GetInfoResponse {
+  TickerInfo info = 1;
+}
+
+message TickerInfo {
+  // Company Information
+  string symbol = 1;
+  string short_name = 2;
+  string long_name = 3;
+  string industry = 4;
+  string sector = 5;
+  string country = 6;
+  string city = 7;
+  string state = 8;
+  string zip = 9;
+  string website = 10;
+  string long_business_summary = 11;
+  
+  // Trading Information
+  double previous_close = 20;
+  double open = 21;
+  double day_low = 22;
+  double day_high = 23;
+  double regular_market_previous_close = 24;
+  double regular_market_open = 25;
+  double regular_market_day_low = 26;
+  double regular_market_day_high = 27;
+  double current_price = 28;
+  
+  // Volume and Shares
+  int64 volume = 30;
+  int64 regular_market_volume = 31;
+  int64 average_volume = 32;
+  int64 average_volume_10days = 33;
+  int64 shares_outstanding = 34;
+  int64 float_shares = 35;
+  
+  // Market Cap and Valuation
+  int64 market_cap = 40;
+  double enterprise_value = 41;
+  double trailing_pe = 42;
+  double forward_pe = 43;
+  double price_to_book = 44;
+  double price_to_sales_trailing_12months = 45;
+  double enterprise_to_revenue = 46;
+  double enterprise_to_ebitda = 47;
+  
+  // Dividends and Yield
+  double dividend_rate = 50;
+  double dividend_yield = 51;
+  int64 ex_dividend_date = 52; // Unix timestamp
+  double payout_ratio = 53;
+  double five_year_avg_dividend_yield = 54;
+  
+  // Financial Metrics
+  double beta = 60;
+  double trailing_eps = 61;
+  double forward_eps = 62;
+  double book_value = 63;
+  double profit_margins = 64;
+  double revenue_per_share = 65;
+  double return_on_assets = 66;
+  double return_on_equity = 67;
+  double revenue_growth = 68;
+  double earnings_growth = 69;
+  double operating_margins = 70;
+  double ebitda_margins = 71;
+  
+  // 52 Week Range
+  double fifty_two_week_low = 80;
+  double fifty_two_week_high = 81;
+  double fifty_day_average = 82;
+  double two_hundred_day_average = 83;
+  
+  // Targets and Estimates
+  double target_high_price = 90;
+  double target_low_price = 91;
+  double target_mean_price = 92;
+  double target_median_price = 93;
+  int32 number_of_analyst_opinions = 94;
+  
+  // Other
+  string currency = 100;
+  string exchange = 101;
+  string quote_type = 102; // EQUITY, ETF, MUTUALFUND, etc.
+  string financial_currency = 103;
+  int32 price_hint = 104;
+}
+
+// ========== GetHistory ==========
+
+message GetHistoryRequest {
+  string ticker = 1; // Ticker symbol (e.g., "AAPL")
+  
+  // Period or date range (use one or the other)
+  optional string period = 2; // e.g., "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"
+  optional google.protobuf.Timestamp start = 3; // Start date
+  optional google.protobuf.Timestamp end = 4; // End date
+  
+  // Interval for data points
+  string interval = 5; // "1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo"
+  
+  // Options
+  optional bool prepost = 6; // Include pre and post market data (default: false)
+  optional bool actions = 7; // Include dividends and stock splits (default: true)
+  optional bool auto_adjust = 8; // Adjust all OHLC automatically (default: true)
+  optional bool back_adjust = 9; // Back-adjust data to account for splits (default: false)
+  optional bool repair = 10; // Detect and repair bad data (default: false)
+  optional bool keepna = 11; // Keep NaN values (default: false)
+  optional bool rounding = 12; // Round values (default: false)
+}
+
+message GetHistoryResponse {
+  repeated HistoryRow rows = 1;
+}
+
+message HistoryRow {
+  google.protobuf.Timestamp date = 1;
+  double open = 2;
+  double high = 3;
+  double low = 4;
+  double close = 5;
+  int64 volume = 6;
+  optional double dividends = 7;
+  optional double stock_splits = 8;
+  optional double capital_gains = 9;
+}
+
+// ========== GetDividends ==========
+
+message GetDividendsRequest {
+  string ticker = 1;
+  optional string period = 2; // e.g., "1y", "5y", "max" (default: "max")
+}
+
+message GetDividendsResponse {
+  repeated DividendRow rows = 1;
+}
+
+message DividendRow {
+  google.protobuf.Timestamp date = 1;
+  double amount = 2;
+}
+
+// ========== GetSplits ==========
+
+message GetSplitsRequest {
+  string ticker = 1;
+  optional string period = 2; // e.g., "1y", "5y", "max" (default: "max")
+}
+
+message GetSplitsResponse {
+  repeated SplitRow rows = 1;
+}
+
+message SplitRow {
+  google.protobuf.Timestamp date = 1;
+  double ratio = 2; // e.g., 2.0 for a 2-for-1 split
+}
+
+// ========== GetActions ==========
+
+message GetActionsRequest {
+  string ticker = 1;
+  optional string period = 2; // e.g., "1y", "5y", "max" (default: "max")
+}
+
+message GetActionsResponse {
+  repeated ActionRow rows = 1;
+}
+
+message ActionRow {
+  google.protobuf.Timestamp date = 1;
+  optional double dividends = 2;
+  optional double stock_splits = 3;
+  optional double capital_gains = 4;
+}
+
+// ========== GetFinancials ==========
+
+message GetFinancialsRequest {
+  string ticker = 1;
+  string freq = 2; // "yearly", "quarterly", or "trailing" (default: "yearly")
+  bool as_dict = 3; // Return as dictionary format
+  bool pretty = 4; // Format row names nicely for readability
+}
+
+message GetFinancialsResponse {
+  repeated FinancialStatement statements = 1;
+}
+
+message FinancialStatement {
+  google.protobuf.Timestamp date = 1;
+  map<string, double> values = 2; // Key: metric name, Value: amount
+}
+
+// ========== GetBalanceSheet ==========
+
+message GetBalanceSheetRequest {
+  string ticker = 1;
+  string freq = 2; // "yearly" or "quarterly" (default: "yearly")
+  bool as_dict = 3;
+  bool pretty = 4;
+}
+
+message GetBalanceSheetResponse {
+  repeated BalanceSheetStatement statements = 1;
+}
+
+message BalanceSheetStatement {
+  google.protobuf.Timestamp date = 1;
+  map<string, double> values = 2;
+}
+
+// ========== GetCashFlow ==========
+
+message GetCashFlowRequest {
+  string ticker = 1;
+  string freq = 2; // "yearly" or "quarterly" (default: "yearly")
+  bool as_dict = 3;
+  bool pretty = 4;
+}
+
+message GetCashFlowResponse {
+  repeated CashFlowStatement statements = 1;
+}
+
+message CashFlowStatement {
+  google.protobuf.Timestamp date = 1;
+  map<string, double> values = 2;
+}
+
+// ========== GetEarnings ==========
+
+message GetEarningsRequest {
+  string ticker = 1;
+  string freq = 2; // "yearly", "quarterly", or "trailing" (default: "yearly")
+  bool as_dict = 3;
+}
+
+message GetEarningsResponse {
+  repeated EarningsRow rows = 1;
+}
+
+message EarningsRow {
+  google.protobuf.Timestamp date = 1;
+  optional double revenue = 2;
+  optional double earnings = 3;
+}
+
+// ========== GetRecommendations ==========
+
+message GetRecommendationsRequest {
+  string ticker = 1;
+}
+
+message GetRecommendationsResponse {
+  repeated RecommendationRow rows = 1;
+}
+
+message RecommendationRow {
+  google.protobuf.Timestamp date = 1;
+  string firm = 2;
+  string to_grade = 3;
+  string from_grade = 4;
+  string action = 5; // "up", "down", "main", "init"
+}
+
+// ========== GetOptions ==========
+
+message GetOptionsRequest {
+  string ticker = 1;
+}
+
+message GetOptionsResponse {
+  repeated string expiration_dates = 1; // List of available expiration dates (YYYY-MM-DD format)
+}
+
+// ========== GetOptionChain ==========
+
+message GetOptionChainRequest {
+  string ticker = 1;
+  optional string date = 2; // Expiration date (YYYY-MM-DD format)
+  optional string tz = 3; // Timezone
+}
+
+message GetOptionChainResponse {
+  repeated OptionContract calls = 1;
+  repeated OptionContract puts = 2;
+}
+
+message OptionContract {
+  string contract_symbol = 1;
+  double strike = 2;
+  string currency = 3;
+  double last_price = 4;
+  double bid = 5;
+  double ask = 6;
+  double change = 7;
+  double percent_change = 8;
+  int64 volume = 9;
+  int64 open_interest = 10;
+  double implied_volatility = 11;
+  bool in_the_money = 12;
+  string contract_size = 13;
+  google.protobuf.Timestamp last_trade_date = 14;
+}
+
+// ========== GetCalendar ==========
+
+message GetCalendarRequest {
+  string ticker = 1;
+}
+
+message GetCalendarResponse {
+  optional EarningsDate earnings = 1;
+  optional DividendDate ex_dividend_date = 2;
+  repeated CalendarEvent events = 3;
+}
+
+message EarningsDate {
+  optional google.protobuf.Timestamp start = 1;
+  optional google.protobuf.Timestamp end = 2;
+}
+
+message DividendDate {
+  optional google.protobuf.Timestamp date = 1;
+}
+
+message CalendarEvent {
+  string event_type = 1;
+  google.protobuf.Timestamp date = 2;
+  string description = 3;
+}
+
+// ========== GetNews ==========
+
+message GetNewsRequest {
+  string ticker = 1;
+  int32 count = 2; // Number of news items to return (default: 10)
+}
+
+message GetNewsResponse {
+  repeated NewsArticle articles = 1;
+}
+
+message NewsArticle {
+  string uuid = 1;
+  string title = 2;
+  string publisher = 3;
+  string link = 4;
+  google.protobuf.Timestamp provider_publish_time = 5;
+  string type = 6;
+  optional string thumbnail = 7;
+  repeated string related_tickers = 8;
+}
+
+// ========== GetMajorHolders ==========
+
+message GetMajorHoldersRequest {
+  string ticker = 1;
+}
+
+message GetMajorHoldersResponse {
+  map<string, string> holders = 1; // Key: description, Value: percentage/value
+}
+
+// ========== GetInstitutionalHolders ==========
+
+message GetInstitutionalHoldersRequest {
+  string ticker = 1;
+}
+
+message GetInstitutionalHoldersResponse {
+  repeated InstitutionalHolder holders = 1;
+}
+
+message InstitutionalHolder {
+  string holder = 1;
+  int64 shares = 2;
+  google.protobuf.Timestamp date_reported = 3;
+  double pct_out = 4; // Percentage of shares outstanding
+  double value = 5;
+}
+
+// ========== GetMutualFundHolders ==========
+
+message GetMutualFundHoldersRequest {
+  string ticker = 1;
+}
+
+message GetMutualFundHoldersResponse {
+  repeated MutualFundHolder holders = 1;
+}
+
+message MutualFundHolder {
+  string holder = 1;
+  int64 shares = 2;
+  google.protobuf.Timestamp date_reported = 3;
+  double pct_out = 4;
+  double value = 5;
+}
