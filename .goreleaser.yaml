@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+
+version: 2
+
+builds:
+  - skip: true
+
+dockers_v2:
+  - images:
+      - "ghcr.io/idebeijer/{{ .ProjectName }}"
+      - "docker.io/idebeijer/{{ .ProjectName }}"
+    tags:
+      - "{{ .Version }}"
+      - "{{ if and (not .Prerelease) (not .IsNightly) (not .IsSnapshot) }}latest{{ end }}"
+    extra_files:
+      - pyproject.toml
+      - gen/
+      - src/
+    labels:
+      "org.opencontainers.image.created": "{{ .Date }}"
+      "org.opencontainers.image.url": "https://github.com/idebeijer/{{ .ProjectName }}"
+      "org.opencontainers.image.documentation": "https://github.com/idebeijer/{{ .ProjectName }}/blob/main/README.md"
+      "org.opencontainers.image.source": "{{ .GitURL }}"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.licenses": "MIT"
+      "org.opencontainers.image.title": "{{ .ProjectName }}"
+      "org.opencontainers.image.description": "gRPC server for accessing Yahoo Finance data"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+
+snapshot:
+  version_template: "{{ incpatch .Version }}"
+
+release:
+  prerelease: auto
+  footer: |
+    **Full Changelog**: https://github.com/idebeijer/{{ .ProjectName }}/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+changelog:
+  sort: asc
+  use: github
+  groups:
+    - title: "Breaking changes"
+      regexp: '^.*?\w+(\(.+\))?!:\s?.+$'
+      order: 0
+    - title: "Features"
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 1
+    - title: "Bug fixes"
+      regexp: '^.*?fix(\(.+\))??!?:.+$'
+      order: 2
+    - title: "Documentation"
+      regexp: '^.*?docs(\(.+\))??!?:.+$'
+      order: 3
+    - title: "Build system"
+      regexp: '^.*?(build|ci)(\(.+\))??!?:.+$'
+      order: 4
+    - title: "Others"
+      order: 999
+  filters:
+    exclude:
+      - '^.*?(test|style)(\(.+\))??!?:.+$'
+      - 'initial commit'
