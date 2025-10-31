@@ -155,7 +155,7 @@ def run_examples():
         if response.rows:
             print(f"{'Date':<12} {'Firm':<30} {'Action':<10} {'Grade':<15}")
             print("-" * 80)
-            for row in response.rows[-10:]:  # Last 10 recommendations
+            for row in response.rows[:15]:  # First 15 recommendations (most recent)
                 date_str = datetime.fromtimestamp(row.date.seconds).strftime('%Y-%m-%d')
                 grade = row.to_grade if row.to_grade else "N/A"
                 print(f"{date_str:<12} {row.firm:<30} {row.action:<10} {grade:<15}")

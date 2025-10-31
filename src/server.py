@@ -18,6 +18,7 @@ from concurrent import futures
 import logging
 from datetime import datetime
 from typing import Optional
+from dateutil import parser as date_parser
 
 import yfinance as yf
 import pandas as pd
@@ -460,16 +461,20 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
             logger.info(f"GetRecommendations called for ticker: {request.ticker}")
             ticker = yf.Ticker(request.ticker)
             
-            recommendations = ticker.get_recommendations(as_dict=False)
-            
+            # Use upgrades_downgrades which has the detailed recommendation data
+            recommendations = ticker.upgrades_downgrades
+
             rows = []
             if recommendations is not None and not recommendations.empty:
+                # Sort by date descending (most recent first)
+                recommendations = recommendations.sort_index(ascending=False)
+                
                 for idx, row in recommendations.iterrows():
                     rows.append(ticker_pb2.RecommendationRow(
                         date=datetime_to_timestamp(idx),
                         firm=safe_str(row.get('Firm', '')),
-                        to_grade=safe_str(row.get('To Grade', '')),
-                        from_grade=safe_str(row.get('From Grade', '')),
+                        to_grade=safe_str(row.get('ToGrade', '')),
+                        from_grade=safe_str(row.get('FromGrade', '')),
                         action=safe_str(row.get('Action', ''))
                     ))
             
@@ -601,31 +606,35 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
             ticker = yf.Ticker(request.ticker)
             
             count = request.count if request.count > 0 else 10
-            news = ticker.get_news(count=count)
+            news = ticker.news
             
             articles = []
-            for article in news:
+            for article_wrapper in news[:count]:
+                article = article_wrapper.get('content', article_wrapper)
+                
                 news_article = ticker_pb2.NewsArticle(
-                    uuid=safe_str(article.get('uuid', '')),
+                    uuid=safe_str(article.get('id', '')),
                     title=safe_str(article.get('title', '')),
-                    publisher=safe_str(article.get('publisher', '')),
-                    link=safe_str(article.get('link', '')),
-                    type=safe_str(article.get('type', ''))
+                    publisher=safe_str(article.get('provider', {}).get('displayName', '')),
+                    link=safe_str(article.get('canonicalUrl', {}).get('url', '')),
+                    type=safe_str(article.get('contentType', ''))
                 )
                 
-                if 'providerPublishTime' in article:
-                    ts = Timestamp()
-                    ts.FromSeconds(article['providerPublishTime'])
-                    news_article.provider_publish_time.CopyFrom(ts)
+                if 'pubDate' in article:
+                    try:
+                        dt = date_parser.isoparse(article['pubDate'])
+                        news_article.provider_publish_time.FromDatetime(dt)
+                    except Exception:
+                        pass
                 
                 if 'thumbnail' in article and article['thumbnail']:
-                    if isinstance(article['thumbnail'], dict) and 'resolutions' in article['thumbnail']:
-                        resolutions = article['thumbnail']['resolutions']
+                    thumbnail = article['thumbnail']
+                    if isinstance(thumbnail, dict) and 'resolutions' in thumbnail:
+                        resolutions = thumbnail['resolutions']
                         if resolutions and len(resolutions) > 0:
                             news_article.thumbnail = safe_str(resolutions[0].get('url', ''))
-                
-                if 'relatedTickers' in article:
-                    news_article.related_tickers.extend(article['relatedTickers'])
+                    elif isinstance(thumbnail, dict) and 'originalUrl' in thumbnail:
+                        news_article.thumbnail = safe_str(thumbnail['originalUrl'])
                 
                 articles.append(news_article)
             
