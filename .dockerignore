@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+LICENSE
+docs/
+
+# Tests and examples (optional - uncomment if you don't want them in the image)
+# client_example.py
+# tests/
+
+# CI/CD
+.github/
+
+# Buf cache
+.buf/
+
+# Other
+Makefile
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Keep only what's needed
+!gen/
+!server.py
+!main.py
+!pyproject.toml

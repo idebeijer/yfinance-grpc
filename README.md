@@ -49,6 +49,42 @@ The gRPC service provides access to the following yfinance functionality:
 - **GetInstitutionalHolders**: Get institutional ownership data
 - **GetMutualFundHolders**: Get mutual fund ownership data
 
+## Quick Start
+
+### Using Docker (Recommended)
+
+The easiest way to get started is using Docker:
+
+```bash
+# Build and run using Make
+make docker-build
+make docker-run
+
+# Or using docker-compose
+docker-compose up -d
+
+# View logs
+make docker-logs
+# or
+docker-compose logs -f
+```
+
+The server will be available at `localhost:50059`.
+
+### Using Make
+
+The project includes a Makefile for common tasks:
+
+```bash
+make help          # Show all available commands
+make install       # Install dependencies
+make generate      # Generate protobuf code
+make run           # Start the server
+make test          # Run client example
+make docker-build  # Build Docker image
+make docker-run    # Run in Docker
+```
+
 ## Installation
 
 ### Prerequisites
@@ -56,6 +92,8 @@ The gRPC service provides access to the following yfinance functionality:
 - Python 3.14+
 - [uv](https://github.com/astral-sh/uv) for Python environment management
 - [buf](https://buf.build/) for protocol buffer compilation
+- Docker (optional, for containerized deployment)
+- Make (optional, for convenience commands)
 
 ### Setup
 
@@ -70,25 +108,39 @@ cd yfinance-grpc
 
 ```bash
 uv sync
+# or
+make install
 ```
 
 3. Generate the protocol buffer code:
 
 ```bash
 buf generate
+# or
+make generate
 ```
 
 ## Usage
 
 ### Starting the Server
 
-Run the gRPC server:
+**Option 1: Run directly with Python**
 
 ```bash
 uv run python main.py
+# or
+make run
 ```
 
-The server will start on port `50051` by default.
+**Option 2: Run with docker-compose**
+
+```bash
+docker-compose up -d
+# or
+make up
+```
+
+The server will start on port `50059` by default.
 
 ### Running the Python Client Example
 
@@ -96,6 +148,8 @@ To see examples of all the available endpoints:
 
 ```bash
 uv run python client_example.py
+# or
+make test
 ```
 
 This will demonstrate:
@@ -224,7 +278,7 @@ message GetOptionChainRequest {
 
 **Response:** Arrays of calls and puts with strike prices, bid/ask, volume, open interest, implied volatility, etc.
 
-See `api/proto/yfinance/v1/ticker.proto` for complete API documentation.
+See `api/proto/yfinance_grpc/v1/ticker.proto` for complete API documentation.
 
 ## Development
 
@@ -234,13 +288,15 @@ After modifying `ticker.proto`:
 
 ```bash
 buf generate
+# or
+make generate
 ```
 
 ### Adding New Endpoints
 
-1. Define the RPC method in `api/proto/yfinance/v1/ticker.proto`
+1. Define the RPC method in `api/proto/yfinance_grpc/v1/ticker.proto`
 2. Add request/response message types
-3. Run `buf generate`
+3. Run `buf generate` or `make generate`
 4. Implement the method in `server.py`'s `TickerServiceServicer` class
 5. Add an example to `client_example.py`
 
