@@ -5,10 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "grpcio>=1.76.0",
-    "grpcio-reflection>=1.76.0",
-    "protobuf>=6.33.0",
-    "yfinance>=0.2.66",
+    "grpcio==1.76.0",
+    "grpcio-reflection==1.76.0",
+    "protobuf==6.33.2",
+    "yfinance==1.0",
 ]
 
 [project.optional-dependencies]
