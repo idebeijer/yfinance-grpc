@@ -62,6 +62,63 @@ service TickerService {
   
   // DownloadHistory streams historical data for multiple tickers
   rpc DownloadHistory(DownloadHistoryRequest) returns (stream DownloadHistoryResponse);
+
+  // GetCapitalGains returns capital gains distributions for a ticker
+  rpc GetCapitalGains(GetCapitalGainsRequest) returns (GetCapitalGainsResponse);
+
+  // GetSharesHistory returns the full history of shares outstanding
+  rpc GetSharesHistory(GetSharesHistoryRequest) returns (GetSharesHistoryResponse);
+
+  // GetIsin returns the ISIN code for a ticker
+  rpc GetIsin(GetIsinRequest) returns (GetIsinResponse);
+
+  // GetFastInfo returns a lightweight snapshot of key price/market data
+  rpc GetFastInfo(GetFastInfoRequest) returns (GetFastInfoResponse);
+
+  // GetSustainability returns ESG scores and controversy flags
+  rpc GetSustainability(GetSustainabilityRequest) returns (GetSustainabilityResponse);
+
+  // GetInsiderPurchases returns a summary table of insider buying/selling activity
+  rpc GetInsiderPurchases(GetInsiderPurchasesRequest) returns (GetInsiderPurchasesResponse);
+
+  // GetInsiderTransactions returns individual insider transaction records
+  rpc GetInsiderTransactions(GetInsiderTransactionsRequest) returns (GetInsiderTransactionsResponse);
+
+  // GetInsiderRosterHolders returns the roster of insider holders
+  rpc GetInsiderRosterHolders(GetInsiderRosterHoldersRequest) returns (GetInsiderRosterHoldersResponse);
+
+  // GetAnalystPriceTargets returns the consensus analyst price target
+  rpc GetAnalystPriceTargets(GetAnalystPriceTargetsRequest) returns (GetAnalystPriceTargetsResponse);
+
+  // GetRecommendationsSummary returns period-based aggregated analyst recommendation counts
+  rpc GetRecommendationsSummary(GetRecommendationsSummaryRequest) returns (GetRecommendationsSummaryResponse);
+
+  // GetEarningsEstimate returns forward EPS estimates by period
+  rpc GetEarningsEstimate(GetEarningsEstimateRequest) returns (GetEarningsEstimateResponse);
+
+  // GetRevenueEstimate returns forward revenue estimates by period
+  rpc GetRevenueEstimate(GetRevenueEstimateRequest) returns (GetRevenueEstimateResponse);
+
+  // GetEarningsHistory returns historical EPS actuals vs estimates
+  rpc GetEarningsHistory(GetEarningsHistoryRequest) returns (GetEarningsHistoryResponse);
+
+  // GetEpsTrend returns the EPS estimate trend across recent revision windows
+  rpc GetEpsTrend(GetEpsTrendRequest) returns (GetEpsTrendResponse);
+
+  // GetEpsRevisions returns counts of upward/downward EPS revisions
+  rpc GetEpsRevisions(GetEpsRevisionsRequest) returns (GetEpsRevisionsResponse);
+
+  // GetGrowthEstimates returns growth estimates for the stock, industry, sector and index
+  rpc GetGrowthEstimates(GetGrowthEstimatesRequest) returns (GetGrowthEstimatesResponse);
+
+  // GetEarningsDates returns upcoming and past earnings dates with EPS data
+  rpc GetEarningsDates(GetEarningsDatesRequest) returns (GetEarningsDatesResponse);
+
+  // GetHistoryMetadata returns exchange and instrument metadata for a ticker
+  rpc GetHistoryMetadata(GetHistoryMetadataRequest) returns (GetHistoryMetadataResponse);
+
+  // GetSecFilings returns SEC filings for a ticker
+  rpc GetSecFilings(GetSecFilingsRequest) returns (GetSecFilingsResponse);
 }
 
 // ========== GetInfo ==========
@@ -497,4 +554,377 @@ message DownloadHistoryRequest {
 message DownloadHistoryResponse {
   string ticker = 1; // Which ticker this data is for
   repeated HistoryRow rows = 2; // Historical data rows
+}
+
+// ========== GetCapitalGains ==========
+
+message GetCapitalGainsRequest {
+  string ticker = 1;
+  optional string period = 2; // e.g., "1y", "5y", "max" (default: "max")
+}
+
+message GetCapitalGainsResponse {
+  repeated CapitalGainsRow rows = 1;
+}
+
+message CapitalGainsRow {
+  google.protobuf.Timestamp date = 1;
+  double amount = 2;
+}
+
+// ========== GetSharesHistory ==========
+
+message GetSharesHistoryRequest {
+  string ticker = 1;
+  optional google.protobuf.Timestamp start = 2;
+  optional google.protobuf.Timestamp end = 3;
+}
+
+message GetSharesHistoryResponse {
+  repeated SharesHistoryRow rows = 1;
+}
+
+message SharesHistoryRow {
+  google.protobuf.Timestamp date = 1;
+  int64 shares = 2;
+}
+
+// ========== GetIsin ==========
+
+message GetIsinRequest {
+  string ticker = 1;
+}
+
+message GetIsinResponse {
+  string isin = 1;
+}
+
+// ========== GetFastInfo ==========
+
+message GetFastInfoRequest {
+  string ticker = 1;
+}
+
+message GetFastInfoResponse {
+  FastInfo info = 1;
+}
+
+message FastInfo {
+  string currency = 1;
+  string exchange = 2;
+  int32 exchange_data_delayed_by = 3;
+  string exchange_timezone_name = 4;
+  double last_price = 5;
+  int64 last_volume = 6;
+  int64 market_cap = 7;
+  double open = 8;
+  double previous_close = 9;
+  string quote_type = 10;
+  double regular_market_day_high = 11;
+  double regular_market_day_low = 12;
+  double regular_market_previous_close = 13;
+  double regular_market_price = 14;
+  int64 shares = 15;
+  double three_month_average_volume = 16;
+  string timezone = 17;
+  double fifty_day_average = 18;
+  double two_hundred_day_average = 19;
+  double year_change = 20;
+  double year_high = 21;
+  double year_low = 22;
+}
+
+// ========== GetSustainability ==========
+
+message GetSustainabilityRequest {
+  string ticker = 1;
+}
+
+message GetSustainabilityResponse {
+  double total_esg = 1;
+  string esg_performance = 2; // e.g., "AVG_PERF", "OUT_PERF", "UNDER_PERF"
+  double environment_score = 3;
+  double social_score = 4;
+  double governance_score = 5;
+  double percentile = 6;
+  string peer_group = 7;
+  // Controversy flags
+  bool adult = 20;
+  bool alcoholic = 21;
+  bool animal_testing = 22;
+  bool catholic = 23;
+  bool controversial_weapons = 24;
+  bool small_arms = 25;
+  bool fur_leather = 26;
+  bool gambling = 27;
+  bool gmo = 28;
+  bool military_contract = 29;
+  bool nuclear = 30;
+  bool pesticides = 31;
+  bool palm_oil = 32;
+  bool coal = 33;
+  bool tobacco = 34;
+}
+
+// ========== GetInsiderPurchases ==========
+
+message GetInsiderPurchasesRequest {
+  string ticker = 1;
+}
+
+message GetInsiderPurchasesResponse {
+  repeated InsiderPurchaseSummaryRow rows = 1;
+}
+
+// Each row corresponds to one label (e.g., "Purchases", "Sales") with a map of column values
+message InsiderPurchaseSummaryRow {
+  string label = 1;
+  map<string, string> values = 2;
+}
+
+// ========== GetInsiderTransactions ==========
+
+message GetInsiderTransactionsRequest {
+  string ticker = 1;
+}
+
+message GetInsiderTransactionsResponse {
+  repeated InsiderTransaction transactions = 1;
+}
+
+message InsiderTransaction {
+  google.protobuf.Timestamp start_date = 1;
+  string insider = 2;
+  string position = 3;
+  string transaction = 4;
+  int64 shares = 5;
+  double value = 6;
+  string text = 7;
+  string url = 8;
+}
+
+// ========== GetInsiderRosterHolders ==========
+
+message GetInsiderRosterHoldersRequest {
+  string ticker = 1;
+}
+
+message GetInsiderRosterHoldersResponse {
+  repeated InsiderRosterHolder holders = 1;
+}
+
+message InsiderRosterHolder {
+  string name = 1;
+  string position = 2;
+  string url = 3;
+  google.protobuf.Timestamp most_recent_transaction = 4;
+  int64 latest_transaction_shares = 5;
+}
+
+// ========== GetAnalystPriceTargets ==========
+
+message GetAnalystPriceTargetsRequest {
+  string ticker = 1;
+}
+
+message GetAnalystPriceTargetsResponse {
+  double current = 1;
+  double low = 2;
+  double high = 3;
+  double mean = 4;
+  double median = 5;
+}
+
+// ========== GetRecommendationsSummary ==========
+
+// Period-based aggregated counts (distinct from GetRecommendations which returns individual upgrades/downgrades)
+message GetRecommendationsSummaryRequest {
+  string ticker = 1;
+}
+
+message GetRecommendationsSummaryResponse {
+  repeated RecommendationSummaryRow rows = 1;
+}
+
+message RecommendationSummaryRow {
+  string period = 1; // e.g., "0m", "-1m", "-2m"
+  int32 strong_buy = 2;
+  int32 buy = 3;
+  int32 hold = 4;
+  int32 sell = 5;
+  int32 strong_sell = 6;
+}
+
+// ========== GetEarningsEstimate ==========
+
+message GetEarningsEstimateRequest {
+  string ticker = 1;
+}
+
+message GetEarningsEstimateResponse {
+  repeated EarningsEstimateRow rows = 1;
+}
+
+message EarningsEstimateRow {
+  string period = 1; // "0q", "+1q", "0y", "+1y"
+  int32 number_of_analysts = 2;
+  double avg = 3;
+  double low = 4;
+  double high = 5;
+  double year_ago_eps = 6;
+  double growth = 7;
+}
+
+// ========== GetRevenueEstimate ==========
+
+message GetRevenueEstimateRequest {
+  string ticker = 1;
+}
+
+message GetRevenueEstimateResponse {
+  repeated RevenueEstimateRow rows = 1;
+}
+
+message RevenueEstimateRow {
+  string period = 1; // "0q", "+1q", "0y", "+1y"
+  int32 number_of_analysts = 2;
+  double avg = 3;
+  double low = 4;
+  double high = 5;
+  double year_ago_revenue = 6;
+  double growth = 7;
+}
+
+// ========== GetEarningsHistory ==========
+
+message GetEarningsHistoryRequest {
+  string ticker = 1;
+}
+
+message GetEarningsHistoryResponse {
+  repeated EarningsHistoryRow rows = 1;
+}
+
+message EarningsHistoryRow {
+  google.protobuf.Timestamp date = 1;
+  double eps_estimate = 2;
+  double eps_actual = 3;
+  double eps_difference = 4;
+  double surprise_percent = 5;
+}
+
+// ========== GetEpsTrend ==========
+
+message GetEpsTrendRequest {
+  string ticker = 1;
+}
+
+message GetEpsTrendResponse {
+  repeated EpsTrendRow rows = 1;
+}
+
+message EpsTrendRow {
+  string period = 1; // "0q", "+1q", "0y", "+1y"
+  double current = 2;
+  double seven_days_ago = 3;
+  double thirty_days_ago = 4;
+  double sixty_days_ago = 5;
+  double ninety_days_ago = 6;
+}
+
+// ========== GetEpsRevisions ==========
+
+message GetEpsRevisionsRequest {
+  string ticker = 1;
+}
+
+message GetEpsRevisionsResponse {
+  repeated EpsRevisionsRow rows = 1;
+}
+
+message EpsRevisionsRow {
+  string period = 1; // "0q", "+1q", "0y", "+1y"
+  int32 up_last_7days = 2;
+  int32 up_last_30days = 3;
+  int32 down_last_7days = 4;
+  int32 down_last_30days = 5;
+}
+
+// ========== GetGrowthEstimates ==========
+
+message GetGrowthEstimatesRequest {
+  string ticker = 1;
+}
+
+message GetGrowthEstimatesResponse {
+  repeated GrowthEstimatesRow rows = 1;
+}
+
+message GrowthEstimatesRow {
+  string period = 1; // "0q", "+1q", "0y", "+1y", "+5y", "-5y"
+  double stock = 2;
+  double industry = 3;
+  double sector = 4;
+  double index = 5;
+}
+
+// ========== GetEarningsDates ==========
+
+message GetEarningsDatesRequest {
+  string ticker = 1;
+  optional int32 limit = 2; // Number of dates to return (default: 12)
+}
+
+message GetEarningsDatesResponse {
+  repeated EarningsDateRow rows = 1;
+}
+
+message EarningsDateRow {
+  google.protobuf.Timestamp date = 1;
+  optional double eps_estimate = 2;
+  optional double reported_eps = 3;
+  optional double surprise_pct = 4;
+}
+
+// ========== GetHistoryMetadata ==========
+
+message GetHistoryMetadataRequest {
+  string ticker = 1;
+}
+
+message GetHistoryMetadataResponse {
+  string currency = 1;
+  string symbol = 2;
+  string exchange_name = 3;
+  string full_exchange_name = 4;
+  string instrument_type = 5;
+  int64 first_trade_date = 6; // Unix timestamp
+  int64 regular_market_time = 7; // Unix timestamp
+  bool has_pre_post_market_data = 8;
+  int32 gmt_offset = 9;
+  string timezone = 10;
+  string exchange_timezone_name = 11;
+  double regular_market_price = 12;
+  double fifty_two_week_high = 13;
+  double fifty_two_week_low = 14;
+  string data_granularity = 15;
+  string range = 16;
+  repeated string valid_ranges = 17;
+}
+
+// ========== GetSecFilings ==========
+
+message GetSecFilingsRequest {
+  string ticker = 1;
+}
+
+message GetSecFilingsResponse {
+  repeated SecFiling filings = 1;
+}
+
+message SecFiling {
+  google.protobuf.Timestamp date = 1;
+  string type = 2;
+  string title = 3;
+  string url = 4;
 }

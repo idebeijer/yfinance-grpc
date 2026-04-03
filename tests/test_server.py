@@ -577,6 +577,549 @@ class TestTickerServiceDownloadHistory:
         assert 'MSFT' in tickers
 
 
+class TestTickerServiceGetCapitalGains:
+    @patch('src.server.yf.Ticker')
+    def test_get_capital_gains_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        dates = pd.date_range('2024-01-01', periods=2, freq='Q')
+        mock_ticker.get_capital_gains.return_value = pd.Series([0.1, 0.2], index=dates)
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetCapitalGains(
+            ticker_pb2.GetCapitalGainsRequest(ticker="SPY", period="1y"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        assert response.rows[0].amount == pytest.approx(0.1)
+        mock_ticker.get_capital_gains.assert_called_once_with(period="1y")
+
+
+class TestTickerServiceGetSharesHistory:
+    @patch('src.server.yf.Ticker')
+    def test_get_shares_history_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        dates = pd.date_range('2024-01-01', periods=3, freq='QE')
+        mock_ticker.get_shares_full.return_value = pd.Series([1_000_000, 1_050_000, 1_100_000], index=dates)
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetSharesHistory(
+            ticker_pb2.GetSharesHistoryRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 3
+        assert response.rows[0].shares == 1_000_000
+
+
+class TestTickerServiceGetIsin:
+    @patch('src.server.yf.Ticker')
+    def test_get_isin_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_isin.return_value = "US0378331005"
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetIsin(ticker_pb2.GetIsinRequest(ticker="AAPL"), Mock())
+
+        assert response.isin == "US0378331005"
+
+    @patch('src.server.yf.Ticker')
+    def test_get_isin_none_returns_empty_string(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_isin.return_value = None
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetIsin(ticker_pb2.GetIsinRequest(ticker="AAPL"), Mock())
+
+        assert response.isin == ""
+
+
+class TestTickerServiceGetFastInfo:
+    @patch('src.server.yf.Ticker')
+    def test_get_fast_info_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        fi = Mock()
+        # Set all numeric/string attributes to avoid Mock objects reaching safe_int/safe_float
+        fi.currency = "USD"
+        fi.exchange = "NMS"
+        fi.exchange_data_delayed_by = 0
+        fi.exchange_timezone_name = "America/New_York"
+        fi.last_price = 175.5
+        fi.last_volume = 50_000_000
+        fi.market_cap = 2_500_000_000_000
+        fi.open = 174.0
+        fi.previous_close = 173.5
+        fi.quote_type = "EQUITY"
+        fi.regular_market_day_high = 176.0
+        fi.regular_market_day_low = 173.0
+        fi.regular_market_previous_close = 173.5
+        fi.regular_market_price = 175.5
+        fi.shares = 15_000_000_000
+        fi.three_month_average_volume = 55_000_000.0
+        fi.timezone = "EST"
+        fi.fifty_day_average = 172.0
+        fi.two_hundred_day_average = 165.0
+        fi.year_change = 0.15
+        fi.year_high = 200.0
+        fi.year_low = 130.0
+        mock_ticker.get_fast_info.return_value = fi
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetFastInfo(ticker_pb2.GetFastInfoRequest(ticker="AAPL"), Mock())
+
+        assert response.info.currency == "USD"
+        assert response.info.last_price == pytest.approx(175.5)
+        assert response.info.market_cap == 2_500_000_000_000
+        assert response.info.quote_type == "EQUITY"
+
+
+class TestTickerServiceGetSustainability:
+    @patch('src.server.yf.Ticker')
+    def test_get_sustainability_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_sustainability.return_value = {
+            'totalEsg': 16.5,
+            'esgPerformance': 'AVG_PERF',
+            'environmentScore': 3.5,
+            'socialScore': 8.5,
+            'governanceScore': 4.5,
+            'percentile': 42.0,
+            'peerGroup': 'Technology Hardware',
+            'adult': False,
+            'coal': False,
+            'tobacco': True,
+        }
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetSustainability(
+            ticker_pb2.GetSustainabilityRequest(ticker="AAPL"), Mock()
+        )
+
+        assert response.total_esg == pytest.approx(16.5)
+        assert response.esg_performance == 'AVG_PERF'
+        assert response.environment_score == pytest.approx(3.5)
+        assert response.tobacco is True
+        assert response.coal is False
+
+    @patch('src.server.yf.Ticker')
+    def test_get_sustainability_no_data(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_sustainability.return_value = None
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetSustainability(
+            ticker_pb2.GetSustainabilityRequest(ticker="AAPL"), Mock()
+        )
+
+        assert response.total_esg == 0.0
+
+
+class TestTickerServiceGetInsiderPurchases:
+    @patch('src.server.yf.Ticker')
+    def test_get_insider_purchases_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame(
+            {'Shares': [5000, 12000], 'Trans': [2, 3]},
+            index=['Purchases', 'Sales']
+        )
+        mock_ticker.get_insider_purchases.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetInsiderPurchases(
+            ticker_pb2.GetInsiderPurchasesRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        labels = [r.label for r in response.rows]
+        assert 'Purchases' in labels
+
+
+class TestTickerServiceGetInsiderTransactions:
+    @patch('src.server.yf.Ticker')
+    def test_get_insider_transactions_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        dates = pd.DatetimeIndex(['2024-01-15', '2024-02-20'])
+        data = pd.DataFrame({
+            'Start Date': dates,
+            'Insider': ['John Doe', 'Jane Smith'],
+            'Position': ['CEO', 'CFO'],
+            'Transaction': ['Sale', 'Purchase'],
+            'Shares': [10000, 5000],
+            'Value': [1_750_000.0, 875_000.0],
+            'Text': ['Sold shares', 'Bought shares'],
+            'URL': ['https://example.com/1', 'https://example.com/2'],
+        }, index=dates)
+        mock_ticker.get_insider_transactions.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetInsiderTransactions(
+            ticker_pb2.GetInsiderTransactionsRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.transactions) == 2
+        assert response.transactions[0].insider == 'John Doe'
+        assert response.transactions[0].shares == 10000
+
+
+class TestTickerServiceGetInsiderRosterHolders:
+    @patch('src.server.yf.Ticker')
+    def test_get_insider_roster_holders_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame({
+            'Name': ['Tim Cook', 'Luca Maestri'],
+            'Position': ['CEO', 'CFO'],
+            'URL': ['https://example.com/1', 'https://example.com/2'],
+            'Most Recent Transaction': pd.to_datetime(['2024-01-15', '2024-02-20']),
+            'Latest Transaction Shares': [5000, 3000],
+        })
+        mock_ticker.get_insider_roster_holders.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetInsiderRosterHolders(
+            ticker_pb2.GetInsiderRosterHoldersRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.holders) == 2
+        assert response.holders[0].name == 'Tim Cook'
+        assert response.holders[0].position == 'CEO'
+        assert response.holders[0].latest_transaction_shares == 5000
+
+
+class TestTickerServiceGetAnalystPriceTargets:
+    @patch('src.server.yf.Ticker')
+    def test_get_analyst_price_targets_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_analyst_price_targets.return_value = {
+            'current': 175.0,
+            'low': 140.0,
+            'high': 220.0,
+            'mean': 185.0,
+            'median': 183.0,
+        }
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetAnalystPriceTargets(
+            ticker_pb2.GetAnalystPriceTargetsRequest(ticker="AAPL"), Mock()
+        )
+
+        assert response.current == pytest.approx(175.0)
+        assert response.low == pytest.approx(140.0)
+        assert response.high == pytest.approx(220.0)
+        assert response.mean == pytest.approx(185.0)
+        assert response.median == pytest.approx(183.0)
+
+
+class TestTickerServiceGetRecommendationsSummary:
+    @patch('src.server.yf.Ticker')
+    def test_get_recommendations_summary_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame({
+            'strongBuy': [15, 14],
+            'buy': [20, 18],
+            'hold': [8, 9],
+            'sell': [2, 3],
+            'strongSell': [0, 1],
+        }, index=['0m', '-1m'])
+
+        mock_ticker.get_recommendations.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetRecommendationsSummary(
+            ticker_pb2.GetRecommendationsSummaryRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        assert response.rows[0].period == '0m'
+        assert response.rows[0].strong_buy == 15
+        assert response.rows[0].buy == 20
+
+
+class TestTickerServiceGetEarningsEstimate:
+    @patch('src.server.yf.Ticker')
+    def test_get_earnings_estimate_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame({
+            'numberOfAnalysts': [30, 28],
+            'avg': [1.55, 6.80],
+            'low': [1.40, 6.20],
+            'high': [1.70, 7.30],
+            'yearAgoEps': [1.46, 6.43],
+            'growth': [0.062, 0.058],
+        }, index=['0q', '0y'])
+        mock_ticker.get_earnings_estimate.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetEarningsEstimate(
+            ticker_pb2.GetEarningsEstimateRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        assert response.rows[0].period == '0q'
+        assert response.rows[0].number_of_analysts == 30
+        assert response.rows[0].avg == pytest.approx(1.55)
+
+
+class TestTickerServiceGetRevenueEstimate:
+    @patch('src.server.yf.Ticker')
+    def test_get_revenue_estimate_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame({
+            'numberOfAnalysts': [25, 22],
+            'avg': [94_000_000_000.0, 410_000_000_000.0],
+            'low': [90_000_000_000.0, 390_000_000_000.0],
+            'high': [98_000_000_000.0, 430_000_000_000.0],
+            'yearAgoRevenue': [89_498_000_000.0, 383_285_000_000.0],
+            'growth': [0.051, 0.070],
+        }, index=['0q', '0y'])
+        mock_ticker.get_revenue_estimate.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetRevenueEstimate(
+            ticker_pb2.GetRevenueEstimateRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        assert response.rows[0].period == '0q'
+        assert response.rows[0].number_of_analysts == 25
+
+
+class TestTickerServiceGetEarningsHistory:
+    @patch('src.server.yf.Ticker')
+    def test_get_earnings_history_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        dates = pd.DatetimeIndex(['2023-10-26', '2024-01-25'])
+        data = pd.DataFrame({
+            'epsEstimate': [1.39, 2.10],
+            'epsActual': [1.46, 2.18],
+            'epsDifference': [0.07, 0.08],
+            'surprisePercent': [5.04, 3.81],
+        }, index=dates)
+        mock_ticker.get_earnings_history.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetEarningsHistory(
+            ticker_pb2.GetEarningsHistoryRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        assert response.rows[0].eps_estimate == pytest.approx(1.39)
+        assert response.rows[0].eps_actual == pytest.approx(1.46)
+        assert response.rows[0].surprise_percent == pytest.approx(5.04)
+
+
+class TestTickerServiceGetEpsTrend:
+    @patch('src.server.yf.Ticker')
+    def test_get_eps_trend_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame({
+            'current': [1.55, 6.80],
+            '7daysAgo': [1.54, 6.79],
+            '30daysAgo': [1.53, 6.75],
+            '60daysAgo': [1.51, 6.70],
+            '90daysAgo': [1.50, 6.65],
+        }, index=['0q', '0y'])
+        mock_ticker.get_eps_trend.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetEpsTrend(
+            ticker_pb2.GetEpsTrendRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        assert response.rows[0].period == '0q'
+        assert response.rows[0].current == pytest.approx(1.55)
+        assert response.rows[0].seven_days_ago == pytest.approx(1.54)
+        assert response.rows[0].ninety_days_ago == pytest.approx(1.50)
+
+
+class TestTickerServiceGetEpsRevisions:
+    @patch('src.server.yf.Ticker')
+    def test_get_eps_revisions_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame({
+            'upLast7days': [3, 5],
+            'upLast30days': [8, 12],
+            'downLast7days': [1, 2],
+            'downLast30days': [2, 3],
+        }, index=['0q', '0y'])
+        mock_ticker.get_eps_revisions.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetEpsRevisions(
+            ticker_pb2.GetEpsRevisionsRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 2
+        assert response.rows[0].period == '0q'
+        assert response.rows[0].up_last_7days == 3
+        assert response.rows[0].down_last_30days == 2
+
+
+class TestTickerServiceGetGrowthEstimates:
+    @patch('src.server.yf.Ticker')
+    def test_get_growth_estimates_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        data = pd.DataFrame({
+            'stock': [0.062, 0.058, 0.120, 0.150],
+            'industry': [0.045, 0.050, 0.095, 0.110],
+            'sector': [0.040, 0.045, 0.090, 0.100],
+            'index': [0.035, 0.038, 0.080, 0.095],
+        }, index=['0q', '+1q', '0y', '+1y'])
+        mock_ticker.get_growth_estimates.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetGrowthEstimates(
+            ticker_pb2.GetGrowthEstimatesRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.rows) == 4
+        assert response.rows[0].period == '0q'
+        assert response.rows[0].stock == pytest.approx(0.062)
+        assert response.rows[0].industry == pytest.approx(0.045)
+
+
+class TestTickerServiceGetEarningsDates:
+    @patch('src.server.yf.Ticker')
+    def test_get_earnings_dates_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        dates = pd.DatetimeIndex(['2024-10-31', '2025-01-30'])
+        data = pd.DataFrame({
+            'EPS Estimate': [1.55, float('nan')],
+            'Reported EPS': [1.64, float('nan')],
+            'Surprise(%)': [5.81, float('nan')],
+        }, index=dates)
+        mock_ticker.get_earnings_dates.return_value = data
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetEarningsDates(
+            ticker_pb2.GetEarningsDatesRequest(ticker="AAPL", limit=12), Mock()
+        )
+
+        assert len(response.rows) == 2
+        # Past date has data
+        assert response.rows[0].HasField('eps_estimate')
+        assert response.rows[0].eps_estimate == pytest.approx(1.55)
+        assert response.rows[0].reported_eps == pytest.approx(1.64)
+        # Future date has no data
+        assert not response.rows[1].HasField('eps_estimate')
+
+        mock_ticker.get_earnings_dates.assert_called_once_with(limit=12)
+
+    @patch('src.server.yf.Ticker')
+    def test_get_earnings_dates_default_limit(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_earnings_dates.return_value = pd.DataFrame()
+
+        servicer = TickerServiceServicer()
+        servicer.GetEarningsDates(ticker_pb2.GetEarningsDatesRequest(ticker="AAPL"), Mock())
+
+        mock_ticker.get_earnings_dates.assert_called_once_with(limit=12)
+
+
+class TestTickerServiceGetHistoryMetadata:
+    @patch('src.server.yf.Ticker')
+    def test_get_history_metadata_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_history_metadata.return_value = {
+            'currency': 'USD',
+            'symbol': 'AAPL',
+            'exchangeName': 'NMS',
+            'fullExchangeName': 'NasdaqGS',
+            'instrumentType': 'EQUITY',
+            'firstTradeDate': 345479400,
+            'regularMarketTime': 1704067200,
+            'hasPrePostMarketData': True,
+            'gmtoffset': -18000,
+            'timezone': 'EST',
+            'exchangeTimezoneName': 'America/New_York',
+            'regularMarketPrice': 175.0,
+            'fiftyTwoWeekHigh': 200.0,
+            'fiftyTwoWeekLow': 130.0,
+            'dataGranularity': '1d',
+            'range': '',
+            'validRanges': ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'],
+        }
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetHistoryMetadata(
+            ticker_pb2.GetHistoryMetadataRequest(ticker="AAPL"), Mock()
+        )
+
+        assert response.currency == 'USD'
+        assert response.symbol == 'AAPL'
+        assert response.exchange_name == 'NMS'
+        assert response.instrument_type == 'EQUITY'
+        assert response.has_pre_post_market_data is True
+        assert response.gmt_offset == -18000
+        assert 'max' in response.valid_ranges
+
+
+class TestTickerServiceGetSecFilings:
+    @patch('src.server.yf.Ticker')
+    def test_get_sec_filings_success(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_sec_filings.return_value = {
+            'filings': [
+                {
+                    'date': '2024-11-01',
+                    'type': '10-K',
+                    'title': 'Annual Report',
+                    'edgarUrl': 'https://www.sec.gov/Archives/edgar/data/320193/000032019324000123',
+                },
+                {
+                    'date': '2024-08-02',
+                    'type': '10-Q',
+                    'title': 'Quarterly Report',
+                    'edgarUrl': 'https://www.sec.gov/Archives/edgar/data/320193/000032019324000099',
+                },
+            ]
+        }
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetSecFilings(
+            ticker_pb2.GetSecFilingsRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.filings) == 2
+        assert response.filings[0].type == '10-K'
+        assert response.filings[0].title == 'Annual Report'
+        assert 'sec.gov' in response.filings[0].url
+        assert response.filings[0].date.seconds > 0
+
+    @patch('src.server.yf.Ticker')
+    def test_get_sec_filings_empty(self, mock_ticker_class):
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+        mock_ticker.get_sec_filings.return_value = {}
+
+        servicer = TickerServiceServicer()
+        response = servicer.GetSecFilings(
+            ticker_pb2.GetSecFilingsRequest(ticker="AAPL"), Mock()
+        )
+
+        assert len(response.filings) == 0
+
+
 class TestTickerServiceEmptyTickers:
     """Test validation of empty tickers lists"""
 

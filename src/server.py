@@ -874,6 +874,489 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
             context.set_details(f"Error downloading history: {str(e)}")
 
 
+    def GetCapitalGains(self, request, context):
+        """Get capital gains distributions for a ticker"""
+        try:
+            logger.info(f"GetCapitalGains called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            period = request.period if request.HasField('period') else 'max'
+            gains = ticker.get_capital_gains(period=period)
+            rows = []
+            for idx, value in gains.items():
+                rows.append(ticker_pb2.CapitalGainsRow(
+                    date=datetime_to_timestamp(idx),
+                    amount=safe_float(value)
+                ))
+            return ticker_pb2.GetCapitalGainsResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetCapitalGains for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching capital gains: {str(e)}")
+            return ticker_pb2.GetCapitalGainsResponse()
+
+    def GetSharesHistory(self, request, context):
+        """Get full history of shares outstanding"""
+        try:
+            logger.info(f"GetSharesHistory called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            kwargs = {}
+            if request.HasField('start'):
+                kwargs['start'] = datetime.fromtimestamp(request.start.seconds)
+            if request.HasField('end'):
+                kwargs['end'] = datetime.fromtimestamp(request.end.seconds)
+            shares = ticker.get_shares_full(**kwargs)
+            rows = []
+            if shares is not None:
+                for idx, value in shares.items():
+                    rows.append(ticker_pb2.SharesHistoryRow(
+                        date=datetime_to_timestamp(idx),
+                        shares=safe_int(value)
+                    ))
+            return ticker_pb2.GetSharesHistoryResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetSharesHistory for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching shares history: {str(e)}")
+            return ticker_pb2.GetSharesHistoryResponse()
+
+    def GetIsin(self, request, context):
+        """Get the ISIN code for a ticker"""
+        try:
+            logger.info(f"GetIsin called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            isin = ticker.get_isin() or ''
+            return ticker_pb2.GetIsinResponse(isin=isin)
+        except Exception as e:
+            logger.error(f"Error in GetIsin for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching ISIN: {str(e)}")
+            return ticker_pb2.GetIsinResponse()
+
+    def GetFastInfo(self, request, context):
+        """Get a lightweight snapshot of key price/market data"""
+        try:
+            logger.info(f"GetFastInfo called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            fi = ticker.get_fast_info()
+            info = ticker_pb2.FastInfo(
+                currency=safe_str(getattr(fi, 'currency', None)),
+                exchange=safe_str(getattr(fi, 'exchange', None)),
+                exchange_data_delayed_by=safe_int(getattr(fi, 'exchange_data_delayed_by', 0)),
+                exchange_timezone_name=safe_str(getattr(fi, 'exchange_timezone_name', None)),
+                last_price=safe_float(getattr(fi, 'last_price', 0)),
+                last_volume=safe_int(getattr(fi, 'last_volume', 0)),
+                market_cap=safe_int(getattr(fi, 'market_cap', 0)),
+                open=safe_float(getattr(fi, 'open', 0)),
+                previous_close=safe_float(getattr(fi, 'previous_close', 0)),
+                quote_type=safe_str(getattr(fi, 'quote_type', None)),
+                regular_market_day_high=safe_float(getattr(fi, 'regular_market_day_high', 0)),
+                regular_market_day_low=safe_float(getattr(fi, 'regular_market_day_low', 0)),
+                regular_market_previous_close=safe_float(getattr(fi, 'regular_market_previous_close', 0)),
+                regular_market_price=safe_float(getattr(fi, 'regular_market_price', 0)),
+                shares=safe_int(getattr(fi, 'shares', 0)),
+                three_month_average_volume=safe_float(getattr(fi, 'three_month_average_volume', 0)),
+                timezone=safe_str(getattr(fi, 'timezone', None)),
+                fifty_day_average=safe_float(getattr(fi, 'fifty_day_average', 0)),
+                two_hundred_day_average=safe_float(getattr(fi, 'two_hundred_day_average', 0)),
+                year_change=safe_float(getattr(fi, 'year_change', 0)),
+                year_high=safe_float(getattr(fi, 'year_high', 0)),
+                year_low=safe_float(getattr(fi, 'year_low', 0)),
+            )
+            return ticker_pb2.GetFastInfoResponse(info=info)
+        except Exception as e:
+            logger.error(f"Error in GetFastInfo for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching fast info: {str(e)}")
+            return ticker_pb2.GetFastInfoResponse()
+
+    def GetSustainability(self, request, context):
+        """Get ESG scores and controversy flags"""
+        try:
+            logger.info(f"GetSustainability called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_sustainability(as_dict=True)
+            if not data:
+                return ticker_pb2.GetSustainabilityResponse()
+            return ticker_pb2.GetSustainabilityResponse(
+                total_esg=safe_float(data.get('totalEsg', 0)),
+                esg_performance=safe_str(data.get('esgPerformance')),
+                environment_score=safe_float(data.get('environmentScore', 0)),
+                social_score=safe_float(data.get('socialScore', 0)),
+                governance_score=safe_float(data.get('governanceScore', 0)),
+                percentile=safe_float(data.get('percentile', 0)),
+                peer_group=safe_str(data.get('peerGroup')),
+                adult=bool(data.get('adult', False)),
+                alcoholic=bool(data.get('alcoholic', False)),
+                animal_testing=bool(data.get('animalTesting', False)),
+                catholic=bool(data.get('catholic', False)),
+                controversial_weapons=bool(data.get('controversialWeapons', False)),
+                small_arms=bool(data.get('smallArms', False)),
+                fur_leather=bool(data.get('furLeather', False)),
+                gambling=bool(data.get('gambling', False)),
+                gmo=bool(data.get('gmo', False)),
+                military_contract=bool(data.get('militaryContract', False)),
+                nuclear=bool(data.get('nuclear', False)),
+                pesticides=bool(data.get('pesticides', False)),
+                palm_oil=bool(data.get('palmOil', False)),
+                coal=bool(data.get('coal', False)),
+                tobacco=bool(data.get('tobacco', False)),
+            )
+        except Exception as e:
+            logger.error(f"Error in GetSustainability for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching sustainability: {str(e)}")
+            return ticker_pb2.GetSustainabilityResponse()
+
+    def GetInsiderPurchases(self, request, context):
+        """Get summary table of insider buying/selling activity"""
+        try:
+            logger.info(f"GetInsiderPurchases called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_insider_purchases(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for label, row in data.iterrows():
+                    rows.append(ticker_pb2.InsiderPurchaseSummaryRow(
+                        label=safe_str(label),
+                        values={safe_str(col): safe_str(row[col]) for col in data.columns}
+                    ))
+            return ticker_pb2.GetInsiderPurchasesResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetInsiderPurchases for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching insider purchases: {str(e)}")
+            return ticker_pb2.GetInsiderPurchasesResponse()
+
+    def GetInsiderTransactions(self, request, context):
+        """Get individual insider transaction records"""
+        try:
+            logger.info(f"GetInsiderTransactions called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_insider_transactions(as_dict=False)
+            transactions = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    transactions.append(ticker_pb2.InsiderTransaction(
+                        start_date=datetime_to_timestamp(row.get('Start Date', idx)),
+                        insider=safe_str(row.get('Insider', '')),
+                        position=safe_str(row.get('Position', '')),
+                        transaction=safe_str(row.get('Transaction', '')),
+                        shares=safe_int(row.get('Shares', 0)),
+                        value=safe_float(row.get('Value', 0)),
+                        text=safe_str(row.get('Text', '')),
+                        url=safe_str(row.get('URL', '')),
+                    ))
+            return ticker_pb2.GetInsiderTransactionsResponse(transactions=transactions)
+        except Exception as e:
+            logger.error(f"Error in GetInsiderTransactions for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching insider transactions: {str(e)}")
+            return ticker_pb2.GetInsiderTransactionsResponse()
+
+    def GetInsiderRosterHolders(self, request, context):
+        """Get the roster of insider holders"""
+        try:
+            logger.info(f"GetInsiderRosterHolders called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_insider_roster_holders(as_dict=False)
+            holders = []
+            if data is not None and not data.empty:
+                for _, row in data.iterrows():
+                    holders.append(ticker_pb2.InsiderRosterHolder(
+                        name=safe_str(row.get('Name', '')),
+                        position=safe_str(row.get('Position', '')),
+                        url=safe_str(row.get('URL', '')),
+                        most_recent_transaction=datetime_to_timestamp(row.get('Most Recent Transaction')),
+                        latest_transaction_shares=safe_int(row.get('Latest Transaction Shares', 0)),
+                    ))
+            return ticker_pb2.GetInsiderRosterHoldersResponse(holders=holders)
+        except Exception as e:
+            logger.error(f"Error in GetInsiderRosterHolders for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching insider roster holders: {str(e)}")
+            return ticker_pb2.GetInsiderRosterHoldersResponse()
+
+    def GetAnalystPriceTargets(self, request, context):
+        """Get consensus analyst price targets"""
+        try:
+            logger.info(f"GetAnalystPriceTargets called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            targets = ticker.get_analyst_price_targets()
+            return ticker_pb2.GetAnalystPriceTargetsResponse(
+                current=safe_float(targets.get('current', 0)),
+                low=safe_float(targets.get('low', 0)),
+                high=safe_float(targets.get('high', 0)),
+                mean=safe_float(targets.get('mean', 0)),
+                median=safe_float(targets.get('median', 0)),
+            )
+        except Exception as e:
+            logger.error(f"Error in GetAnalystPriceTargets for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching analyst price targets: {str(e)}")
+            return ticker_pb2.GetAnalystPriceTargetsResponse()
+
+    def GetRecommendationsSummary(self, request, context):
+        """Get period-based aggregated analyst recommendation counts"""
+        try:
+            logger.info(f"GetRecommendationsSummary called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_recommendations(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    rows.append(ticker_pb2.RecommendationSummaryRow(
+                        period=safe_str(idx),
+                        strong_buy=safe_int(row.get('strongBuy', 0)),
+                        buy=safe_int(row.get('buy', 0)),
+                        hold=safe_int(row.get('hold', 0)),
+                        sell=safe_int(row.get('sell', 0)),
+                        strong_sell=safe_int(row.get('strongSell', 0)),
+                    ))
+            return ticker_pb2.GetRecommendationsSummaryResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetRecommendationsSummary for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching recommendations summary: {str(e)}")
+            return ticker_pb2.GetRecommendationsSummaryResponse()
+
+    def GetEarningsEstimate(self, request, context):
+        """Get forward EPS estimates by period"""
+        try:
+            logger.info(f"GetEarningsEstimate called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_earnings_estimate(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    rows.append(ticker_pb2.EarningsEstimateRow(
+                        period=safe_str(idx),
+                        number_of_analysts=safe_int(row.get('numberOfAnalysts', 0)),
+                        avg=safe_float(row.get('avg', 0)),
+                        low=safe_float(row.get('low', 0)),
+                        high=safe_float(row.get('high', 0)),
+                        year_ago_eps=safe_float(row.get('yearAgoEps', 0)),
+                        growth=safe_float(row.get('growth', 0)),
+                    ))
+            return ticker_pb2.GetEarningsEstimateResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetEarningsEstimate for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching earnings estimate: {str(e)}")
+            return ticker_pb2.GetEarningsEstimateResponse()
+
+    def GetRevenueEstimate(self, request, context):
+        """Get forward revenue estimates by period"""
+        try:
+            logger.info(f"GetRevenueEstimate called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_revenue_estimate(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    rows.append(ticker_pb2.RevenueEstimateRow(
+                        period=safe_str(idx),
+                        number_of_analysts=safe_int(row.get('numberOfAnalysts', 0)),
+                        avg=safe_float(row.get('avg', 0)),
+                        low=safe_float(row.get('low', 0)),
+                        high=safe_float(row.get('high', 0)),
+                        year_ago_revenue=safe_float(row.get('yearAgoRevenue', 0)),
+                        growth=safe_float(row.get('growth', 0)),
+                    ))
+            return ticker_pb2.GetRevenueEstimateResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetRevenueEstimate for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching revenue estimate: {str(e)}")
+            return ticker_pb2.GetRevenueEstimateResponse()
+
+    def GetEarningsHistory(self, request, context):
+        """Get historical EPS actuals vs estimates"""
+        try:
+            logger.info(f"GetEarningsHistory called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_earnings_history(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    rows.append(ticker_pb2.EarningsHistoryRow(
+                        date=datetime_to_timestamp(idx),
+                        eps_estimate=safe_float(row.get('epsEstimate', 0)),
+                        eps_actual=safe_float(row.get('epsActual', 0)),
+                        eps_difference=safe_float(row.get('epsDifference', 0)),
+                        surprise_percent=safe_float(row.get('surprisePercent', 0)),
+                    ))
+            return ticker_pb2.GetEarningsHistoryResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetEarningsHistory for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching earnings history: {str(e)}")
+            return ticker_pb2.GetEarningsHistoryResponse()
+
+    def GetEpsTrend(self, request, context):
+        """Get EPS estimate trend across recent revision windows"""
+        try:
+            logger.info(f"GetEpsTrend called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_eps_trend(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    rows.append(ticker_pb2.EpsTrendRow(
+                        period=safe_str(idx),
+                        current=safe_float(row.get('current', 0)),
+                        seven_days_ago=safe_float(row.get('7daysAgo', 0)),
+                        thirty_days_ago=safe_float(row.get('30daysAgo', 0)),
+                        sixty_days_ago=safe_float(row.get('60daysAgo', 0)),
+                        ninety_days_ago=safe_float(row.get('90daysAgo', 0)),
+                    ))
+            return ticker_pb2.GetEpsTrendResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetEpsTrend for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching EPS trend: {str(e)}")
+            return ticker_pb2.GetEpsTrendResponse()
+
+    def GetEpsRevisions(self, request, context):
+        """Get counts of upward/downward EPS revisions"""
+        try:
+            logger.info(f"GetEpsRevisions called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_eps_revisions(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    rows.append(ticker_pb2.EpsRevisionsRow(
+                        period=safe_str(idx),
+                        up_last_7days=safe_int(row.get('upLast7days', 0)),
+                        up_last_30days=safe_int(row.get('upLast30days', 0)),
+                        down_last_7days=safe_int(row.get('downLast7days', 0)),
+                        down_last_30days=safe_int(row.get('downLast30days', 0)),
+                    ))
+            return ticker_pb2.GetEpsRevisionsResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetEpsRevisions for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching EPS revisions: {str(e)}")
+            return ticker_pb2.GetEpsRevisionsResponse()
+
+    def GetGrowthEstimates(self, request, context):
+        """Get growth estimates for stock, industry, sector and index"""
+        try:
+            logger.info(f"GetGrowthEstimates called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_growth_estimates(as_dict=False)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    rows.append(ticker_pb2.GrowthEstimatesRow(
+                        period=safe_str(idx),
+                        stock=safe_float(row.get('stock', 0)),
+                        industry=safe_float(row.get('industry', 0)),
+                        sector=safe_float(row.get('sector', 0)),
+                        index=safe_float(row.get('index', 0)),
+                    ))
+            return ticker_pb2.GetGrowthEstimatesResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetGrowthEstimates for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching growth estimates: {str(e)}")
+            return ticker_pb2.GetGrowthEstimatesResponse()
+
+    def GetEarningsDates(self, request, context):
+        """Get upcoming and past earnings dates with EPS data"""
+        try:
+            logger.info(f"GetEarningsDates called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            limit = request.limit if request.HasField('limit') else 12
+            data = ticker.get_earnings_dates(limit=limit)
+            rows = []
+            if data is not None and not data.empty:
+                for idx, row in data.iterrows():
+                    earnings_row = ticker_pb2.EarningsDateRow(
+                        date=datetime_to_timestamp(idx),
+                    )
+                    eps_est = row.get('EPS Estimate')
+                    if eps_est is not None and not pd.isna(eps_est):
+                        earnings_row.eps_estimate = safe_float(eps_est)
+                    reported = row.get('Reported EPS')
+                    if reported is not None and not pd.isna(reported):
+                        earnings_row.reported_eps = safe_float(reported)
+                    surprise = row.get('Surprise(%)')
+                    if surprise is not None and not pd.isna(surprise):
+                        earnings_row.surprise_pct = safe_float(surprise)
+                    rows.append(earnings_row)
+            return ticker_pb2.GetEarningsDatesResponse(rows=rows)
+        except Exception as e:
+            logger.error(f"Error in GetEarningsDates for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching earnings dates: {str(e)}")
+            return ticker_pb2.GetEarningsDatesResponse()
+
+    def GetHistoryMetadata(self, request, context):
+        """Get exchange and instrument metadata for a ticker"""
+        try:
+            logger.info(f"GetHistoryMetadata called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            meta = ticker.get_history_metadata()
+            return ticker_pb2.GetHistoryMetadataResponse(
+                currency=safe_str(meta.get('currency')),
+                symbol=safe_str(meta.get('symbol')),
+                exchange_name=safe_str(meta.get('exchangeName')),
+                full_exchange_name=safe_str(meta.get('fullExchangeName')),
+                instrument_type=safe_str(meta.get('instrumentType')),
+                first_trade_date=safe_int(meta.get('firstTradeDate', 0)),
+                regular_market_time=safe_int(meta.get('regularMarketTime', 0)),
+                has_pre_post_market_data=bool(meta.get('hasPrePostMarketData', False)),
+                gmt_offset=safe_int(meta.get('gmtoffset', 0)),
+                timezone=safe_str(meta.get('timezone')),
+                exchange_timezone_name=safe_str(meta.get('exchangeTimezoneName')),
+                regular_market_price=safe_float(meta.get('regularMarketPrice', 0)),
+                fifty_two_week_high=safe_float(meta.get('fiftyTwoWeekHigh', 0)),
+                fifty_two_week_low=safe_float(meta.get('fiftyTwoWeekLow', 0)),
+                data_granularity=safe_str(meta.get('dataGranularity')),
+                range=safe_str(meta.get('range')),
+                valid_ranges=list(meta.get('validRanges', [])),
+            )
+        except Exception as e:
+            logger.error(f"Error in GetHistoryMetadata for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching history metadata: {str(e)}")
+            return ticker_pb2.GetHistoryMetadataResponse()
+
+    def GetSecFilings(self, request, context):
+        """Get SEC filings for a ticker"""
+        try:
+            logger.info(f"GetSecFilings called for ticker: {request.ticker}")
+            ticker = yf.Ticker(request.ticker)
+            data = ticker.get_sec_filings()
+            filings = []
+            if data and isinstance(data, dict):
+                for filing in data.get('filings', []):
+                    date_val = filing.get('date')
+                    ts = None
+                    if date_val:
+                        try:
+                            dt = date_parser.isoparse(str(date_val))
+                            ts = Timestamp()
+                            ts.FromDatetime(dt)
+                        except Exception as e:
+                            logger.warning(f"Failed to parse SEC filing date '{date_val}': {e}")
+                    sec_filing = ticker_pb2.SecFiling(
+                        type=safe_str(filing.get('type')),
+                        title=safe_str(filing.get('title')),
+                        url=safe_str(filing.get('edgarUrl', filing.get('url', ''))),
+                    )
+                    if ts:
+                        sec_filing.date.CopyFrom(ts)
+                    filings.append(sec_filing)
+            return ticker_pb2.GetSecFilingsResponse(filings=filings)
+        except Exception as e:
+            logger.error(f"Error in GetSecFilings for {request.ticker}: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error fetching SEC filings: {str(e)}")
+            return ticker_pb2.GetSecFilingsResponse()
+
+
 def serve(port: int = 50051, max_workers: int = 10):
     """Start the gRPC server with reflection enabled"""
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))

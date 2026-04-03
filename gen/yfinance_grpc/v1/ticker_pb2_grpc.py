@@ -110,6 +110,101 @@ class TickerServiceStub(object):
                 request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryRequest.SerializeToString,
                 response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryResponse.FromString,
                 _registered_method=True)
+        self.GetCapitalGains = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetCapitalGains',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetCapitalGainsRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetCapitalGainsResponse.FromString,
+                _registered_method=True)
+        self.GetSharesHistory = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetSharesHistory',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSharesHistoryRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSharesHistoryResponse.FromString,
+                _registered_method=True)
+        self.GetIsin = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetIsin',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetIsinRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetIsinResponse.FromString,
+                _registered_method=True)
+        self.GetFastInfo = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetFastInfo',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetFastInfoRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetFastInfoResponse.FromString,
+                _registered_method=True)
+        self.GetSustainability = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetSustainability',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSustainabilityRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSustainabilityResponse.FromString,
+                _registered_method=True)
+        self.GetInsiderPurchases = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetInsiderPurchases',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderPurchasesRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderPurchasesResponse.FromString,
+                _registered_method=True)
+        self.GetInsiderTransactions = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetInsiderTransactions',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderTransactionsRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderTransactionsResponse.FromString,
+                _registered_method=True)
+        self.GetInsiderRosterHolders = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetInsiderRosterHolders',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderRosterHoldersRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderRosterHoldersResponse.FromString,
+                _registered_method=True)
+        self.GetAnalystPriceTargets = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetAnalystPriceTargets',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetAnalystPriceTargetsRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetAnalystPriceTargetsResponse.FromString,
+                _registered_method=True)
+        self.GetRecommendationsSummary = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetRecommendationsSummary',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRecommendationsSummaryRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRecommendationsSummaryResponse.FromString,
+                _registered_method=True)
+        self.GetEarningsEstimate = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetEarningsEstimate',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsEstimateRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsEstimateResponse.FromString,
+                _registered_method=True)
+        self.GetRevenueEstimate = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetRevenueEstimate',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRevenueEstimateRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRevenueEstimateResponse.FromString,
+                _registered_method=True)
+        self.GetEarningsHistory = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetEarningsHistory',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsHistoryRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsHistoryResponse.FromString,
+                _registered_method=True)
+        self.GetEpsTrend = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetEpsTrend',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsTrendRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsTrendResponse.FromString,
+                _registered_method=True)
+        self.GetEpsRevisions = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetEpsRevisions',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsRevisionsRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsRevisionsResponse.FromString,
+                _registered_method=True)
+        self.GetGrowthEstimates = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetGrowthEstimates',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetGrowthEstimatesRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetGrowthEstimatesResponse.FromString,
+                _registered_method=True)
+        self.GetEarningsDates = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetEarningsDates',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsDatesRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsDatesResponse.FromString,
+                _registered_method=True)
+        self.GetHistoryMetadata = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetHistoryMetadata',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetHistoryMetadataRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetHistoryMetadataResponse.FromString,
+                _registered_method=True)
+        self.GetSecFilings = channel.unary_unary(
+                '/yfinance_grpc.v1.TickerService/GetSecFilings',
+                request_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSecFilingsRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSecFilingsResponse.FromString,
+                _registered_method=True)
 
 
 class TickerServiceServicer(object):
@@ -249,6 +344,139 @@ class TickerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetCapitalGains(self, request, context):
+        """GetCapitalGains returns capital gains distributions for a ticker
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetSharesHistory(self, request, context):
+        """GetSharesHistory returns the full history of shares outstanding
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetIsin(self, request, context):
+        """GetIsin returns the ISIN code for a ticker
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetFastInfo(self, request, context):
+        """GetFastInfo returns a lightweight snapshot of key price/market data
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetSustainability(self, request, context):
+        """GetSustainability returns ESG scores and controversy flags
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetInsiderPurchases(self, request, context):
+        """GetInsiderPurchases returns a summary table of insider buying/selling activity
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetInsiderTransactions(self, request, context):
+        """GetInsiderTransactions returns individual insider transaction records
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetInsiderRosterHolders(self, request, context):
+        """GetInsiderRosterHolders returns the roster of insider holders
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetAnalystPriceTargets(self, request, context):
+        """GetAnalystPriceTargets returns the consensus analyst price target
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetRecommendationsSummary(self, request, context):
+        """GetRecommendationsSummary returns period-based aggregated analyst recommendation counts
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetEarningsEstimate(self, request, context):
+        """GetEarningsEstimate returns forward EPS estimates by period
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetRevenueEstimate(self, request, context):
+        """GetRevenueEstimate returns forward revenue estimates by period
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetEarningsHistory(self, request, context):
+        """GetEarningsHistory returns historical EPS actuals vs estimates
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetEpsTrend(self, request, context):
+        """GetEpsTrend returns the EPS estimate trend across recent revision windows
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetEpsRevisions(self, request, context):
+        """GetEpsRevisions returns counts of upward/downward EPS revisions
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetGrowthEstimates(self, request, context):
+        """GetGrowthEstimates returns growth estimates for the stock, industry, sector and index
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetEarningsDates(self, request, context):
+        """GetEarningsDates returns upcoming and past earnings dates with EPS data
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetHistoryMetadata(self, request, context):
+        """GetHistoryMetadata returns exchange and instrument metadata for a ticker
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetSecFilings(self, request, context):
+        """GetSecFilings returns SEC filings for a ticker
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TickerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -346,6 +574,101 @@ def add_TickerServiceServicer_to_server(servicer, server):
                     servicer.DownloadHistory,
                     request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryRequest.FromString,
                     response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryResponse.SerializeToString,
+            ),
+            'GetCapitalGains': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetCapitalGains,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetCapitalGainsRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetCapitalGainsResponse.SerializeToString,
+            ),
+            'GetSharesHistory': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSharesHistory,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSharesHistoryRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSharesHistoryResponse.SerializeToString,
+            ),
+            'GetIsin': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetIsin,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetIsinRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetIsinResponse.SerializeToString,
+            ),
+            'GetFastInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFastInfo,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetFastInfoRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetFastInfoResponse.SerializeToString,
+            ),
+            'GetSustainability': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSustainability,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSustainabilityRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSustainabilityResponse.SerializeToString,
+            ),
+            'GetInsiderPurchases': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetInsiderPurchases,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderPurchasesRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderPurchasesResponse.SerializeToString,
+            ),
+            'GetInsiderTransactions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetInsiderTransactions,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderTransactionsRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderTransactionsResponse.SerializeToString,
+            ),
+            'GetInsiderRosterHolders': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetInsiderRosterHolders,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderRosterHoldersRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderRosterHoldersResponse.SerializeToString,
+            ),
+            'GetAnalystPriceTargets': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAnalystPriceTargets,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetAnalystPriceTargetsRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetAnalystPriceTargetsResponse.SerializeToString,
+            ),
+            'GetRecommendationsSummary': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetRecommendationsSummary,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRecommendationsSummaryRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRecommendationsSummaryResponse.SerializeToString,
+            ),
+            'GetEarningsEstimate': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetEarningsEstimate,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsEstimateRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsEstimateResponse.SerializeToString,
+            ),
+            'GetRevenueEstimate': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetRevenueEstimate,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRevenueEstimateRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetRevenueEstimateResponse.SerializeToString,
+            ),
+            'GetEarningsHistory': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetEarningsHistory,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsHistoryRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsHistoryResponse.SerializeToString,
+            ),
+            'GetEpsTrend': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetEpsTrend,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsTrendRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsTrendResponse.SerializeToString,
+            ),
+            'GetEpsRevisions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetEpsRevisions,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsRevisionsRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsRevisionsResponse.SerializeToString,
+            ),
+            'GetGrowthEstimates': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetGrowthEstimates,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetGrowthEstimatesRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetGrowthEstimatesResponse.SerializeToString,
+            ),
+            'GetEarningsDates': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetEarningsDates,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsDatesRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsDatesResponse.SerializeToString,
+            ),
+            'GetHistoryMetadata': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetHistoryMetadata,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetHistoryMetadataRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetHistoryMetadataResponse.SerializeToString,
+            ),
+            'GetSecFilings': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSecFilings,
+                    request_deserializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSecFilingsRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1_dot_ticker__pb2.GetSecFilingsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -862,6 +1185,519 @@ class TickerService(object):
             '/yfinance_grpc.v1.TickerService/DownloadHistory',
             yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryRequest.SerializeToString,
             yfinance__grpc_dot_v1_dot_ticker__pb2.DownloadHistoryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetCapitalGains(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetCapitalGains',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetCapitalGainsRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetCapitalGainsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetSharesHistory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetSharesHistory',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetSharesHistoryRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetSharesHistoryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetIsin(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetIsin',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetIsinRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetIsinResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetFastInfo(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetFastInfo',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetFastInfoRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetFastInfoResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetSustainability(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetSustainability',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetSustainabilityRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetSustainabilityResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetInsiderPurchases(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetInsiderPurchases',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderPurchasesRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderPurchasesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetInsiderTransactions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetInsiderTransactions',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderTransactionsRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderTransactionsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetInsiderRosterHolders(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetInsiderRosterHolders',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderRosterHoldersRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetInsiderRosterHoldersResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetAnalystPriceTargets(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetAnalystPriceTargets',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetAnalystPriceTargetsRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetAnalystPriceTargetsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetRecommendationsSummary(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetRecommendationsSummary',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetRecommendationsSummaryRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetRecommendationsSummaryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetEarningsEstimate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetEarningsEstimate',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsEstimateRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsEstimateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetRevenueEstimate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetRevenueEstimate',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetRevenueEstimateRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetRevenueEstimateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetEarningsHistory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetEarningsHistory',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsHistoryRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsHistoryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetEpsTrend(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetEpsTrend',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsTrendRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsTrendResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetEpsRevisions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetEpsRevisions',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsRevisionsRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEpsRevisionsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetGrowthEstimates(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetGrowthEstimates',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetGrowthEstimatesRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetGrowthEstimatesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetEarningsDates(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetEarningsDates',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsDatesRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetEarningsDatesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetHistoryMetadata(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetHistoryMetadata',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetHistoryMetadataRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetHistoryMetadataResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetSecFilings(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/yfinance_grpc.v1.TickerService/GetSecFilings',
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetSecFilingsRequest.SerializeToString,
+            yfinance__grpc_dot_v1_dot_ticker__pb2.GetSecFilingsResponse.FromString,
             options,
             channel_credentials,
             insecure,
