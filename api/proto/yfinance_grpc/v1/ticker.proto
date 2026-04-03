@@ -8,58 +8,58 @@ import "google/protobuf/timestamp.proto";
 service TickerService {
   // GetInfo returns general information about a ticker
   rpc GetInfo(GetInfoRequest) returns (GetInfoResponse);
-  
+
   // GetHistory returns historical market data for a ticker
   rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
-  
+
   // GetDividends returns dividend history for a ticker
   rpc GetDividends(GetDividendsRequest) returns (GetDividendsResponse);
-  
+
   // GetSplits returns stock split history for a ticker
   rpc GetSplits(GetSplitsRequest) returns (GetSplitsResponse);
-  
+
   // GetActions returns all corporate actions (dividends, splits, capital gains)
   rpc GetActions(GetActionsRequest) returns (GetActionsResponse);
-  
+
   // GetFinancials returns financial statements (income statement)
   rpc GetFinancials(GetFinancialsRequest) returns (GetFinancialsResponse);
-  
+
   // GetBalanceSheet returns balance sheet data
   rpc GetBalanceSheet(GetBalanceSheetRequest) returns (GetBalanceSheetResponse);
-  
+
   // GetCashFlow returns cash flow statement data
   rpc GetCashFlow(GetCashFlowRequest) returns (GetCashFlowResponse);
-  
+
   // GetEarnings returns earnings data
   rpc GetEarnings(GetEarningsRequest) returns (GetEarningsResponse);
-  
+
   // GetRecommendations returns analyst recommendations
   rpc GetRecommendations(GetRecommendationsRequest) returns (GetRecommendationsResponse);
-  
+
   // GetOptions returns available option expiration dates
   rpc GetOptions(GetOptionsRequest) returns (GetOptionsResponse);
-  
+
   // GetOptionChain returns option chain data for a specific expiration date
   rpc GetOptionChain(GetOptionChainRequest) returns (GetOptionChainResponse);
-  
+
   // GetCalendar returns upcoming events, earnings, and dividends
   rpc GetCalendar(GetCalendarRequest) returns (GetCalendarResponse);
-  
+
   // GetNews returns recent news articles for a ticker
   rpc GetNews(GetNewsRequest) returns (GetNewsResponse);
-  
+
   // GetMajorHolders returns major holders information
   rpc GetMajorHolders(GetMajorHoldersRequest) returns (GetMajorHoldersResponse);
-  
+
   // GetInstitutionalHolders returns institutional holders information
   rpc GetInstitutionalHolders(GetInstitutionalHoldersRequest) returns (GetInstitutionalHoldersResponse);
-  
+
   // GetMutualFundHolders returns mutual fund holders information
   rpc GetMutualFundHolders(GetMutualFundHoldersRequest) returns (GetMutualFundHoldersResponse);
-  
+
   // GetMultipleInfo returns information for multiple tickers at once
   rpc GetMultipleInfo(GetMultipleInfoRequest) returns (GetMultipleInfoResponse);
-  
+
   // DownloadHistory streams historical data for multiple tickers
   rpc DownloadHistory(DownloadHistoryRequest) returns (stream DownloadHistoryResponse);
 
@@ -144,7 +144,7 @@ message TickerInfo {
   string zip = 9;
   string website = 10;
   string long_business_summary = 11;
-  
+
   // Trading Information
   double previous_close = 20;
   double open = 21;
@@ -155,7 +155,7 @@ message TickerInfo {
   double regular_market_day_low = 26;
   double regular_market_day_high = 27;
   double current_price = 28;
-  
+
   // Volume and Shares
   int64 volume = 30;
   int64 regular_market_volume = 31;
@@ -163,7 +163,7 @@ message TickerInfo {
   int64 average_volume_10days = 33;
   int64 shares_outstanding = 34;
   int64 float_shares = 35;
-  
+
   // Market Cap and Valuation
   int64 market_cap = 40;
   double enterprise_value = 41;
@@ -173,14 +173,14 @@ message TickerInfo {
   double price_to_sales_trailing_12months = 45;
   double enterprise_to_revenue = 46;
   double enterprise_to_ebitda = 47;
-  
+
   // Dividends and Yield
   double dividend_rate = 50;
   double dividend_yield = 51;
   int64 ex_dividend_date = 52; // Unix timestamp
   double payout_ratio = 53;
   double five_year_avg_dividend_yield = 54;
-  
+
   // Financial Metrics
   double beta = 60;
   double trailing_eps = 61;
@@ -194,20 +194,20 @@ message TickerInfo {
   double earnings_growth = 69;
   double operating_margins = 70;
   double ebitda_margins = 71;
-  
+
   // 52 Week Range
   double fifty_two_week_low = 80;
   double fifty_two_week_high = 81;
   double fifty_day_average = 82;
   double two_hundred_day_average = 83;
-  
+
   // Targets and Estimates
   double target_high_price = 90;
   double target_low_price = 91;
   double target_mean_price = 92;
   double target_median_price = 93;
   int32 number_of_analyst_opinions = 94;
-  
+
   // Other
   string currency = 100;
   string exchange = 101;
@@ -220,15 +220,15 @@ message TickerInfo {
 
 message GetHistoryRequest {
   string ticker = 1; // Ticker symbol (e.g., "AAPL")
-  
+
   // Period or date range (use one or the other)
   optional string period = 2; // e.g., "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"
   optional google.protobuf.Timestamp start = 3; // Start date
   optional google.protobuf.Timestamp end = 4; // End date
-  
+
   // Interval for data points
   string interval = 5; // "1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo"
-  
+
   // Options
   optional bool prepost = 6; // Include pre and post market data (default: false)
   optional bool actions = 7; // Include dividends and stock splits (default: true)
