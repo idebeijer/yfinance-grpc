@@ -15,41 +15,74 @@ This project solves that problem by wrapping yfinance in a gRPC service, allowin
 
 ## Features
 
-The gRPC service provides access to the following yfinance functionality:
+The gRPC service exposes 38 RPCs covering the full yfinance `Ticker` API. See [docs/rpc-reference.md](docs/rpc-reference.md) for a complete mapping to yfinance methods.
 
 ### Ticker Information
 
-- **GetInfo**: Get comprehensive ticker information (price, market cap, P/E ratios, dividends, etc.)
-- **GetMultipleInfo**: Get information for multiple tickers at once (bulk operation)
-- **GetHistory**: Get historical price data with configurable intervals and date ranges
-- **DownloadHistory**: Stream historical data for multiple tickers efficiently (streaming RPC)
-- **GetDividends**: Get dividend payment history
-- **GetSplits**: Get stock split history
-- **GetActions**: Get all corporate actions (dividends, splits, capital gains)
+- **GetInfo**: Comprehensive ticker information (price, market cap, P/E, dividends, targets, etc.)
+- **GetFastInfo**: Lightweight price/market snapshot — faster than `GetInfo`
+- **GetMultipleInfo**: Bulk info fetch for multiple tickers in one call
+- **GetIsin**: ISIN code for a ticker
+- **GetHistoryMetadata**: Exchange metadata, valid intervals, timezone info
+
+### Price History
+
+- **GetHistory**: Historical OHLCV data with configurable period, interval and adjustments
+- **DownloadHistory**: Stream historical data for multiple tickers concurrently (server-streaming RPC)
+
+### Corporate Actions
+
+- **GetDividends**: Dividend payment history
+- **GetSplits**: Stock split history
+- **GetCapitalGains**: Capital gains distributions (ETFs/funds)
+- **GetActions**: All corporate actions combined (dividends, splits, capital gains)
 
 ### Financial Statements
 
-- **GetFinancials**: Get income statements (yearly/quarterly/trailing)
-- **GetBalanceSheet**: Get balance sheet data
-- **GetCashFlow**: Get cash flow statements
-- **GetEarnings**: Get earnings data
+- **GetFinancials**: Income statements (yearly/quarterly/trailing)
+- **GetBalanceSheet**: Balance sheet data
+- **GetCashFlow**: Cash flow statements
+- **GetEarnings**: Earnings revenue and EPS data
 
-### Analysis & Research
+### Analyst Data & Estimates
 
-- **GetRecommendations**: Get analyst recommendations and upgrades/downgrades
-- **GetNews**: Get recent news articles for a ticker
-- **GetCalendar**: Get upcoming earnings and dividend dates
+- **GetRecommendations**: Individual analyst upgrades/downgrades with firm and grade
+- **GetRecommendationsSummary**: Period-based aggregated counts (strongBuy/buy/hold/sell/strongSell)
+- **GetAnalystPriceTargets**: Consensus price target (current/low/high/mean/median)
+- **GetEarningsEstimate**: Forward EPS estimates by period (0q/+1q/0y/+1y)
+- **GetRevenueEstimate**: Forward revenue estimates by period
+- **GetEarningsHistory**: Historical EPS actuals vs estimates with surprise %
+- **GetEpsTrend**: EPS estimate trend across 7/30/60/90-day revision windows
+- **GetEpsRevisions**: Counts of upward/downward EPS revisions
+- **GetGrowthEstimates**: Growth estimates for stock, industry, sector and index
+
+### Calendar & Events
+
+- **GetCalendar**: Upcoming earnings dates and ex-dividend dates
+- **GetEarningsDates**: Past and upcoming earnings dates with EPS data
 
 ### Options
 
-- **GetOptions**: Get available option expiration dates
-- **GetOptionChain**: Get detailed option chain data (calls and puts)
+- **GetOptions**: Available option expiration dates
+- **GetOptionChain**: Full option chain (calls and puts) for a specific expiration
 
 ### Ownership
 
-- **GetMajorHolders**: Get major shareholders information
-- **GetInstitutionalHolders**: Get institutional ownership data
-- **GetMutualFundHolders**: Get mutual fund ownership data
+- **GetMajorHolders**: Major holder breakdown (% held by insiders, institutions, etc.)
+- **GetInstitutionalHolders**: Institutional ownership with shares, value, and date reported
+- **GetMutualFundHolders**: Mutual fund ownership data
+- **GetInsiderPurchases**: Summary table of insider buying/selling activity
+- **GetInsiderTransactions**: Individual insider transaction records
+- **GetInsiderRosterHolders**: Roster of current insider holders with positions
+
+### ESG & Filings
+
+- **GetSustainability**: ESG scores (environment, social, governance) and 15 controversy flags
+- **GetSecFilings**: SEC filing history (10-K, 10-Q, 8-K, etc.)
+
+### Shares
+
+- **GetSharesHistory**: Full history of shares outstanding
 
 ## Quick Start
 
@@ -243,66 +276,9 @@ client.getInfo({ ticker: "AAPL" }, (error, response) => {
 
 ## API Documentation
 
-### GetInfo
+See [docs/rpc-reference.md](docs/rpc-reference.md) for a full mapping of every RPC to its yfinance equivalent, parameters, and return type.
 
-Get comprehensive information about a ticker.
-
-**Request:**
-
-```protobuf
-message GetInfoRequest {
-  string ticker = 1; // e.g., "AAPL", "GOOGL"
-}
-```
-
-**Response:** Returns `TickerInfo` with 100+ fields including:
-
-- Basic info (symbol, name, sector, industry)
-- Trading data (current price, volume, market cap)
-- Valuation metrics (P/E ratios, price-to-book)
-- Dividends (rate, yield, payout ratio)
-- Financial metrics (profit margins, ROE, ROA)
-- 52-week ranges and moving averages
-- Analyst targets
-
-### GetHistory
-
-Get historical price data.
-
-**Request:**
-
-```protobuf
-message GetHistoryRequest {
-  string ticker = 1;
-  optional string period = 2;  // "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"
-  optional Timestamp start = 3;  // Alternative to period
-  optional Timestamp end = 4;
-  string interval = 5;  // "1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo"
-  bool prepost = 6;  // Include pre/post market
-  bool actions = 7;  // Include dividends/splits
-  bool auto_adjust = 8;  // Auto-adjust OHLC
-}
-```
-
-**Response:** Array of `HistoryRow` with OHLCV data plus optional dividends/splits.
-
-### GetOptionChain
-
-Get option chain data for a specific expiration date.
-
-**Request:**
-
-```protobuf
-message GetOptionChainRequest {
-  string ticker = 1;
-  optional string date = 2;  // YYYY-MM-DD format
-  optional string tz = 3;    // Timezone
-}
-```
-
-**Response:** Arrays of calls and puts with strike prices, bid/ask, volume, open interest, implied volatility, etc.
-
-See `api/proto/yfinance_grpc/v1/ticker.proto` for complete API documentation.
+The complete protobuf definitions are in `api/proto/yfinance_grpc/v1/ticker.proto`.
 
 ## Development
 
@@ -326,11 +302,14 @@ make generate
 
 ## Error Handling
 
-The server returns gRPC status codes:
+The server returns standard gRPC status codes:
 
 - `OK`: Request succeeded
-- `INTERNAL`: yfinance error or data processing error
-- Error details are included in the status message
+- `NOT_FOUND`: Ticker has no data or doesn't exist (e.g. invalid symbol passed to `DownloadHistory`)
+- `INVALID_ARGUMENT`: Bad request parameters (e.g. empty tickers list)
+- `INTERNAL`: Unexpected yfinance or data processing error
+
+Error details are included in the status message.
 
 ## Limitations
 
