@@ -37,6 +37,9 @@ buf lint
 # Check for breaking proto changes
 buf breaking --against '.git#branch=main'
 
+# Format proto files
+buf format api -w
+
 # Docker
 make up      # docker-compose up -d
 make down    # docker-compose down
@@ -60,6 +63,7 @@ tests/test_integration.py               # Integration tests (live server)
 ## Key Implementation Details
 
 `src/server.py` contains the full `TickerServiceServicer` with 19 RPC methods and several helper utilities:
+
 - `safe_float()`, `safe_int()`, `safe_str()`: Handle NaN/None values from yfinance (pandas DataFrames frequently produce these)
 - `datetime_to_timestamp()`: Converts Python datetime to protobuf `Timestamp`
 - `create_ticker_info()`: Maps yfinance's info dict to the `TickerInfo` protobuf message

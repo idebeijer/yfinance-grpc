@@ -681,3 +681,568 @@ class DownloadHistoryResponse(_message.Message):
     ticker: str
     rows: _containers.RepeatedCompositeFieldContainer[HistoryRow]
     def __init__(self, ticker: _Optional[str] = ..., rows: _Optional[_Iterable[_Union[HistoryRow, _Mapping]]] = ...) -> None: ...
+
+class GetCapitalGainsRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    period: str
+    def __init__(self, ticker: _Optional[str] = ..., period: _Optional[str] = ...) -> None: ...
+
+class GetCapitalGainsResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[CapitalGainsRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[CapitalGainsRow, _Mapping]]] = ...) -> None: ...
+
+class CapitalGainsRow(_message.Message):
+    __slots__ = ()
+    DATE_FIELD_NUMBER: _ClassVar[int]
+    AMOUNT_FIELD_NUMBER: _ClassVar[int]
+    date: _timestamp_pb2.Timestamp
+    amount: float
+    def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., amount: _Optional[float] = ...) -> None: ...
+
+class GetSharesHistoryRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    START_FIELD_NUMBER: _ClassVar[int]
+    END_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    start: _timestamp_pb2.Timestamp
+    end: _timestamp_pb2.Timestamp
+    def __init__(self, ticker: _Optional[str] = ..., start: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+
+class GetSharesHistoryResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[SharesHistoryRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[SharesHistoryRow, _Mapping]]] = ...) -> None: ...
+
+class SharesHistoryRow(_message.Message):
+    __slots__ = ()
+    DATE_FIELD_NUMBER: _ClassVar[int]
+    SHARES_FIELD_NUMBER: _ClassVar[int]
+    date: _timestamp_pb2.Timestamp
+    shares: int
+    def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., shares: _Optional[int] = ...) -> None: ...
+
+class GetIsinRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetIsinResponse(_message.Message):
+    __slots__ = ()
+    ISIN_FIELD_NUMBER: _ClassVar[int]
+    isin: str
+    def __init__(self, isin: _Optional[str] = ...) -> None: ...
+
+class GetFastInfoRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetFastInfoResponse(_message.Message):
+    __slots__ = ()
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    info: FastInfo
+    def __init__(self, info: _Optional[_Union[FastInfo, _Mapping]] = ...) -> None: ...
+
+class FastInfo(_message.Message):
+    __slots__ = ()
+    CURRENCY_FIELD_NUMBER: _ClassVar[int]
+    EXCHANGE_FIELD_NUMBER: _ClassVar[int]
+    EXCHANGE_DATA_DELAYED_BY_FIELD_NUMBER: _ClassVar[int]
+    EXCHANGE_TIMEZONE_NAME_FIELD_NUMBER: _ClassVar[int]
+    LAST_PRICE_FIELD_NUMBER: _ClassVar[int]
+    LAST_VOLUME_FIELD_NUMBER: _ClassVar[int]
+    MARKET_CAP_FIELD_NUMBER: _ClassVar[int]
+    OPEN_FIELD_NUMBER: _ClassVar[int]
+    PREVIOUS_CLOSE_FIELD_NUMBER: _ClassVar[int]
+    QUOTE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    REGULAR_MARKET_DAY_HIGH_FIELD_NUMBER: _ClassVar[int]
+    REGULAR_MARKET_DAY_LOW_FIELD_NUMBER: _ClassVar[int]
+    REGULAR_MARKET_PREVIOUS_CLOSE_FIELD_NUMBER: _ClassVar[int]
+    REGULAR_MARKET_PRICE_FIELD_NUMBER: _ClassVar[int]
+    SHARES_FIELD_NUMBER: _ClassVar[int]
+    THREE_MONTH_AVERAGE_VOLUME_FIELD_NUMBER: _ClassVar[int]
+    TIMEZONE_FIELD_NUMBER: _ClassVar[int]
+    FIFTY_DAY_AVERAGE_FIELD_NUMBER: _ClassVar[int]
+    TWO_HUNDRED_DAY_AVERAGE_FIELD_NUMBER: _ClassVar[int]
+    YEAR_CHANGE_FIELD_NUMBER: _ClassVar[int]
+    YEAR_HIGH_FIELD_NUMBER: _ClassVar[int]
+    YEAR_LOW_FIELD_NUMBER: _ClassVar[int]
+    currency: str
+    exchange: str
+    exchange_data_delayed_by: int
+    exchange_timezone_name: str
+    last_price: float
+    last_volume: int
+    market_cap: int
+    open: float
+    previous_close: float
+    quote_type: str
+    regular_market_day_high: float
+    regular_market_day_low: float
+    regular_market_previous_close: float
+    regular_market_price: float
+    shares: int
+    three_month_average_volume: float
+    timezone: str
+    fifty_day_average: float
+    two_hundred_day_average: float
+    year_change: float
+    year_high: float
+    year_low: float
+    def __init__(self, currency: _Optional[str] = ..., exchange: _Optional[str] = ..., exchange_data_delayed_by: _Optional[int] = ..., exchange_timezone_name: _Optional[str] = ..., last_price: _Optional[float] = ..., last_volume: _Optional[int] = ..., market_cap: _Optional[int] = ..., open: _Optional[float] = ..., previous_close: _Optional[float] = ..., quote_type: _Optional[str] = ..., regular_market_day_high: _Optional[float] = ..., regular_market_day_low: _Optional[float] = ..., regular_market_previous_close: _Optional[float] = ..., regular_market_price: _Optional[float] = ..., shares: _Optional[int] = ..., three_month_average_volume: _Optional[float] = ..., timezone: _Optional[str] = ..., fifty_day_average: _Optional[float] = ..., two_hundred_day_average: _Optional[float] = ..., year_change: _Optional[float] = ..., year_high: _Optional[float] = ..., year_low: _Optional[float] = ...) -> None: ...
+
+class GetSustainabilityRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetSustainabilityResponse(_message.Message):
+    __slots__ = ()
+    TOTAL_ESG_FIELD_NUMBER: _ClassVar[int]
+    ESG_PERFORMANCE_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_SCORE_FIELD_NUMBER: _ClassVar[int]
+    SOCIAL_SCORE_FIELD_NUMBER: _ClassVar[int]
+    GOVERNANCE_SCORE_FIELD_NUMBER: _ClassVar[int]
+    PERCENTILE_FIELD_NUMBER: _ClassVar[int]
+    PEER_GROUP_FIELD_NUMBER: _ClassVar[int]
+    ADULT_FIELD_NUMBER: _ClassVar[int]
+    ALCOHOLIC_FIELD_NUMBER: _ClassVar[int]
+    ANIMAL_TESTING_FIELD_NUMBER: _ClassVar[int]
+    CATHOLIC_FIELD_NUMBER: _ClassVar[int]
+    CONTROVERSIAL_WEAPONS_FIELD_NUMBER: _ClassVar[int]
+    SMALL_ARMS_FIELD_NUMBER: _ClassVar[int]
+    FUR_LEATHER_FIELD_NUMBER: _ClassVar[int]
+    GAMBLING_FIELD_NUMBER: _ClassVar[int]
+    GMO_FIELD_NUMBER: _ClassVar[int]
+    MILITARY_CONTRACT_FIELD_NUMBER: _ClassVar[int]
+    NUCLEAR_FIELD_NUMBER: _ClassVar[int]
+    PESTICIDES_FIELD_NUMBER: _ClassVar[int]
+    PALM_OIL_FIELD_NUMBER: _ClassVar[int]
+    COAL_FIELD_NUMBER: _ClassVar[int]
+    TOBACCO_FIELD_NUMBER: _ClassVar[int]
+    total_esg: float
+    esg_performance: str
+    environment_score: float
+    social_score: float
+    governance_score: float
+    percentile: float
+    peer_group: str
+    adult: bool
+    alcoholic: bool
+    animal_testing: bool
+    catholic: bool
+    controversial_weapons: bool
+    small_arms: bool
+    fur_leather: bool
+    gambling: bool
+    gmo: bool
+    military_contract: bool
+    nuclear: bool
+    pesticides: bool
+    palm_oil: bool
+    coal: bool
+    tobacco: bool
+    def __init__(self, total_esg: _Optional[float] = ..., esg_performance: _Optional[str] = ..., environment_score: _Optional[float] = ..., social_score: _Optional[float] = ..., governance_score: _Optional[float] = ..., percentile: _Optional[float] = ..., peer_group: _Optional[str] = ..., adult: _Optional[bool] = ..., alcoholic: _Optional[bool] = ..., animal_testing: _Optional[bool] = ..., catholic: _Optional[bool] = ..., controversial_weapons: _Optional[bool] = ..., small_arms: _Optional[bool] = ..., fur_leather: _Optional[bool] = ..., gambling: _Optional[bool] = ..., gmo: _Optional[bool] = ..., military_contract: _Optional[bool] = ..., nuclear: _Optional[bool] = ..., pesticides: _Optional[bool] = ..., palm_oil: _Optional[bool] = ..., coal: _Optional[bool] = ..., tobacco: _Optional[bool] = ...) -> None: ...
+
+class GetInsiderPurchasesRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetInsiderPurchasesResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[InsiderPurchaseSummaryRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[InsiderPurchaseSummaryRow, _Mapping]]] = ...) -> None: ...
+
+class InsiderPurchaseSummaryRow(_message.Message):
+    __slots__ = ()
+    class ValuesEntry(_message.Message):
+        __slots__ = ()
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    LABEL_FIELD_NUMBER: _ClassVar[int]
+    VALUES_FIELD_NUMBER: _ClassVar[int]
+    label: str
+    values: _containers.ScalarMap[str, str]
+    def __init__(self, label: _Optional[str] = ..., values: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class GetInsiderTransactionsRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetInsiderTransactionsResponse(_message.Message):
+    __slots__ = ()
+    TRANSACTIONS_FIELD_NUMBER: _ClassVar[int]
+    transactions: _containers.RepeatedCompositeFieldContainer[InsiderTransaction]
+    def __init__(self, transactions: _Optional[_Iterable[_Union[InsiderTransaction, _Mapping]]] = ...) -> None: ...
+
+class InsiderTransaction(_message.Message):
+    __slots__ = ()
+    START_DATE_FIELD_NUMBER: _ClassVar[int]
+    INSIDER_FIELD_NUMBER: _ClassVar[int]
+    POSITION_FIELD_NUMBER: _ClassVar[int]
+    TRANSACTION_FIELD_NUMBER: _ClassVar[int]
+    SHARES_FIELD_NUMBER: _ClassVar[int]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
+    TEXT_FIELD_NUMBER: _ClassVar[int]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    start_date: _timestamp_pb2.Timestamp
+    insider: str
+    position: str
+    transaction: str
+    shares: int
+    value: float
+    text: str
+    url: str
+    def __init__(self, start_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., insider: _Optional[str] = ..., position: _Optional[str] = ..., transaction: _Optional[str] = ..., shares: _Optional[int] = ..., value: _Optional[float] = ..., text: _Optional[str] = ..., url: _Optional[str] = ...) -> None: ...
+
+class GetInsiderRosterHoldersRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetInsiderRosterHoldersResponse(_message.Message):
+    __slots__ = ()
+    HOLDERS_FIELD_NUMBER: _ClassVar[int]
+    holders: _containers.RepeatedCompositeFieldContainer[InsiderRosterHolder]
+    def __init__(self, holders: _Optional[_Iterable[_Union[InsiderRosterHolder, _Mapping]]] = ...) -> None: ...
+
+class InsiderRosterHolder(_message.Message):
+    __slots__ = ()
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    POSITION_FIELD_NUMBER: _ClassVar[int]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    MOST_RECENT_TRANSACTION_FIELD_NUMBER: _ClassVar[int]
+    LATEST_TRANSACTION_SHARES_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    position: str
+    url: str
+    most_recent_transaction: _timestamp_pb2.Timestamp
+    latest_transaction_shares: int
+    def __init__(self, name: _Optional[str] = ..., position: _Optional[str] = ..., url: _Optional[str] = ..., most_recent_transaction: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., latest_transaction_shares: _Optional[int] = ...) -> None: ...
+
+class GetAnalystPriceTargetsRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetAnalystPriceTargetsResponse(_message.Message):
+    __slots__ = ()
+    CURRENT_FIELD_NUMBER: _ClassVar[int]
+    LOW_FIELD_NUMBER: _ClassVar[int]
+    HIGH_FIELD_NUMBER: _ClassVar[int]
+    MEAN_FIELD_NUMBER: _ClassVar[int]
+    MEDIAN_FIELD_NUMBER: _ClassVar[int]
+    current: float
+    low: float
+    high: float
+    mean: float
+    median: float
+    def __init__(self, current: _Optional[float] = ..., low: _Optional[float] = ..., high: _Optional[float] = ..., mean: _Optional[float] = ..., median: _Optional[float] = ...) -> None: ...
+
+class GetRecommendationsSummaryRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetRecommendationsSummaryResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[RecommendationSummaryRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[RecommendationSummaryRow, _Mapping]]] = ...) -> None: ...
+
+class RecommendationSummaryRow(_message.Message):
+    __slots__ = ()
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    STRONG_BUY_FIELD_NUMBER: _ClassVar[int]
+    BUY_FIELD_NUMBER: _ClassVar[int]
+    HOLD_FIELD_NUMBER: _ClassVar[int]
+    SELL_FIELD_NUMBER: _ClassVar[int]
+    STRONG_SELL_FIELD_NUMBER: _ClassVar[int]
+    period: str
+    strong_buy: int
+    buy: int
+    hold: int
+    sell: int
+    strong_sell: int
+    def __init__(self, period: _Optional[str] = ..., strong_buy: _Optional[int] = ..., buy: _Optional[int] = ..., hold: _Optional[int] = ..., sell: _Optional[int] = ..., strong_sell: _Optional[int] = ...) -> None: ...
+
+class GetEarningsEstimateRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetEarningsEstimateResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[EarningsEstimateRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[EarningsEstimateRow, _Mapping]]] = ...) -> None: ...
+
+class EarningsEstimateRow(_message.Message):
+    __slots__ = ()
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    NUMBER_OF_ANALYSTS_FIELD_NUMBER: _ClassVar[int]
+    AVG_FIELD_NUMBER: _ClassVar[int]
+    LOW_FIELD_NUMBER: _ClassVar[int]
+    HIGH_FIELD_NUMBER: _ClassVar[int]
+    YEAR_AGO_EPS_FIELD_NUMBER: _ClassVar[int]
+    GROWTH_FIELD_NUMBER: _ClassVar[int]
+    period: str
+    number_of_analysts: int
+    avg: float
+    low: float
+    high: float
+    year_ago_eps: float
+    growth: float
+    def __init__(self, period: _Optional[str] = ..., number_of_analysts: _Optional[int] = ..., avg: _Optional[float] = ..., low: _Optional[float] = ..., high: _Optional[float] = ..., year_ago_eps: _Optional[float] = ..., growth: _Optional[float] = ...) -> None: ...
+
+class GetRevenueEstimateRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetRevenueEstimateResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[RevenueEstimateRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[RevenueEstimateRow, _Mapping]]] = ...) -> None: ...
+
+class RevenueEstimateRow(_message.Message):
+    __slots__ = ()
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    NUMBER_OF_ANALYSTS_FIELD_NUMBER: _ClassVar[int]
+    AVG_FIELD_NUMBER: _ClassVar[int]
+    LOW_FIELD_NUMBER: _ClassVar[int]
+    HIGH_FIELD_NUMBER: _ClassVar[int]
+    YEAR_AGO_REVENUE_FIELD_NUMBER: _ClassVar[int]
+    GROWTH_FIELD_NUMBER: _ClassVar[int]
+    period: str
+    number_of_analysts: int
+    avg: float
+    low: float
+    high: float
+    year_ago_revenue: float
+    growth: float
+    def __init__(self, period: _Optional[str] = ..., number_of_analysts: _Optional[int] = ..., avg: _Optional[float] = ..., low: _Optional[float] = ..., high: _Optional[float] = ..., year_ago_revenue: _Optional[float] = ..., growth: _Optional[float] = ...) -> None: ...
+
+class GetEarningsHistoryRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetEarningsHistoryResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[EarningsHistoryRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[EarningsHistoryRow, _Mapping]]] = ...) -> None: ...
+
+class EarningsHistoryRow(_message.Message):
+    __slots__ = ()
+    DATE_FIELD_NUMBER: _ClassVar[int]
+    EPS_ESTIMATE_FIELD_NUMBER: _ClassVar[int]
+    EPS_ACTUAL_FIELD_NUMBER: _ClassVar[int]
+    EPS_DIFFERENCE_FIELD_NUMBER: _ClassVar[int]
+    SURPRISE_PERCENT_FIELD_NUMBER: _ClassVar[int]
+    date: _timestamp_pb2.Timestamp
+    eps_estimate: float
+    eps_actual: float
+    eps_difference: float
+    surprise_percent: float
+    def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., eps_estimate: _Optional[float] = ..., eps_actual: _Optional[float] = ..., eps_difference: _Optional[float] = ..., surprise_percent: _Optional[float] = ...) -> None: ...
+
+class GetEpsTrendRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetEpsTrendResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[EpsTrendRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[EpsTrendRow, _Mapping]]] = ...) -> None: ...
+
+class EpsTrendRow(_message.Message):
+    __slots__ = ()
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    CURRENT_FIELD_NUMBER: _ClassVar[int]
+    SEVEN_DAYS_AGO_FIELD_NUMBER: _ClassVar[int]
+    THIRTY_DAYS_AGO_FIELD_NUMBER: _ClassVar[int]
+    SIXTY_DAYS_AGO_FIELD_NUMBER: _ClassVar[int]
+    NINETY_DAYS_AGO_FIELD_NUMBER: _ClassVar[int]
+    period: str
+    current: float
+    seven_days_ago: float
+    thirty_days_ago: float
+    sixty_days_ago: float
+    ninety_days_ago: float
+    def __init__(self, period: _Optional[str] = ..., current: _Optional[float] = ..., seven_days_ago: _Optional[float] = ..., thirty_days_ago: _Optional[float] = ..., sixty_days_ago: _Optional[float] = ..., ninety_days_ago: _Optional[float] = ...) -> None: ...
+
+class GetEpsRevisionsRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetEpsRevisionsResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[EpsRevisionsRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[EpsRevisionsRow, _Mapping]]] = ...) -> None: ...
+
+class EpsRevisionsRow(_message.Message):
+    __slots__ = ()
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    UP_LAST_7DAYS_FIELD_NUMBER: _ClassVar[int]
+    UP_LAST_30DAYS_FIELD_NUMBER: _ClassVar[int]
+    DOWN_LAST_7DAYS_FIELD_NUMBER: _ClassVar[int]
+    DOWN_LAST_30DAYS_FIELD_NUMBER: _ClassVar[int]
+    period: str
+    up_last_7days: int
+    up_last_30days: int
+    down_last_7days: int
+    down_last_30days: int
+    def __init__(self, period: _Optional[str] = ..., up_last_7days: _Optional[int] = ..., up_last_30days: _Optional[int] = ..., down_last_7days: _Optional[int] = ..., down_last_30days: _Optional[int] = ...) -> None: ...
+
+class GetGrowthEstimatesRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetGrowthEstimatesResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[GrowthEstimatesRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[GrowthEstimatesRow, _Mapping]]] = ...) -> None: ...
+
+class GrowthEstimatesRow(_message.Message):
+    __slots__ = ()
+    PERIOD_FIELD_NUMBER: _ClassVar[int]
+    STOCK_FIELD_NUMBER: _ClassVar[int]
+    INDUSTRY_FIELD_NUMBER: _ClassVar[int]
+    SECTOR_FIELD_NUMBER: _ClassVar[int]
+    INDEX_FIELD_NUMBER: _ClassVar[int]
+    period: str
+    stock: float
+    industry: float
+    sector: float
+    index: float
+    def __init__(self, period: _Optional[str] = ..., stock: _Optional[float] = ..., industry: _Optional[float] = ..., sector: _Optional[float] = ..., index: _Optional[float] = ...) -> None: ...
+
+class GetEarningsDatesRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    limit: int
+    def __init__(self, ticker: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
+
+class GetEarningsDatesResponse(_message.Message):
+    __slots__ = ()
+    ROWS_FIELD_NUMBER: _ClassVar[int]
+    rows: _containers.RepeatedCompositeFieldContainer[EarningsDateRow]
+    def __init__(self, rows: _Optional[_Iterable[_Union[EarningsDateRow, _Mapping]]] = ...) -> None: ...
+
+class EarningsDateRow(_message.Message):
+    __slots__ = ()
+    DATE_FIELD_NUMBER: _ClassVar[int]
+    EPS_ESTIMATE_FIELD_NUMBER: _ClassVar[int]
+    REPORTED_EPS_FIELD_NUMBER: _ClassVar[int]
+    SURPRISE_PCT_FIELD_NUMBER: _ClassVar[int]
+    date: _timestamp_pb2.Timestamp
+    eps_estimate: float
+    reported_eps: float
+    surprise_pct: float
+    def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., eps_estimate: _Optional[float] = ..., reported_eps: _Optional[float] = ..., surprise_pct: _Optional[float] = ...) -> None: ...
+
+class GetHistoryMetadataRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetHistoryMetadataResponse(_message.Message):
+    __slots__ = ()
+    CURRENCY_FIELD_NUMBER: _ClassVar[int]
+    SYMBOL_FIELD_NUMBER: _ClassVar[int]
+    EXCHANGE_NAME_FIELD_NUMBER: _ClassVar[int]
+    FULL_EXCHANGE_NAME_FIELD_NUMBER: _ClassVar[int]
+    INSTRUMENT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    FIRST_TRADE_DATE_FIELD_NUMBER: _ClassVar[int]
+    REGULAR_MARKET_TIME_FIELD_NUMBER: _ClassVar[int]
+    HAS_PRE_POST_MARKET_DATA_FIELD_NUMBER: _ClassVar[int]
+    GMT_OFFSET_FIELD_NUMBER: _ClassVar[int]
+    TIMEZONE_FIELD_NUMBER: _ClassVar[int]
+    EXCHANGE_TIMEZONE_NAME_FIELD_NUMBER: _ClassVar[int]
+    REGULAR_MARKET_PRICE_FIELD_NUMBER: _ClassVar[int]
+    FIFTY_TWO_WEEK_HIGH_FIELD_NUMBER: _ClassVar[int]
+    FIFTY_TWO_WEEK_LOW_FIELD_NUMBER: _ClassVar[int]
+    DATA_GRANULARITY_FIELD_NUMBER: _ClassVar[int]
+    RANGE_FIELD_NUMBER: _ClassVar[int]
+    VALID_RANGES_FIELD_NUMBER: _ClassVar[int]
+    currency: str
+    symbol: str
+    exchange_name: str
+    full_exchange_name: str
+    instrument_type: str
+    first_trade_date: int
+    regular_market_time: int
+    has_pre_post_market_data: bool
+    gmt_offset: int
+    timezone: str
+    exchange_timezone_name: str
+    regular_market_price: float
+    fifty_two_week_high: float
+    fifty_two_week_low: float
+    data_granularity: str
+    range: str
+    valid_ranges: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, currency: _Optional[str] = ..., symbol: _Optional[str] = ..., exchange_name: _Optional[str] = ..., full_exchange_name: _Optional[str] = ..., instrument_type: _Optional[str] = ..., first_trade_date: _Optional[int] = ..., regular_market_time: _Optional[int] = ..., has_pre_post_market_data: _Optional[bool] = ..., gmt_offset: _Optional[int] = ..., timezone: _Optional[str] = ..., exchange_timezone_name: _Optional[str] = ..., regular_market_price: _Optional[float] = ..., fifty_two_week_high: _Optional[float] = ..., fifty_two_week_low: _Optional[float] = ..., data_granularity: _Optional[str] = ..., range: _Optional[str] = ..., valid_ranges: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class GetSecFilingsRequest(_message.Message):
+    __slots__ = ()
+    TICKER_FIELD_NUMBER: _ClassVar[int]
+    ticker: str
+    def __init__(self, ticker: _Optional[str] = ...) -> None: ...
+
+class GetSecFilingsResponse(_message.Message):
+    __slots__ = ()
+    FILINGS_FIELD_NUMBER: _ClassVar[int]
+    filings: _containers.RepeatedCompositeFieldContainer[SecFiling]
+    def __init__(self, filings: _Optional[_Iterable[_Union[SecFiling, _Mapping]]] = ...) -> None: ...
+
+class SecFiling(_message.Message):
+    __slots__ = ()
+    DATE_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    date: _timestamp_pb2.Timestamp
+    type: str
+    title: str
+    url: str
+    def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., type: _Optional[str] = ..., title: _Optional[str] = ..., url: _Optional[str] = ...) -> None: ...
