@@ -206,6 +206,7 @@ class TestTickerServiceGetDividends:
         
         assert len(response.rows) == 4
         assert response.rows[0].amount == 0.25
+        mock_ticker.get_dividends.assert_called_once_with(period="1y")
 
 
 class TestTickerServiceGetRecommendations:
@@ -323,6 +324,40 @@ class TestTickerServiceGetNews:
         assert response.articles[0].type == 'STORY'
         assert response.articles[0].link == 'https://finance.yahoo.com/news/article-1.html'
         assert response.articles[0].thumbnail == 'https://example.com/thumb1.jpg'
+
+    @patch('src.server.yf.Ticker')
+    def test_get_news_thumbnail_fallback(self, mock_ticker_class):
+        """Test GetNews uses originalUrl when resolutions list is absent"""
+        mock_ticker = Mock()
+        mock_ticker_class.return_value = mock_ticker
+
+        mock_news = [
+            {
+                'id': 'article-1',
+                'content': {
+                    'id': 'article-1',
+                    'title': 'Fallback Thumbnail Test',
+                    'contentType': 'STORY',
+                    'pubDate': '2025-10-31T14:20:57Z',
+                    'provider': {'displayName': 'Test Publisher'},
+                    'canonicalUrl': {'url': 'https://example.com/article'},
+                    'thumbnail': {
+                        'originalUrl': 'https://example.com/original.jpg'
+                        # no 'resolutions' key
+                    }
+                }
+            }
+        ]
+        mock_ticker.news = mock_news
+
+        servicer = TickerServiceServicer()
+        context = Mock()
+        request = ticker_pb2.GetNewsRequest(ticker="AAPL", count=5)
+
+        response = servicer.GetNews(request, context)
+
+        assert len(response.articles) == 1
+        assert response.articles[0].thumbnail == 'https://example.com/original.jpg'
 
     @patch('src.server.yf.Ticker')
     def test_get_news_respects_count(self, mock_ticker_class):
@@ -540,6 +575,39 @@ class TestTickerServiceDownloadHistory:
         tickers = [r.ticker for r in responses]
         assert 'AAPL' in tickers
         assert 'MSFT' in tickers
+
+
+class TestTickerServiceEmptyTickers:
+    """Test validation of empty tickers lists"""
+
+    def test_download_history_empty_tickers_returns_invalid_argument(self):
+        """Test DownloadHistory with empty tickers returns INVALID_ARGUMENT"""
+        servicer = TickerServiceServicer()
+        context = Mock()
+        request = ticker_pb2.DownloadHistoryRequest(
+            tickers=[],
+            period="1d",
+            interval="1d"
+        )
+
+        responses = list(servicer.DownloadHistory(request, context))
+
+        assert len(responses) == 0
+        context.set_code.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT)
+        context.set_details.assert_called_once()
+
+    @patch('src.server.yf.Tickers')
+    def test_get_multiple_info_empty_tickers_returns_invalid_argument(self, mock_tickers_class):
+        """Test GetMultipleInfo with empty tickers returns INVALID_ARGUMENT without calling yfinance"""
+        servicer = TickerServiceServicer()
+        context = Mock()
+        request = ticker_pb2.GetMultipleInfoRequest(tickers=[])
+
+        servicer.GetMultipleInfo(request, context)
+
+        context.set_code.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT)
+        context.set_details.assert_called_once()
+        mock_tickers_class.assert_not_called()
 
 
 if __name__ == '__main__':

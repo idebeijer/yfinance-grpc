@@ -357,37 +357,42 @@ class TestIntegrationDownloadHistory:
     def test_download_history_with_dates(self, stub):
         """Test DownloadHistory with start/end dates"""
         from google.protobuf.timestamp_pb2 import Timestamp
-        
-        # Create timestamps for January 2024
+        from datetime import timezone
+
+        # Use a fixed historical month that is always in the past
+        start_dt = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        end_dt = datetime(2024, 1, 31, 23, 59, 59, tzinfo=timezone.utc)
+
         start_ts = Timestamp()
-        start_ts.FromDatetime(datetime(2024, 1, 1))
-        
+        start_ts.FromDatetime(start_dt)
+
         end_ts = Timestamp()
-        end_ts.FromDatetime(datetime(2024, 1, 31))
-        
+        end_ts.FromDatetime(end_dt)
+
         request = ticker_pb2.DownloadHistoryRequest(
             tickers=["AAPL"],
             start=start_ts,
             end=end_ts,
             interval="1d"
         )
-        
+
         responses = list(stub.DownloadHistory(request))
-        
+
         # Should have at least one response
         assert len(responses) > 0
-        
+
+        total_rows = sum(len(r.rows) for r in responses)
+        assert total_rows > 15   # at least 15 trading days in January 2024
+        assert total_rows < 25   # but no more than 25
+
+        start_bound = int(start_dt.timestamp())
+        end_bound = int(end_dt.timestamp())
+
         for response in responses:
             assert response.ticker == "AAPL"
-            # Should have trading days in January 2024
-            assert len(response.rows) > 15  # At least 15 trading days
-            assert len(response.rows) < 25  # But not more than 25
-            
             for row in response.rows:
-                # Timestamps should be in January 2024
-                # Unix timestamps: Jan 1 2024 = 1704067200, Jan 31 2024 = 1706659200
-                assert row.date.seconds >= 1704067200
-                assert row.date.seconds <= 1706745600  # End of Jan 31
+                assert row.date.seconds >= start_bound
+                assert row.date.seconds <= end_bound
 
     def test_download_history_auto_adjust(self, stub):
         """Test DownloadHistory with auto_adjust flag"""
@@ -428,20 +433,16 @@ class TestIntegrationErrorHandling:
             assert e.code() == grpc.StatusCode.INTERNAL
 
     def test_download_history_invalid_ticker(self, stub):
-        """Test DownloadHistory with invalid ticker returns proper error"""
+        """Test DownloadHistory with invalid ticker returns NOT_FOUND"""
         request = ticker_pb2.DownloadHistoryRequest(
             tickers=["INVALID_TICKER_XYZ123"],
             period="1mo",
             interval="1d"
         )
-        
-        try:
-            responses = list(stub.DownloadHistory(request))
-            # Should return error, not empty responses
-            assert len(responses) == 0, "Should not return data for invalid ticker"
-        except grpc.RpcError as e:
-            # Should get NOT_FOUND error
-            assert e.code() in [grpc.StatusCode.NOT_FOUND, grpc.StatusCode.INTERNAL]
+
+        with pytest.raises(grpc.RpcError) as exc_info:
+            list(stub.DownloadHistory(request))
+        assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND
 
     def test_download_history_malformed_ticker(self, stub):
         """Test DownloadHistory with malformed ticker string (space-separated instead of array)"""

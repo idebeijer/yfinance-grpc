@@ -35,6 +35,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+_STREAM_BATCH_SIZE = 500
+
 
 def datetime_to_timestamp(dt) -> Timestamp:
     """Convert datetime or pandas Timestamp to protobuf Timestamp"""
@@ -630,8 +632,8 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
                     try:
                         dt = date_parser.isoparse(article['pubDate'])
                         news_article.provider_publish_time.FromDatetime(dt)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.warning(f"Failed to parse pubDate '{article['pubDate']}': {e}")
                 
                 if 'thumbnail' in article and article['thumbnail']:
                     thumbnail = article['thumbnail']
@@ -658,13 +660,11 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
             logger.info(f"GetMajorHolders called for ticker: {request.ticker}")
             ticker = yf.Ticker(request.ticker)
             
-            major_holders = ticker.get_major_holders(as_dict=False)
-            
+            major_holders = ticker.get_major_holders(as_dict=True)
+
             holders = {}
-            if major_holders is not None and not major_holders.empty:
-                for _, row in major_holders.iterrows():
-                    if len(row) >= 2:
-                        holders[safe_str(row[1])] = safe_str(row[0])
+            if major_holders and isinstance(major_holders, dict):
+                holders = {k: safe_str(v) for k, v in major_holders.items()}
             
             return ticker_pb2.GetMajorHoldersResponse(holders=holders)
             
@@ -730,6 +730,11 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
 
     def GetMultipleInfo(self, request, context):
         """Get information for multiple tickers at once"""
+        if not request.tickers:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("Tickers list cannot be empty")
+            return ticker_pb2.GetMultipleInfoResponse()
+
         try:
             tickers_str = ' '.join(request.tickers)
             logger.info(f"GetMultipleInfo called for tickers: {tickers_str}")
@@ -757,6 +762,11 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
 
     def DownloadHistory(self, request, context):
         """Stream historical data for multiple tickers"""
+        if not request.tickers:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("Tickers list cannot be empty")
+            return
+
         try:
             tickers_str = ' '.join(request.tickers)
             logger.info(f"DownloadHistory called for tickers: {tickers_str}")
@@ -790,29 +800,29 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
                 context.set_details(f"No historical data found for {tickers_str}")
                 return
             
+            is_multi = isinstance(data.columns, pd.MultiIndex)
+
             # Handle single ticker vs multiple tickers
             if len(request.tickers) == 1:
                 ticker = request.tickers[0]
-                rows = []
-                
+                batch = []
+
                 for idx, row in data.iterrows():
-                    # For single ticker with group_by='ticker', columns are MultiIndex (ticker, price_type)
-                    # Access using the ticker name as first level
-                    if isinstance(data.columns, pd.MultiIndex):
+                    # For single ticker with group_by='ticker', columns may be MultiIndex (ticker, price_type)
+                    if is_multi:
                         open_val = safe_float(row.get((ticker, 'Open'), 0))
                         high_val = safe_float(row.get((ticker, 'High'), 0))
                         low_val = safe_float(row.get((ticker, 'Low'), 0))
                         close_val = safe_float(row.get((ticker, 'Close'), 0))
                         volume_val = safe_int(row.get((ticker, 'Volume'), 0))
                     else:
-                        # Fallback for regular columns
                         open_val = safe_float(row.get('Open', 0))
                         high_val = safe_float(row.get('High', 0))
                         low_val = safe_float(row.get('Low', 0))
                         close_val = safe_float(row.get('Close', 0))
                         volume_val = safe_int(row.get('Volume', 0))
-                    
-                    rows.append(ticker_pb2.HistoryRow(
+
+                    batch.append(ticker_pb2.HistoryRow(
                         date=datetime_to_timestamp(idx),
                         open=open_val,
                         high=high_val,
@@ -820,25 +830,22 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
                         close=close_val,
                         volume=volume_val
                     ))
-                
-                # Validate that we have at least some valid price data
-                valid_rows = [r for r in rows if r.open > 0 or r.close > 0]
-                if not valid_rows:
-                    logger.warning(f"No valid price data returned for {ticker}. Check ticker symbol is correct.")
-                    context.set_code(grpc.StatusCode.NOT_FOUND)
-                    context.set_details(f"No valid price data found for '{ticker}'. Ticker may be invalid or data unavailable.")
-                    return
-                
-                yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=rows)
+
+                    if len(batch) >= _STREAM_BATCH_SIZE:
+                        yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=batch)
+                        batch = []
+
+                if batch:
+                    yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=batch)
             else:
                 # Multiple tickers - group by ticker and stream each
                 for ticker in request.tickers:
                     try:
                         ticker_data = data[ticker]
-                        rows = []
-                        
+                        batch = []
+
                         for idx, row in ticker_data.iterrows():
-                            rows.append(ticker_pb2.HistoryRow(
+                            batch.append(ticker_pb2.HistoryRow(
                                 date=datetime_to_timestamp(idx),
                                 open=safe_float(row.get('Open', 0)),
                                 high=safe_float(row.get('High', 0)),
@@ -846,22 +853,19 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
                                 close=safe_float(row.get('Close', 0)),
                                 volume=safe_int(row.get('Volume', 0))
                             ))
-                        
-                        # Validate that we have at least some valid price data
-                        valid_rows = [r for r in rows if r.open > 0 or r.close > 0]
-                        if not valid_rows:
-                            logger.warning(f"No valid price data returned for {ticker}. Skipping.")
-                            continue
-                        
-                        yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=rows)
-                        
-                    except KeyError as e:
+
+                            if len(batch) >= _STREAM_BATCH_SIZE:
+                                yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=batch)
+                                batch = []
+
+                        if batch:
+                            yield ticker_pb2.DownloadHistoryResponse(ticker=ticker, rows=batch)
+
+                    except KeyError:
                         logger.error(f"Ticker '{ticker}' not found in data. Check ticker symbol is correct.")
-                        # Continue with other tickers
                         continue
                     except Exception as e:
                         logger.error(f"Error processing data for {ticker}: {str(e)}")
-                        # Continue with other tickers
                         continue
             
         except Exception as e:
