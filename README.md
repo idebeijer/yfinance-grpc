@@ -15,7 +15,7 @@ This project solves that problem by wrapping yfinance in a gRPC service, allowin
 
 ## Features
 
-The gRPC service exposes 38 RPCs covering the full yfinance `Ticker` API. See [docs/rpc-reference.md](docs/rpc-reference.md) for a complete mapping to yfinance methods.
+The server exposes 44 RPCs across four gRPC services currently covering a subset of the yfinance API (more to come). See [docs/rpc-reference.md](docs/rpc-reference.md) for a complete mapping to yfinance methods.
 
 ### Ticker Information
 
@@ -83,6 +83,21 @@ The gRPC service exposes 38 RPCs covering the full yfinance `Ticker` API. See [d
 ### Shares
 
 - **GetSharesHistory**: Full history of shares outstanding
+
+### Search & Lookup (SearchService)
+
+- **Search**: Full-text search returning matching quotes (symbol, name, exchange, sector, score) and news articles
+- **Lookup**: Typed instrument lookup filtered by class — equity, ETF, index, future, currency, cryptocurrency, or mutual fund
+
+### Market (MarketService)
+
+- **GetMarketStatus**: Current session type (REGULAR/PRE/POST), open/close timestamps and timezone for a market (e.g. `us_market`, `gb_market`)
+- **GetMarketSummary**: Price snapshot of major instruments in a market — price, change and change %
+
+### Sector & Industry (SectorService)
+
+- **GetSector**: Sector overview, top companies, top ETFs, top mutual funds, and list of constituent industries (e.g. key `technology`)
+- **GetIndustry**: Industry overview, top companies, top performing companies (YTD return/last price/target price) and top growth companies (e.g. key `consumer-electronics`)
 
 ## Quick Start
 
@@ -260,13 +275,13 @@ const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
 const packageDefinition = protoLoader.loadSync(
-  "api/proto/yfinance/v1/ticker.proto"
+  "api/proto/yfinance/v1/ticker.proto",
 );
 const proto = grpc.loadPackageDefinition(packageDefinition).yfinance.v1;
 
 const client = new proto.TickerService(
   "localhost:50051",
-  grpc.credentials.createInsecure()
+  grpc.credentials.createInsecure(),
 );
 
 client.getInfo({ ticker: "AAPL" }, (error, response) => {

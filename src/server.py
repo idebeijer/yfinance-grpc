@@ -26,7 +26,11 @@ import pandas as pd
 
 # Import generated protobuf and gRPC modules
 from yfinance_grpc.v1 import ticker_pb2, ticker_pb2_grpc
+from yfinance_grpc.v1 import search_pb2, search_pb2_grpc
+from yfinance_grpc.v1 import market_pb2, market_pb2_grpc
+from yfinance_grpc.v1 import sector_pb2, sector_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
+from src.market_server import SearchServiceServicer, MarketServiceServicer, SectorServiceServicer
 
 # Configure logging
 logging.basicConfig(
@@ -1363,10 +1367,16 @@ def serve(port: int = 50051, max_workers: int = 10):
     ticker_pb2_grpc.add_TickerServiceServicer_to_server(
         TickerServiceServicer(), server
     )
-    
+    search_pb2_grpc.add_SearchServiceServicer_to_server(SearchServiceServicer(), server)
+    market_pb2_grpc.add_MarketServiceServicer_to_server(MarketServiceServicer(), server)
+    sector_pb2_grpc.add_SectorServiceServicer_to_server(SectorServiceServicer(), server)
+
     # Enable reflection for grpcurl and other tools
     SERVICE_NAMES = (
         ticker_pb2.DESCRIPTOR.services_by_name['TickerService'].full_name,
+        search_pb2.DESCRIPTOR.services_by_name['SearchService'].full_name,
+        market_pb2.DESCRIPTOR.services_by_name['MarketService'].full_name,
+        sector_pb2.DESCRIPTOR.services_by_name['SectorService'].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
