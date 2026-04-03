@@ -187,9 +187,9 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
                 kwargs['period'] = request.period
             else:
                 if request.HasField('start'):
-                    kwargs['start'] = datetime.fromtimestamp(request.start.seconds)
+                    kwargs['start'] = request.start.ToDatetime()
                 if request.HasField('end'):
-                    kwargs['end'] = datetime.fromtimestamp(request.end.seconds)
+                    kwargs['end'] = request.end.ToDatetime()
             
             # Interval
             if request.interval:
@@ -783,9 +783,9 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
                 kwargs['period'] = request.period
             else:
                 if request.HasField('start'):
-                    kwargs['start'] = datetime.fromtimestamp(request.start.seconds)
+                    kwargs['start'] = request.start.ToDatetime()
                 if request.HasField('end'):
-                    kwargs['end'] = datetime.fromtimestamp(request.end.seconds)
+                    kwargs['end'] = request.end.ToDatetime()
             
             if request.HasField('interval'):
                 kwargs['interval'] = request.interval
@@ -901,9 +901,9 @@ class TickerServiceServicer(ticker_pb2_grpc.TickerServiceServicer):
             ticker = yf.Ticker(request.ticker)
             kwargs = {}
             if request.HasField('start'):
-                kwargs['start'] = datetime.fromtimestamp(request.start.seconds)
+                kwargs['start'] = request.start.ToDatetime()
             if request.HasField('end'):
-                kwargs['end'] = datetime.fromtimestamp(request.end.seconds)
+                kwargs['end'] = request.end.ToDatetime()
             shares = ticker.get_shares_full(**kwargs)
             rows = []
             if shares is not None:
