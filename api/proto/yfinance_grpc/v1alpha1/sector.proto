@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package yfinance_grpc.v1;
+package yfinance_grpc.v1alpha1;
 
 // SectorService provides sector- and industry-level data.
 service SectorService {

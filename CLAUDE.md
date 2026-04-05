@@ -18,7 +18,7 @@ uv run python -m src.main
 make run
 
 # Run unit tests (no server required)
-uv run pytest tests/test_server.py -v
+uv run pytest tests/test_server.py tests/test_search_server.py tests/test_market_server.py tests/test_sector_server.py -v
 
 # Run integration tests (requires running server on :50059)
 uv run pytest tests/test_integration.py -v
@@ -48,21 +48,40 @@ make down    # docker-compose down
 ## Architecture
 
 ```
-api/proto/yfinance_grpc/v1/ticker.proto  # API contract (single TickerService)
-gen/yfinance_grpc/v1/                    # Generated protobuf/gRPC Python code (do not edit)
-src/server.py                            # TickerServiceServicer — all RPC implementations
-src/main.py                              # Entry point: starts server on port 50059
-tests/test_server.py                     # Unit tests (mock yfinance)
+api/proto/yfinance_grpc/v1alpha1/        # Proto definitions (package yfinance_grpc.v1alpha1)
+  ticker.proto                           # TickerService — single-ticker RPCs
+  search.proto                           # SearchService — Search and Lookup
+  market.proto                           # MarketService — GetMarketStatus, GetMarketSummary
+  sector.proto                           # SectorService — GetSector, GetIndustry
+
+gen/yfinance_grpc/v1alpha1/              # Generated Python protobuf/gRPC code (do not edit)
+gen/go/yfinance_grpc/v1alpha1/           # Generated Go protobuf/gRPC code (do not edit)
+gen/go/go.mod                            # Go module for generated code
+
+src/server.py                            # Entry point servicer: registers all 4 services + reflection
+src/market_server.py                     # MarketServiceServicer
+src/search_server.py                     # SearchServiceServicer
+src/sector_server.py                     # SectorServiceServicer
+src/main.py                              # Starts server on port 50059
+
+tests/test_server.py                     # Unit tests for TickerService
+tests/test_search_server.py              # Unit tests for SearchService
+tests/test_market_server.py              # Unit tests for MarketService
+tests/test_sector_server.py              # Unit tests for SectorService
 tests/test_integration.py               # Integration tests (live server)
+
+examples/client_example.py              # Python client example
+examples/go/main.go                      # Go client example
+examples/go/go.mod                       # Go module for the example
 ```
 
-**Data flow**: gRPC client → `src/server.py` (TickerServiceServicer) → yfinance library → Yahoo Finance HTTP API
+**Data flow**: gRPC client → `src/server.py` → one of the four servicers → yfinance library → Yahoo Finance HTTP API
 
-**Proto management**: Buf is used for linting, code generation, and breaking change detection. Config in `buf.yaml` and `buf.gen.yaml`. Generated code goes to `gen/`.
+**Proto management**: Buf is used for linting, code generation, and breaking change detection. Config in `buf.yaml` and `buf.gen.yaml`. Generated code goes to `gen/`. The proto package `yfinance_grpc.v1alpha1` is used (not `yfinance.v1alpha1`) to avoid a naming conflict with the installed `yfinance` Python library.
 
 ## Key Implementation Details
 
-`src/server.py` contains the full `TickerServiceServicer` with 19 RPC methods and several helper utilities:
+`src/server.py` registers all four gRPC services and reflection. The servicer helpers live in separate files:
 
 - `safe_float()`, `safe_int()`, `safe_str()`: Handle NaN/None values from yfinance (pandas DataFrames frequently produce these)
 - `datetime_to_timestamp()`: Converts Python datetime to protobuf `Timestamp`

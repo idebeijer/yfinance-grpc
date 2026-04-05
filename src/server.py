@@ -25,10 +25,10 @@ import yfinance as yf
 import pandas as pd
 
 # Import generated protobuf and gRPC modules
-from yfinance_grpc.v1 import ticker_pb2, ticker_pb2_grpc
-from yfinance_grpc.v1 import search_pb2, search_pb2_grpc
-from yfinance_grpc.v1 import market_pb2, market_pb2_grpc
-from yfinance_grpc.v1 import sector_pb2, sector_pb2_grpc
+from yfinance_grpc.v1alpha1 import ticker_pb2, ticker_pb2_grpc
+from yfinance_grpc.v1alpha1 import search_pb2, search_pb2_grpc
+from yfinance_grpc.v1alpha1 import market_pb2, market_pb2_grpc
+from yfinance_grpc.v1alpha1 import sector_pb2, sector_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
 from src.search_server import SearchServiceServicer
 from src.market_server import MarketServiceServicer

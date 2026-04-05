@@ -13,7 +13,7 @@ sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "gen"))
 
 from src.search_server import SearchServiceServicer
-from yfinance_grpc.v1 import search_pb2
+from yfinance_grpc.v1alpha1 import search_pb2
 
 
 class TestSearchServiceSearch:
