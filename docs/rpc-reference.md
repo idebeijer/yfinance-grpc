@@ -1,6 +1,13 @@
 # RPC Reference
 
-Complete mapping of every `TickerService` RPC to the underlying yfinance method.
+Complete mapping of all RPCs to the underlying yfinance methods.
+
+The server exposes four gRPC services:
+
+- **TickerService** — single-ticker data (info, history, financials, options, etc.)
+- **SearchService** — full-text search and typed instrument lookup
+- **MarketService** — market-level trading status and price summaries
+- **SectorService** — sector and industry aggregate data
 
 ## Ticker Information
 
@@ -94,3 +101,30 @@ Complete mapping of every `TickerService` RPC to the underlying yfinance method.
 | RPC | yfinance | Returns | Notes |
 |-----|----------|---------|-------|
 | `GetNews` | `ticker.news` | `repeated NewsArticle` | Recent news articles with title, publisher, link, publish time, content type, and thumbnail URL; `count` defaults to 10 |
+
+---
+
+## SearchService
+
+| RPC | yfinance | Returns | Notes |
+|-----|----------|---------|-------|
+| `Search` | `yf.Search(query, ...)` | `repeated SearchQuote`, `repeated SearchNewsItem` | Full-text search returning matching quotes and news; `max_results` and `news_count` default to 8; optional fuzzy matching |
+| `Lookup` | `yf.Lookup(query).get_*()` | `repeated LookupResult` | Typed instrument lookup; `type` enum filters to equity/etf/index/future/currency/cryptocurrency/mutualfund; `count` defaults to 25 |
+
+---
+
+## MarketService
+
+| RPC | yfinance | Returns | Notes |
+|-----|----------|---------|-------|
+| `GetMarketStatus` | `yf.Market(market).status` | `MarketStatus` | Current session type (REGULAR/PRE/POST), open/close timestamps, and timezone; `market` is a Yahoo Finance market ID e.g. `us_market` |
+| `GetMarketSummary` | `yf.Market(market).summary` | `map<string, MarketSummaryItem>` | Price snapshot of major instruments keyed by exchange symbol (e.g. `^GSPC`); includes price, change, and change % |
+
+---
+
+## SectorService
+
+| RPC | yfinance | Returns | Notes |
+|-----|----------|---------|-------|
+| `GetSector` | `yf.Sector(key)` | `GetSectorResponse` | Overview, top companies, top ETFs (`map<string,string>`), top mutual funds (`map<string,string>`), and industries list; `key` e.g. `technology`, `financial-services` |
+| `GetIndustry` | `yf.Industry(key)` | `GetIndustryResponse` | Overview, top companies, top performing companies (YTD return, last price, target price), and top growth companies (YTD return, growth estimate); `key` e.g. `consumer-electronics` |

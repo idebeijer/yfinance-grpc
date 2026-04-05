@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package yfinance_grpc.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// SearchService provides full-text search and typed lookup of financial instruments.
+service SearchService {
+  // Search searches Yahoo Finance for quotes and news matching a query string.
+  rpc Search(SearchRequest) returns (SearchResponse);
+
+  // Lookup looks up financial instruments by query string and optional type filter.
+  rpc Lookup(LookupRequest) returns (LookupResponse);
+}
+
+// ========== Search ==========
+
+message SearchRequest {
+  string query = 1;
+  // Maximum number of quote results to return (default: 8).
+  int32 max_results = 2;
+  // Number of news articles to return (default: 8).
+  int32 news_count = 3;
+  // Enable fuzzy matching for typos (default: false).
+  bool enable_fuzzy_query = 4;
+}
+
+message SearchQuote {
+  string symbol = 1;
+  string short_name = 2;
+  string long_name = 3;
+  string exchange = 4;
+  string quote_type = 5;
+  string sector = 6;
+  string industry = 7;
+  // Human-readable type label (e.g. "Equity", "ETF").
+  string type_disp = 8;
+  double score = 9;
+}
+
+message SearchNewsItem {
+  string uuid = 1;
+  string title = 2;
+  string publisher = 3;
+  string link = 4;
+  google.protobuf.Timestamp provider_publish_time = 5;
+  string type = 6;
+}
+
+message SearchResponse {
+  repeated SearchQuote quotes = 1;
+  repeated SearchNewsItem news = 2;
+}
+
+// ========== Lookup ==========
+
+// LookupType filters Lookup results to a specific instrument class.
+enum LookupType {
+  LOOKUP_TYPE_UNSPECIFIED = 0;
+  LOOKUP_TYPE_ALL = 1;
+  LOOKUP_TYPE_EQUITY = 2;
+  LOOKUP_TYPE_MUTUALFUND = 3;
+  LOOKUP_TYPE_ETF = 4;
+  LOOKUP_TYPE_INDEX = 5;
+  LOOKUP_TYPE_FUTURE = 6;
+  LOOKUP_TYPE_CURRENCY = 7;
+  LOOKUP_TYPE_CRYPTOCURRENCY = 8;
+}
+
+message LookupRequest {
+  string query = 1;
+  // Instrument type filter (default: LOOKUP_TYPE_ALL).
+  LookupType type = 2;
+  // Maximum results to return (default: 25).
+  int32 count = 3;
+}
+
+message LookupResult {
+  string symbol = 1;
+  string name = 2;
+  string exchange = 3;
+  string quote_type = 4;
+  double score = 5;
+}
+
+message LookupResponse {
+  repeated LookupResult results = 1;
+}

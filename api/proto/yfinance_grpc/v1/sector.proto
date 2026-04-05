@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package yfinance_grpc.v1;
+
+// SectorService provides sector- and industry-level data.
+service SectorService {
+  // GetSector returns overview, top companies, ETFs, mutual funds, and industries for a sector.
+  rpc GetSector(GetSectorRequest) returns (GetSectorResponse);
+
+  // GetIndustry returns overview, top companies, top performing and top growth companies for an industry.
+  rpc GetIndustry(GetIndustryRequest) returns (GetIndustryResponse);
+}
+
+// ========== Shared ==========
+
+// DomainOverview holds aggregate statistics shared by Sector and Industry responses.
+message DomainOverview {
+  int32 companies_count = 1;
+  double market_cap = 2;
+  string description = 3;
+  // Number of sub-industries (only populated for sectors).
+  int32 industries_count = 4;
+  double market_weight = 5;
+  double employee_count = 6;
+}
+
+// DomainCompany is a top-company entry shared by Sector and Industry responses.
+message DomainCompany {
+  string symbol = 1;
+  string name = 2;
+  string rating = 3;
+  double market_weight = 4;
+}
+
+// ========== GetSector ==========
+
+message GetSectorRequest {
+  // Sector key as used by Yahoo Finance, e.g. "technology", "financial-services".
+  string key = 1;
+}
+
+// IndustryInfo is a row from Sector.industries.
+message IndustryInfo {
+  string key = 1;
+  string name = 2;
+  string symbol = 3;
+  double market_weight = 4;
+}
+
+message GetSectorResponse {
+  string key = 1;
+  string name = 2;
+  string symbol = 3;
+  DomainOverview overview = 4;
+  repeated DomainCompany top_companies = 5;
+  // Top ETFs: symbol -> name.
+  map<string, string> top_etfs = 6;
+  // Top mutual funds: symbol -> name.
+  map<string, string> top_mutual_funds = 7;
+  repeated IndustryInfo industries = 8;
+}
+
+// ========== GetIndustry ==========
+
+message GetIndustryRequest {
+  // Industry key as used by Yahoo Finance, e.g. "consumer-electronics".
+  string key = 1;
+}
+
+// TopPerformingCompany is a row from Industry.top_performing_companies.
+message TopPerformingCompany {
+  string symbol = 1;
+  string name = 2;
+  double ytd_return = 3;
+  double last_price = 4;
+  double target_price = 5;
+}
+
+// TopGrowthCompany is a row from Industry.top_growth_companies.
+message TopGrowthCompany {
+  string symbol = 1;
+  string name = 2;
+  double ytd_return = 3;
+  double growth_estimate = 4;
+}
+
+message GetIndustryResponse {
+  string key = 1;
+  string name = 2;
+  string symbol = 3;
+  string sector_key = 4;
+  string sector_name = 5;
+  DomainOverview overview = 6;
+  repeated DomainCompany top_companies = 7;
+  repeated TopPerformingCompany top_performing_companies = 8;
+  repeated TopGrowthCompany top_growth_companies = 9;
+}
