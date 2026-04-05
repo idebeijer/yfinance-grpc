@@ -18,6 +18,9 @@ sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "gen"))
 
 from yfinance_grpc.v1 import ticker_pb2, ticker_pb2_grpc
+from yfinance_grpc.v1 import search_pb2, search_pb2_grpc
+from yfinance_grpc.v1 import market_pb2, market_pb2_grpc
+from yfinance_grpc.v1 import sector_pb2, sector_pb2_grpc
 
 
 @pytest.fixture(scope="module")
@@ -465,6 +468,118 @@ class TestIntegrationErrorHandling:
         except grpc.RpcError as e:
             # Or it should return a proper error
             assert e.code() in [grpc.StatusCode.NOT_FOUND, grpc.StatusCode.INTERNAL]
+
+
+@pytest.fixture(scope="module")
+def search_stub(grpc_channel):
+    return search_pb2_grpc.SearchServiceStub(grpc_channel)
+
+
+@pytest.fixture(scope="module")
+def market_stub(grpc_channel):
+    return market_pb2_grpc.MarketServiceStub(grpc_channel)
+
+
+@pytest.fixture(scope="module")
+def sector_stub(grpc_channel):
+    return sector_pb2_grpc.SectorServiceStub(grpc_channel)
+
+
+class TestIntegrationSearch:
+    def test_search_returns_quotes(self, search_stub):
+        response = search_stub.Search(search_pb2.SearchRequest(query="Apple"))
+        assert len(response.quotes) > 0
+        symbols = [q.symbol for q in response.quotes]
+        assert "AAPL" in symbols
+
+    def test_search_returns_news(self, search_stub):
+        response = search_stub.Search(
+            search_pb2.SearchRequest(query="Apple", news_count=3)
+        )
+        # News may occasionally be empty; just verify the RPC succeeds and titles are strings
+        for item in response.news:
+            assert isinstance(item.title, str)
+
+    def test_search_empty_query_returns_error(self, search_stub):
+        with pytest.raises(grpc.RpcError) as exc_info:
+            search_stub.Search(search_pb2.SearchRequest(query=""))
+        assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
+
+    def test_lookup_equity_returns_results(self, search_stub):
+        response = search_stub.Lookup(
+            search_pb2.LookupRequest(
+                query="Apple",
+                type=search_pb2.LOOKUP_TYPE_EQUITY,
+                count=5,
+            )
+        )
+        assert len(response.results) > 0
+        assert all(r.symbol for r in response.results)
+
+    def test_lookup_empty_query_returns_error(self, search_stub):
+        with pytest.raises(grpc.RpcError) as exc_info:
+            search_stub.Lookup(search_pb2.LookupRequest(query=""))
+        assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
+
+
+class TestIntegrationMarket:
+    def test_get_market_status_succeeds(self, market_stub):
+        # Market may be closed; just verify the RPC completes without error
+        response = market_stub.GetMarketStatus(
+            market_pb2.GetMarketStatusRequest(market="us_market")
+        )
+        assert isinstance(response, market_pb2.GetMarketStatusResponse)
+
+    def test_get_market_summary_returns_instruments(self, market_stub):
+        response = market_stub.GetMarketSummary(
+            market_pb2.GetMarketSummaryRequest(market="us_market")
+        )
+        # Summary keyed by exchange symbol; prices should be positive when populated
+        for exchange, item in response.summary.items():
+            assert isinstance(exchange, str)
+            assert item.regular_market_price >= 0
+
+    def test_get_market_status_empty_market_returns_error(self, market_stub):
+        with pytest.raises(grpc.RpcError) as exc_info:
+            market_stub.GetMarketStatus(market_pb2.GetMarketStatusRequest(market=""))
+        assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
+
+
+class TestIntegrationSector:
+    def test_get_sector_technology(self, sector_stub):
+        response = sector_stub.GetSector(
+            sector_pb2.GetSectorRequest(key="technology")
+        )
+        assert response.key == "technology"
+        assert len(response.name) > 0
+        assert len(response.symbol) > 0
+
+    def test_get_sector_has_industries(self, sector_stub):
+        response = sector_stub.GetSector(
+            sector_pb2.GetSectorRequest(key="technology")
+        )
+        assert len(response.industries) > 0
+        for industry in response.industries:
+            assert len(industry.key) > 0
+            assert len(industry.name) > 0
+
+    def test_get_industry_consumer_electronics(self, sector_stub):
+        response = sector_stub.GetIndustry(
+            sector_pb2.GetIndustryRequest(key="consumer-electronics")
+        )
+        assert response.key == "consumer-electronics"
+        assert len(response.name) > 0
+        assert response.sector_key == "technology"
+
+    def test_get_sector_empty_key_returns_error(self, sector_stub):
+        with pytest.raises(grpc.RpcError) as exc_info:
+            sector_stub.GetSector(sector_pb2.GetSectorRequest(key=""))
+        assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
+
+    def test_get_industry_empty_key_returns_error(self, sector_stub):
+        with pytest.raises(grpc.RpcError) as exc_info:
+            sector_stub.GetIndustry(sector_pb2.GetIndustryRequest(key=""))
+        assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
 
 
 if __name__ == '__main__':
