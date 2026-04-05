@@ -193,7 +193,7 @@ class TestTickerServiceGetDividends:
         mock_ticker_class.return_value = mock_ticker
         
         # Create mock dividends series
-        dates = pd.date_range('2024-01-01', periods=4, freq='Q')
+        dates = pd.date_range('2024-01-01', periods=4, freq='QE')
         mock_dividends = pd.Series([0.25, 0.25, 0.26, 0.26], index=dates)
         # get_dividends should return the series
         mock_ticker.get_dividends.return_value = mock_dividends
@@ -582,7 +582,7 @@ class TestTickerServiceGetCapitalGains:
     def test_get_capital_gains_success(self, mock_ticker_class):
         mock_ticker = Mock()
         mock_ticker_class.return_value = mock_ticker
-        dates = pd.date_range('2024-01-01', periods=2, freq='Q')
+        dates = pd.date_range('2024-01-01', periods=2, freq='QE')
         mock_ticker.get_capital_gains.return_value = pd.Series([0.1, 0.2], index=dates)
 
         servicer = TickerServiceServicer()
