@@ -94,7 +94,9 @@ class MarketServiceServicer(market_pb2_grpc.MarketServiceServicer):
             return market_pb2.GetMarketSummaryResponse()
         try:
             summary = yf.Market(request.market).summary
-            if not summary:
+            # yfinance returns {'finance': {'result': None, 'error': ...}} when
+            # the market identifier is not valid for the summary endpoint.
+            if not summary or "finance" in summary:
                 return market_pb2.GetMarketSummaryResponse()
 
             items = {

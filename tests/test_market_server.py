@@ -121,6 +121,18 @@ class TestMarketServiceGetMarketSummary:
         assert len(response.summary) == 0
 
     @patch("src.market_server.yf.Market")
+    def test_get_market_summary_finance_error_key_returns_empty_response(self, mock_market_cls):
+        mock_market = Mock()
+        mock_market_cls.return_value = mock_market
+        mock_market.summary = {"finance": {"result": None, "error": {"code": "Bad Request", "description": "invalid broad market region"}}}
+
+        response = MarketServiceServicer().GetMarketSummary(
+            market_pb2.GetMarketSummaryRequest(market="us_market"), Mock()
+        )
+
+        assert len(response.summary) == 0
+
+    @patch("src.market_server.yf.Market")
     def test_get_market_summary_exception_returns_internal_error(self, mock_market_cls):
         mock_market_cls.side_effect = Exception("API error")
         context = Mock()

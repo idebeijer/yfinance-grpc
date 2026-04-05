@@ -107,8 +107,8 @@ func main() {
 		fmt.Printf("  Timezone: %s\n", status.Status.TimezoneShort)
 	}
 
-	fmt.Println("\n=== GetMarketSummary: us_market ===")
-	summary, err := marketClient.GetMarketSummary(ctx, &pb.GetMarketSummaryRequest{Market: "us_market"})
+	fmt.Println("\n=== GetMarketSummary: US ===")
+	summary, err := marketClient.GetMarketSummary(ctx, &pb.GetMarketSummaryRequest{Market: "US"})
 	if err != nil {
 		log.Printf("GetMarketSummary error: %v", err)
 	} else {
