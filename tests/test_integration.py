@@ -17,10 +17,10 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "gen"))
 
-from yfinance_grpc.v1 import ticker_pb2, ticker_pb2_grpc
-from yfinance_grpc.v1 import search_pb2, search_pb2_grpc
-from yfinance_grpc.v1 import market_pb2, market_pb2_grpc
-from yfinance_grpc.v1 import sector_pb2, sector_pb2_grpc
+from yfinance_grpc.v1alpha1 import ticker_pb2, ticker_pb2_grpc
+from yfinance_grpc.v1alpha1 import search_pb2, search_pb2_grpc
+from yfinance_grpc.v1alpha1 import market_pb2, market_pb2_grpc
+from yfinance_grpc.v1alpha1 import sector_pb2, sector_pb2_grpc
 
 
 @pytest.fixture(scope="module")

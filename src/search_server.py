@@ -13,7 +13,7 @@ import logging
 import yfinance as yf
 import pandas as pd
 
-from yfinance_grpc.v1 import search_pb2, search_pb2_grpc
+from yfinance_grpc.v1alpha1 import search_pb2, search_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
 
 logger = logging.getLogger(__name__)

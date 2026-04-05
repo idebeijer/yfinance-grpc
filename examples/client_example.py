@@ -13,7 +13,7 @@ sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "gen"))
 
 import grpc
-from yfinance_grpc.v1 import ticker_pb2, ticker_pb2_grpc
+from yfinance_grpc.v1alpha1 import ticker_pb2, ticker_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
 from datetime import datetime, timedelta
 

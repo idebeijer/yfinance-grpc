@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from yfinance_grpc.v1 import sector_pb2 as yfinance__grpc_dot_v1_dot_sector__pb2
+from yfinance_grpc.v1alpha1 import sector_pb2 as yfinance__grpc_dot_v1alpha1_dot_sector__pb2
 
 
 class SectorServiceStub(object):
@@ -16,14 +16,14 @@ class SectorServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetSector = channel.unary_unary(
-                '/yfinance_grpc.v1.SectorService/GetSector',
-                request_serializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetSectorRequest.SerializeToString,
-                response_deserializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetSectorResponse.FromString,
+                '/yfinance_grpc.v1alpha1.SectorService/GetSector',
+                request_serializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetSectorRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetSectorResponse.FromString,
                 _registered_method=True)
         self.GetIndustry = channel.unary_unary(
-                '/yfinance_grpc.v1.SectorService/GetIndustry',
-                request_serializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetIndustryRequest.SerializeToString,
-                response_deserializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetIndustryResponse.FromString,
+                '/yfinance_grpc.v1alpha1.SectorService/GetIndustry',
+                request_serializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetIndustryRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetIndustryResponse.FromString,
                 _registered_method=True)
 
 
@@ -50,19 +50,19 @@ def add_SectorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetSector': grpc.unary_unary_rpc_method_handler(
                     servicer.GetSector,
-                    request_deserializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetSectorRequest.FromString,
-                    response_serializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetSectorResponse.SerializeToString,
+                    request_deserializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetSectorRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetSectorResponse.SerializeToString,
             ),
             'GetIndustry': grpc.unary_unary_rpc_method_handler(
                     servicer.GetIndustry,
-                    request_deserializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetIndustryRequest.FromString,
-                    response_serializer=yfinance__grpc_dot_v1_dot_sector__pb2.GetIndustryResponse.SerializeToString,
+                    request_deserializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetIndustryRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetIndustryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'yfinance_grpc.v1.SectorService', rpc_method_handlers)
+            'yfinance_grpc.v1alpha1.SectorService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('yfinance_grpc.v1.SectorService', rpc_method_handlers)
+    server.add_registered_method_handlers('yfinance_grpc.v1alpha1.SectorService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -84,9 +84,9 @@ class SectorService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/yfinance_grpc.v1.SectorService/GetSector',
-            yfinance__grpc_dot_v1_dot_sector__pb2.GetSectorRequest.SerializeToString,
-            yfinance__grpc_dot_v1_dot_sector__pb2.GetSectorResponse.FromString,
+            '/yfinance_grpc.v1alpha1.SectorService/GetSector',
+            yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetSectorRequest.SerializeToString,
+            yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetSectorResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -111,9 +111,9 @@ class SectorService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/yfinance_grpc.v1.SectorService/GetIndustry',
-            yfinance__grpc_dot_v1_dot_sector__pb2.GetIndustryRequest.SerializeToString,
-            yfinance__grpc_dot_v1_dot_sector__pb2.GetIndustryResponse.FromString,
+            '/yfinance_grpc.v1alpha1.SectorService/GetIndustry',
+            yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetIndustryRequest.SerializeToString,
+            yfinance__grpc_dot_v1alpha1_dot_sector__pb2.GetIndustryResponse.FromString,
             options,
             channel_credentials,
             insecure,

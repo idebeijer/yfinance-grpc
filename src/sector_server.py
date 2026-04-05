@@ -13,7 +13,7 @@ import logging
 import yfinance as yf
 import pandas as pd
 
-from yfinance_grpc.v1 import sector_pb2, sector_pb2_grpc
+from yfinance_grpc.v1alpha1 import sector_pb2, sector_pb2_grpc
 
 logger = logging.getLogger(__name__)
 

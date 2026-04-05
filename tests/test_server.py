@@ -21,7 +21,7 @@ sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "gen"))
 
 from src.server import TickerServiceServicer, datetime_to_timestamp, safe_float, safe_int, safe_str
-from yfinance_grpc.v1 import ticker_pb2
+from yfinance_grpc.v1alpha1 import ticker_pb2
 
 
 class TestHelperFunctions:

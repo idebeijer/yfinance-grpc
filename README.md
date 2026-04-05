@@ -10,7 +10,6 @@ This project solves that problem by wrapping yfinance in a gRPC service, allowin
 
 - Access Yahoo Finance data from **any language** that supports gRPC
 - Maintain a **single source of truth** for Yahoo Finance data across your microservices
-- Leverage yfinance's robust implementation and maintenance
 - Use strongly-typed protocol buffers for data exchange
 
 ## Features
@@ -197,7 +196,7 @@ The server will start on port `50059` by default.
 To see examples of all the available endpoints:
 
 ```bash
-uv run python client_example.py
+uv run python examples/client_example.py
 # or
 make test
 ```
@@ -217,54 +216,74 @@ The server supports gRPC reflection, so you can use `grpcurl` without proto file
 # List all services
 grpcurl -plaintext localhost:50059 list
 
-# List methods
-grpcurl -plaintext localhost:50059 list yfinance_grpc.v1.TickerService
+# List methods on a service
+grpcurl -plaintext localhost:50059 list yfinance_grpc.v1alpha1.TickerService
 
 # Get ticker info
 grpcurl -plaintext -d '{"ticker": "AAPL"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetInfo
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService.GetInfo
 
 # Get historical data
 grpcurl -plaintext -d '{"ticker": "AAPL", "period": "5d", "interval": "1d"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetHistory
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService.GetHistory
+
+# Search for a symbol
+grpcurl -plaintext -d '{"query": "Apple", "max_results": 5}' \
+  localhost:50059 yfinance_grpc.v1alpha1.SearchService.Search
+
+# Get market status
+grpcurl -plaintext -d '{"market": "us_market"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.MarketService.GetMarketStatus
+
+# Get sector overview
+grpcurl -plaintext -d '{"key": "technology"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.SectorService.GetSector
 ```
 
 See [docs/grpcurl.md](docs/grpcurl.md) for more examples.
 
-### Using from Other Languages
+### Client Examples
 
-The protocol buffer definitions are in `api/proto/yfinance/v1/ticker.proto`. Use `buf` to generate client code for your language:
+#### Python
 
-#### Go Example
+A full Python client example covering all four services is in [`examples/client_example.py`](examples/client_example.py):
 
 ```bash
-buf generate --template buf.gen.go.yaml
+uv run python examples/client_example.py
 ```
 
-Then in your Go code:
+#### Go
+
+A runnable Go client example covering all four services is in [`examples/go/main.go`](examples/go/main.go). Pre-generated Go bindings are already included in `gen/go/` — no need to run `buf generate`.
+
+```bash
+cd examples/go
+go mod tidy
+go run main.go
+```
+
+The Go client uses the generated package at `github.com/idebeijer/yfinance-grpc/gen/go/yfinance_grpc/v1alpha1`. To use the generated bindings in your own Go project:
 
 ```go
 import (
     "context"
     "google.golang.org/grpc"
-    pb "your-module/gen/yfinance/v1"
+    "google.golang.org/grpc/credentials/insecure"
+    pb "github.com/idebeijer/yfinance-grpc/gen/go/yfinance_grpc/v1alpha1"
 )
 
 func main() {
-    conn, _ := grpc.Dial("localhost:50051", grpc.WithInsecure())
+    conn, _ := grpc.NewClient("localhost:50059",
+        grpc.WithTransportCredentials(insecure.NewCredentials()))
     defer conn.Close()
 
     client := pb.NewTickerServiceClient(conn)
-
-    resp, _ := client.GetInfo(context.Background(), &pb.GetInfoRequest{
-        Ticker: "AAPL",
-    })
-
+    resp, _ := client.GetInfo(context.Background(), &pb.GetInfoRequest{Ticker: "AAPL"})
     fmt.Printf("Price: $%.2f\n", resp.Info.CurrentPrice)
 }
 ```
 
-#### Node.js Example
+#### Node.js
 
 ```bash
 npm install @grpc/grpc-js @grpc/proto-loader
@@ -275,12 +294,12 @@ const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
 const packageDefinition = protoLoader.loadSync(
-  "api/proto/yfinance/v1/ticker.proto",
+  "api/proto/yfinance_grpc/v1alpha1/ticker.proto",
 );
-const proto = grpc.loadPackageDefinition(packageDefinition).yfinance.v1;
+const proto = grpc.loadPackageDefinition(packageDefinition).yfinance_grpc.v1alpha1;
 
 const client = new proto.TickerService(
-  "localhost:50051",
+  "localhost:50059",
   grpc.credentials.createInsecure(),
 );
 
@@ -293,7 +312,7 @@ client.getInfo({ ticker: "AAPL" }, (error, response) => {
 
 See [docs/rpc-reference.md](docs/rpc-reference.md) for a full mapping of every RPC to its yfinance equivalent, parameters, and return type.
 
-The complete protobuf definitions are in `api/proto/yfinance_grpc/v1/ticker.proto`.
+The complete protobuf definitions are in `api/proto/yfinance_grpc/v1alpha1/`.
 
 ## Development
 
@@ -309,11 +328,11 @@ make generate
 
 ### Adding New Endpoints
 
-1. Define the RPC method in `api/proto/yfinance_grpc/v1/ticker.proto`
+1. Define the RPC method in the appropriate `api/proto/yfinance_grpc/v1alpha1/*.proto` file (or add a new proto file for a new service)
 2. Add request/response message types
 3. Run `buf generate` or `make generate`
-4. Implement the method in `server.py`'s `TickerServiceServicer` class
-5. Add an example to `client_example.py`
+4. Implement the method in the corresponding servicer in `src/`
+5. Add an example to `examples/client_example.py`
 
 ## Error Handling
 

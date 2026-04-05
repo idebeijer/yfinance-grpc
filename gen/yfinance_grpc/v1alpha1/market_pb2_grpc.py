@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from yfinance_grpc.v1 import market_pb2 as yfinance__grpc_dot_v1_dot_market__pb2
+from yfinance_grpc.v1alpha1 import market_pb2 as yfinance__grpc_dot_v1alpha1_dot_market__pb2
 
 
 class MarketServiceStub(object):
@@ -16,14 +16,14 @@ class MarketServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetMarketStatus = channel.unary_unary(
-                '/yfinance_grpc.v1.MarketService/GetMarketStatus',
-                request_serializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketStatusRequest.SerializeToString,
-                response_deserializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketStatusResponse.FromString,
+                '/yfinance_grpc.v1alpha1.MarketService/GetMarketStatus',
+                request_serializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketStatusRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketStatusResponse.FromString,
                 _registered_method=True)
         self.GetMarketSummary = channel.unary_unary(
-                '/yfinance_grpc.v1.MarketService/GetMarketSummary',
-                request_serializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketSummaryRequest.SerializeToString,
-                response_deserializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketSummaryResponse.FromString,
+                '/yfinance_grpc.v1alpha1.MarketService/GetMarketSummary',
+                request_serializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketSummaryRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketSummaryResponse.FromString,
                 _registered_method=True)
 
 
@@ -50,19 +50,19 @@ def add_MarketServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetMarketStatus': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMarketStatus,
-                    request_deserializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketStatusRequest.FromString,
-                    response_serializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketStatusResponse.SerializeToString,
+                    request_deserializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketStatusRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketStatusResponse.SerializeToString,
             ),
             'GetMarketSummary': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMarketSummary,
-                    request_deserializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketSummaryRequest.FromString,
-                    response_serializer=yfinance__grpc_dot_v1_dot_market__pb2.GetMarketSummaryResponse.SerializeToString,
+                    request_deserializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketSummaryRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketSummaryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'yfinance_grpc.v1.MarketService', rpc_method_handlers)
+            'yfinance_grpc.v1alpha1.MarketService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('yfinance_grpc.v1.MarketService', rpc_method_handlers)
+    server.add_registered_method_handlers('yfinance_grpc.v1alpha1.MarketService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -84,9 +84,9 @@ class MarketService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/yfinance_grpc.v1.MarketService/GetMarketStatus',
-            yfinance__grpc_dot_v1_dot_market__pb2.GetMarketStatusRequest.SerializeToString,
-            yfinance__grpc_dot_v1_dot_market__pb2.GetMarketStatusResponse.FromString,
+            '/yfinance_grpc.v1alpha1.MarketService/GetMarketStatus',
+            yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketStatusRequest.SerializeToString,
+            yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketStatusResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -111,9 +111,9 @@ class MarketService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/yfinance_grpc.v1.MarketService/GetMarketSummary',
-            yfinance__grpc_dot_v1_dot_market__pb2.GetMarketSummaryRequest.SerializeToString,
-            yfinance__grpc_dot_v1_dot_market__pb2.GetMarketSummaryResponse.FromString,
+            '/yfinance_grpc.v1alpha1.MarketService/GetMarketSummary',
+            yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketSummaryRequest.SerializeToString,
+            yfinance__grpc_dot_v1alpha1_dot_market__pb2.GetMarketSummaryResponse.FromString,
             options,
             channel_credentials,
             insecure,

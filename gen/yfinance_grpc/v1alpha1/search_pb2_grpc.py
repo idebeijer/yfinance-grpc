@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from yfinance_grpc.v1 import search_pb2 as yfinance__grpc_dot_v1_dot_search__pb2
+from yfinance_grpc.v1alpha1 import search_pb2 as yfinance__grpc_dot_v1alpha1_dot_search__pb2
 
 
 class SearchServiceStub(object):
@@ -16,14 +16,14 @@ class SearchServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Search = channel.unary_unary(
-                '/yfinance_grpc.v1.SearchService/Search',
-                request_serializer=yfinance__grpc_dot_v1_dot_search__pb2.SearchRequest.SerializeToString,
-                response_deserializer=yfinance__grpc_dot_v1_dot_search__pb2.SearchResponse.FromString,
+                '/yfinance_grpc.v1alpha1.SearchService/Search',
+                request_serializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.SearchRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.SearchResponse.FromString,
                 _registered_method=True)
         self.Lookup = channel.unary_unary(
-                '/yfinance_grpc.v1.SearchService/Lookup',
-                request_serializer=yfinance__grpc_dot_v1_dot_search__pb2.LookupRequest.SerializeToString,
-                response_deserializer=yfinance__grpc_dot_v1_dot_search__pb2.LookupResponse.FromString,
+                '/yfinance_grpc.v1alpha1.SearchService/Lookup',
+                request_serializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.LookupRequest.SerializeToString,
+                response_deserializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.LookupResponse.FromString,
                 _registered_method=True)
 
 
@@ -50,19 +50,19 @@ def add_SearchServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Search': grpc.unary_unary_rpc_method_handler(
                     servicer.Search,
-                    request_deserializer=yfinance__grpc_dot_v1_dot_search__pb2.SearchRequest.FromString,
-                    response_serializer=yfinance__grpc_dot_v1_dot_search__pb2.SearchResponse.SerializeToString,
+                    request_deserializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.SearchRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.SearchResponse.SerializeToString,
             ),
             'Lookup': grpc.unary_unary_rpc_method_handler(
                     servicer.Lookup,
-                    request_deserializer=yfinance__grpc_dot_v1_dot_search__pb2.LookupRequest.FromString,
-                    response_serializer=yfinance__grpc_dot_v1_dot_search__pb2.LookupResponse.SerializeToString,
+                    request_deserializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.LookupRequest.FromString,
+                    response_serializer=yfinance__grpc_dot_v1alpha1_dot_search__pb2.LookupResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'yfinance_grpc.v1.SearchService', rpc_method_handlers)
+            'yfinance_grpc.v1alpha1.SearchService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('yfinance_grpc.v1.SearchService', rpc_method_handlers)
+    server.add_registered_method_handlers('yfinance_grpc.v1alpha1.SearchService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -84,9 +84,9 @@ class SearchService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/yfinance_grpc.v1.SearchService/Search',
-            yfinance__grpc_dot_v1_dot_search__pb2.SearchRequest.SerializeToString,
-            yfinance__grpc_dot_v1_dot_search__pb2.SearchResponse.FromString,
+            '/yfinance_grpc.v1alpha1.SearchService/Search',
+            yfinance__grpc_dot_v1alpha1_dot_search__pb2.SearchRequest.SerializeToString,
+            yfinance__grpc_dot_v1alpha1_dot_search__pb2.SearchResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -111,9 +111,9 @@ class SearchService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/yfinance_grpc.v1.SearchService/Lookup',
-            yfinance__grpc_dot_v1_dot_search__pb2.LookupRequest.SerializeToString,
-            yfinance__grpc_dot_v1_dot_search__pb2.LookupResponse.FromString,
+            '/yfinance_grpc.v1alpha1.SearchService/Lookup',
+            yfinance__grpc_dot_v1alpha1_dot_search__pb2.LookupRequest.SerializeToString,
+            yfinance__grpc_dot_v1alpha1_dot_search__pb2.LookupResponse.FromString,
             options,
             channel_credentials,
             insecure,

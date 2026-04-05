@@ -13,7 +13,7 @@ sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "gen"))
 
 from src.market_server import MarketServiceServicer
-from yfinance_grpc.v1 import market_pb2
+from yfinance_grpc.v1alpha1 import market_pb2
 
 
 class TestMarketServiceGetMarketStatus:
