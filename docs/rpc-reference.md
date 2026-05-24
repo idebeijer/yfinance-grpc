@@ -117,7 +117,7 @@ The server exposes four gRPC services:
 
 | RPC | yfinance | Returns | Notes |
 |-----|----------|---------|-------|
-| `GetMarketStatus` | `yf.Market(market).status` | `MarketStatus` | Current session type (REGULAR/PRE/POST), open/close timestamps, and timezone; `market` is a Yahoo Finance market ID e.g. `us_market` |
+| `GetMarketStatus` | `yf.Market(market).status` | `MarketStatus` | Current session type (REGULAR/PRE/POST), open/close timestamps, and timezone; `market` is a Yahoo Finance market ID e.g. `US` |
 | `GetMarketSummary` | `yf.Market(market).summary` | `map<string, MarketSummaryItem>` | Price snapshot of major instruments keyed by exchange symbol (e.g. `^GSPC`); includes price, change, and change % |
 
 ---

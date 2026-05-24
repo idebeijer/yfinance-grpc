@@ -98,8 +98,8 @@ func main() {
 	}
 
 	// --- MarketService ---
-	fmt.Println("\n=== GetMarketStatus: us_market ===")
-	status, err := marketClient.GetMarketStatus(ctx, &pb.GetMarketStatusRequest{Market: "us_market"})
+	fmt.Println("\n=== GetMarketStatus: US ===")
+	status, err := marketClient.GetMarketStatus(ctx, &pb.GetMarketStatusRequest{Market: "US"})
 	if err != nil {
 		log.Printf("GetMarketStatus error: %v", err)
 	} else {

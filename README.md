@@ -90,7 +90,7 @@ The server exposes 44 RPCs across four gRPC services currently covering a subset
 
 ### Market (MarketService)
 
-- **GetMarketStatus**: Current session type (REGULAR/PRE/POST), open/close timestamps and timezone for a market (e.g. `us_market`, `gb_market`)
+- **GetMarketStatus**: Current session type (REGULAR/PRE/POST), open/close timestamps and timezone for a market (e.g. `US`, `GB`)
 - **GetMarketSummary**: Price snapshot of major instruments in a market — price, change and change %
 
 ### Sector & Industry (SectorService)
@@ -232,7 +232,7 @@ grpcurl -plaintext -d '{"query": "Apple", "max_results": 5}' \
   localhost:50059 yfinance_grpc.v1alpha1.SearchService.Search
 
 # Get market status
-grpcurl -plaintext -d '{"market": "us_market"}' \
+grpcurl -plaintext -d '{"market": "US"}' \
   localhost:50059 yfinance_grpc.v1alpha1.MarketService.GetMarketStatus
 
 # Get sector overview

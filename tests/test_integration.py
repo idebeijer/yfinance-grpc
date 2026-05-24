@@ -526,13 +526,13 @@ class TestIntegrationMarket:
     def test_get_market_status_succeeds(self, market_stub):
         # Market may be closed; just verify the RPC completes without error
         response = market_stub.GetMarketStatus(
-            market_pb2.GetMarketStatusRequest(market="us_market")
+            market_pb2.GetMarketStatusRequest(market="US")
         )
         assert isinstance(response, market_pb2.GetMarketStatusResponse)
 
     def test_get_market_summary_returns_instruments(self, market_stub):
         response = market_stub.GetMarketSummary(
-            market_pb2.GetMarketSummaryRequest(market="us_market")
+            market_pb2.GetMarketSummaryRequest(market="US")
         )
         # Summary keyed by exchange symbol; prices should be positive when populated
         for exchange, item in response.summary.items():
