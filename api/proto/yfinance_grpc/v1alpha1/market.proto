@@ -16,7 +16,7 @@ service MarketService {
 // ========== GetMarketStatus ==========
 
 message GetMarketStatusRequest {
-  // Yahoo Finance market identifier, e.g. "us_market", "gb_market", "jp_market".
+  // Yahoo Finance market identifier, e.g. "US", "GB", "ASIA", "EUROPE".
   string market = 1;
 }
 
@@ -38,7 +38,7 @@ message GetMarketStatusResponse {
 // ========== GetMarketSummary ==========
 
 message GetMarketSummaryRequest {
-  // Yahoo Finance market identifier, e.g. "us_market".
+  // Yahoo Finance market identifier, e.g. "US".
   string market = 1;
 }
 

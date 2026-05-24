@@ -24,7 +24,7 @@ const (
 
 type GetMarketStatusRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Yahoo Finance market identifier, e.g. "us_market", "gb_market", "jp_market".
+	// Yahoo Finance market identifier, e.g. "US", "GB", "ASIA", "EUROPE".
 	Market        string `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -192,7 +192,7 @@ func (x *GetMarketStatusResponse) GetStatus() *MarketStatus {
 
 type GetMarketSummaryRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Yahoo Finance market identifier, e.g. "us_market".
+	// Yahoo Finance market identifier, e.g. "US".
 	Market        string `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
