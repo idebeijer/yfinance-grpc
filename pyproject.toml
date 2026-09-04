@@ -8,7 +8,7 @@ dependencies = [
     "grpcio==1.80.0",
     "grpcio-reflection==1.80.0",
     "protobuf==6.33.6",
-    "yfinance==1.4.0",
+    "yfinance==1.7.0",
 ]
 
 [project.optional-dependencies]
