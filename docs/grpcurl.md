@@ -1,181 +1,132 @@
 # Using grpcurl with yfinance-grpc
 
-The server now supports gRPC reflection, which means you can use `grpcurl` without needing to provide proto files.
+The server has gRPC reflection enabled, so [grpcurl](https://github.com/fullstorydev/grpcurl) works without proto files. All examples assume the server is running on `localhost:50059` (`make run` or `make up`).
 
-## Installing grpcurl
-
-### macOS
+## Install grpcurl
 
 ```bash
-brew install grpcurl
+brew install grpcurl                                          # macOS
+go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest # anywhere with Go
 ```
 
-### Linux
+Linux binaries are on the [releases page](https://github.com/fullstorydev/grpcurl/releases).
 
-```bash
-# Download latest release
-wget https://github.com/fullstorydev/grpcurl/releases/download/v1.9.1/grpcurl_1.9.1_linux_x86_64.tar.gz
-tar -xvzf grpcurl_1.9.1_linux_x86_64.tar.gz
-sudo mv grpcurl /usr/local/bin/
-```
-
-### Or using Go
-
-```bash
-go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
-```
-
-## Usage Examples
-
-### List all services
+## Discover the API
 
 ```bash
 grpcurl -plaintext localhost:50059 list
 ```
 
-Expected output:
-
 ```
 grpc.reflection.v1alpha.ServerReflection
-yfinance_grpc.v1.TickerService
+yfinance_grpc.v1alpha1.MarketService
+yfinance_grpc.v1alpha1.SearchService
+yfinance_grpc.v1alpha1.SectorService
+yfinance_grpc.v1alpha1.TickerService
 ```
 
-### List all methods in TickerService
-
 ```bash
-grpcurl -plaintext localhost:50059 list yfinance_grpc.v1.TickerService
+# Methods of one service
+grpcurl -plaintext localhost:50059 list yfinance_grpc.v1alpha1.TickerService
+
+# Full service definition, including request/response types
+grpcurl -plaintext localhost:50059 describe yfinance_grpc.v1alpha1.TickerService
+
+# One message type
+grpcurl -plaintext localhost:50059 describe yfinance_grpc.v1alpha1.GetHistoryRequest
 ```
 
-### Describe a method
+Python's reflection service cannot resolve individual methods, so `describe Service.Method` fails with "Symbol not found". Describe the service or the message instead.
+
+Field names in `-d` JSON may be written as in the proto (`max_results`) or in lowerCamelCase (`maxResults`).
+
+## TickerService
 
 ```bash
-grpcurl -plaintext localhost:50059 describe yfinance_grpc.v1.TickerService.GetInfo
-```
+# Company info and fast price snapshot
+grpcurl -plaintext -d '{"ticker": "AAPL"}' localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetInfo
+grpcurl -plaintext -d '{"ticker": "AAPL"}' localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetFastInfo
 
-### Call GetInfo
-
-```bash
-grpcurl -plaintext -d '{"ticker": "AAPL"}' localhost:50059 yfinance_grpc.v1.TickerService.GetInfo
-```
-
-### Call GetHistory
-
-```bash
-grpcurl -plaintext -d '{"ticker": "AAPL", "period": "5d", "interval": "1d"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetHistory
-```
-
-### Call GetNews
-
-```bash
-grpcurl -plaintext -d '{"ticker": "AAPL", "count": 5}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetNews
-```
-
-### Call GetRecommendations
-
-```bash
-grpcurl -plaintext -d '{"ticker": "AAPL"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetRecommendations
-```
-
-### Call GetOptions
-
-```bash
-grpcurl -plaintext -d '{"ticker": "AAPL"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetOptions
-```
-
-### Call GetOptionChain
-
-```bash
-# First get available dates
-grpcurl -plaintext -d '{"ticker": "AAPL"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetOptions
-
-# Then use one of the dates
-grpcurl -plaintext -d '{"ticker": "AAPL", "date": "2025-11-15"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetOptionChain
-```
-
-### Call GetMultipleInfo (NEW!)
-
-Get information for multiple tickers at once:
-
-```bash
+# Several tickers at once
 grpcurl -plaintext -d '{"tickers": ["AAPL", "MSFT", "GOOGL"]}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetMultipleInfo
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetMultipleInfo
+
+# Price history by period, or by date range
+grpcurl -plaintext -d '{"ticker": "AAPL", "period": "1mo", "interval": "1d"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetHistory
+grpcurl -plaintext -d '{"ticker": "AAPL", "start": "2025-01-01T00:00:00Z", "end": "2025-02-01T00:00:00Z"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetHistory
+
+# Financial statements: freq is "yearly" (default), "quarterly" or "trailing"
+grpcurl -plaintext -d '{"ticker": "AAPL", "freq": "quarterly"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetFinancials
+
+# Options: list expirations, then fetch one chain
+grpcurl -plaintext -d '{"ticker": "AAPL"}' localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetOptions
+grpcurl -plaintext -d '{"ticker": "AAPL", "date": "2026-12-18"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetOptionChain
+
+# News, holders, analyst data
+grpcurl -plaintext -d '{"ticker": "AAPL", "count": 5}' localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetNews
+grpcurl -plaintext -d '{"ticker": "AAPL"}' localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetInstitutionalHolders
+grpcurl -plaintext -d '{"ticker": "AAPL"}' localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetAnalystPriceTargets
 ```
 
-### Call DownloadHistory (NEW! - Streaming)
+### Streaming history for many tickers
 
-Bulk download historical data for multiple tickers (returns a stream):
+`DownloadHistory` is server-streaming: each response message carries up to 500 rows for one ticker. Pass one symbol per list entry. `["AAPL MSFT"]` is rejected with `INVALID_ARGUMENT`.
 
 ```bash
-# Download 5 days of data for multiple tickers
-grpcurl -plaintext -d '{"tickers": ["AAPL", "MSFT"], "period": "5d", "interval": "1d"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.DownloadHistory
-
-# Download with custom date range
-grpcurl -plaintext -d '{
-  "tickers": ["AAPL", "GOOGL"],
-  "interval": "1d",
-  "start": {"seconds": 1704067200},
-  "end": {"seconds": 1735689600}
-}' localhost:50059 yfinance_grpc.v1.TickerService.DownloadHistory
-
-# Download with auto_adjust disabled
-grpcurl -plaintext -d '{"tickers": ["AAPL"], "period": "1mo", "interval": "1d", "auto_adjust": false}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.DownloadHistory
+grpcurl -plaintext -v -d '{"tickers": ["AAPL", "MSFT", "NOPE_XYZ"], "period": "5d", "interval": "1d"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.TickerService/DownloadHistory
 ```
 
-## Pretty Print Output
+With `-v`, the trailers at the end list symbols that returned no data:
 
-Use `jq` to format JSON output:
-
-```bash
-grpcurl -plaintext -d '{"ticker": "AAPL"}' \
-  localhost:50059 yfinance_grpc.v1.TickerService.GetInfo | jq .
+```
+Response trailers received:
+missing-tickers: NOPE_XYZ
 ```
 
-## Using with Docker
+If none of the symbols has data, the call fails with `NOT_FOUND` instead.
 
-If running the server in Docker:
+## SearchService
 
 ```bash
-# Start the server
-docker compose up -d
+# Quotes and news matching a query
+grpcurl -plaintext -d '{"query": "Apple", "max_results": 5}' \
+  localhost:50059 yfinance_grpc.v1alpha1.SearchService/Search
 
-# Call from host
-grpcurl -plaintext -d '{"ticker": "AAPL"}' localhost:50059 yfinance_grpc.v1.TickerService.GetInfo
+# Instruments of one type: LOOKUP_TYPE_EQUITY, _ETF, _INDEX, _FUTURE, _CURRENCY, _CRYPTOCURRENCY, _MUTUALFUND
+grpcurl -plaintext -d '{"query": "S&P 500", "type": "LOOKUP_TYPE_ETF", "count": 5}' \
+  localhost:50059 yfinance_grpc.v1alpha1.SearchService/Lookup
 ```
 
-## Troubleshooting
-
-### Connection refused
-
-Make sure the server is running:
+## MarketService
 
 ```bash
-make run
-# or
-docker compose up
+grpcurl -plaintext -d '{"market": "US"}' localhost:50059 yfinance_grpc.v1alpha1.MarketService/GetMarketStatus
+grpcurl -plaintext -d '{"market": "US"}' localhost:50059 yfinance_grpc.v1alpha1.MarketService/GetMarketSummary
 ```
 
-### "Failed to dial target host"
-
-Check that port 50059 is not blocked by firewall and the server is listening:
+## SectorService
 
 ```bash
-netstat -an | grep 50059
-# or
-lsof -i :50059
+grpcurl -plaintext -d '{"key": "technology"}' localhost:50059 yfinance_grpc.v1alpha1.SectorService/GetSector
+grpcurl -plaintext -d '{"key": "consumer-electronics"}' \
+  localhost:50059 yfinance_grpc.v1alpha1.SectorService/GetIndustry
 ```
 
-### "Method not found"
+## Errors
 
-Make sure you're using the correct service and method names. List available methods:
+Failures come back as gRPC status codes (see [Errors in the RPC reference](rpc-reference.md#errors)):
 
 ```bash
-grpcurl -plaintext localhost:50059 list yfinance_grpc.v1.TickerService
+grpcurl -plaintext -d '{"ticker": ""}' localhost:50059 yfinance_grpc.v1alpha1.TickerService/GetInfo
+```
+
+```
+ERROR:
+  Code: InvalidArgument
+  Message: ticker must not be empty
 ```

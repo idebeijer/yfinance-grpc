@@ -27,7 +27,7 @@ The server exposes 44 RPCs across four gRPC services currently covering a subset
 ### Price History
 
 - **GetHistory**: Historical OHLCV data with configurable period, interval and adjustments
-- **DownloadHistory**: Stream historical data for multiple tickers concurrently (server-streaming RPC)
+- **DownloadHistory**: Stream historical data for multiple tickers (server-streaming RPC); symbols without data are reported in `missing-tickers` trailing metadata
 
 ### Corporate Actions
 
@@ -41,7 +41,7 @@ The server exposes 44 RPCs across four gRPC services currently covering a subset
 - **GetFinancials**: Income statements (yearly/quarterly/trailing)
 - **GetBalanceSheet**: Balance sheet data
 - **GetCashFlow**: Cash flow statements
-- **GetEarnings**: Earnings revenue and EPS data
+- **GetEarnings**: *Deprecated*, always returns `UNIMPLEMENTED` (Yahoo Finance dropped this data; use `GetFinancials` or `GetEarningsHistory`)
 
 ### Analyst Data & Estimates
 
@@ -102,106 +102,58 @@ The server exposes 44 RPCs across four gRPC services currently covering a subset
 
 ### Using Docker (Recommended)
 
-The easiest way to get started is using Docker:
-
 ```bash
-# Build and run using Make
-make docker-build
-make docker-run
-
-# Or using docker-compose
-docker-compose up -d
-
-# View logs
-make docker-logs
-# or
-docker-compose logs -f
+docker compose up -d      # or: make up
+docker compose logs -f    # or: make logs
 ```
 
-The server will be available at `localhost:50059`.
-
-### Using Make
-
-The project includes a Makefile for common tasks:
+Or use the published image:
 
 ```bash
-make help          # Show all available commands
-make install       # Install dependencies
-make generate      # Generate protobuf code
-make run           # Start the server
-make test          # Run client example
-make docker-build  # Build Docker image
-make docker-run    # Run in Docker
+docker run -p 50059:50059 ghcr.io/idebeijer/yfinance-grpc:latest
 ```
 
-## Installation
+The server listens on `localhost:50059`.
 
-### Prerequisites
+### From Source
 
-- Python 3.14+
-- [uv](https://github.com/astral-sh/uv) for Python environment management
-- [buf](https://buf.build/) for protocol buffer compilation
-- Docker (optional, for containerized deployment)
-- Make (optional, for convenience commands)
-
-### Setup
-
-1. Clone the repository:
+Prerequisites: Python 3.14+ and [uv](https://github.com/astral-sh/uv). The generated protobuf code is committed, so [buf](https://buf.build/) is only needed if you change the `.proto` files.
 
 ```bash
 git clone https://github.com/idebeijer/yfinance-grpc.git
 cd yfinance-grpc
+uv sync        # or: make install
+make run       # or: uv run yfinance-grpc
 ```
 
-2. Install dependencies using uv:
-
-```bash
-uv sync
-# or
-make install
-```
-
-3. Generate the protocol buffer code:
-
-```bash
-buf generate
-# or
-make generate
-```
+Run `make help` to see every available target.
 
 ## Usage
 
 ### Starting the Server
 
-**Option 1: Run directly with Python**
-
 ```bash
-uv run python main.py
-# or
-make run
+uv run yfinance-grpc                      # or: make run
+uv run yfinance-grpc --port 6000 --log-level debug
 ```
 
-**Option 2: Run with docker-compose**
-
-```bash
-docker-compose up -d
-# or
-make up
-```
-
-The server will start on port `50059` by default.
+| Flag | Environment variable | Default |
+|------|----------------------|---------|
+| `--port` | `PORT` | `50059` |
+| `--log-level` | `LOG_LEVEL` | `INFO` |
+| `--max-workers` | — | `10` |
 
 ### Running the Python Client Example
 
-To see examples of all the available endpoints:
+With the server running:
 
 ```bash
 uv run python examples/client_example.py
 # or
-make test
+make example
 ```
 
-This will demonstrate:
+This demonstrates:
 
 - Fetching ticker information
 - Getting historical data
@@ -265,20 +217,31 @@ go run main.go
 The Go client uses the generated package at `github.com/idebeijer/yfinance-grpc/gen/go/yfinance_grpc/v1alpha1`. To use the generated bindings in your own Go project:
 
 ```go
+package main
+
 import (
     "context"
+    "fmt"
+    "log"
+
+    pb "github.com/idebeijer/yfinance-grpc/gen/go/yfinance_grpc/v1alpha1"
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials/insecure"
-    pb "github.com/idebeijer/yfinance-grpc/gen/go/yfinance_grpc/v1alpha1"
 )
 
 func main() {
-    conn, _ := grpc.NewClient("localhost:50059",
+    conn, err := grpc.NewClient("localhost:50059",
         grpc.WithTransportCredentials(insecure.NewCredentials()))
+    if err != nil {
+        log.Fatal(err)
+    }
     defer conn.Close()
 
     client := pb.NewTickerServiceClient(conn)
-    resp, _ := client.GetInfo(context.Background(), &pb.GetInfoRequest{Ticker: "AAPL"})
+    resp, err := client.GetInfo(context.Background(), &pb.GetInfoRequest{Ticker: "AAPL"})
+    if err != nil {
+        log.Fatal(err)
+    }
     fmt.Printf("Price: $%.2f\n", resp.Info.CurrentPrice)
 }
 ```
@@ -289,61 +252,67 @@ func main() {
 npm install @grpc/grpc-js @grpc/proto-loader
 ```
 
+Copy `api/proto` from this repository into your project, then load every service:
+
 ```javascript
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
 const packageDefinition = protoLoader.loadSync(
-  "api/proto/yfinance_grpc/v1alpha1/ticker.proto",
+  ["ticker.proto", "search.proto", "market.proto", "sector.proto"].map(
+    (f) => `yfinance_grpc/v1alpha1/${f}`,
+  ),
+  { includeDirs: [`${__dirname}/api/proto`] },
 );
 const proto = grpc.loadPackageDefinition(packageDefinition).yfinance_grpc.v1alpha1;
 
-const client = new proto.TickerService(
-  "localhost:50059",
-  grpc.credentials.createInsecure(),
-);
+const ticker = new proto.TickerService("localhost:50059", grpc.credentials.createInsecure());
 
-client.getInfo({ ticker: "AAPL" }, (error, response) => {
+ticker.getInfo({ ticker: "AAPL" }, (error, response) => {
+  if (error) throw error;
   console.log(`Price: $${response.info.currentPrice}`);
 });
 ```
 
 ## API Documentation
 
-See [docs/rpc-reference.md](docs/rpc-reference.md) for a full mapping of every RPC to its yfinance equivalent, parameters, and return type.
+See [docs/rpc-reference.md](docs/rpc-reference.md) for a full mapping of every RPC to its yfinance equivalent, parameters, return type and error codes.
 
 The complete protobuf definitions are in `api/proto/yfinance_grpc/v1alpha1/`.
 
 ## Development
 
-### Regenerating Protocol Buffers
+### Layout
 
-After modifying `ticker.proto`:
-
-```bash
-buf generate
-# or
-make generate
+```
+api/proto/yfinance_grpc/v1alpha1/   Proto definitions (the API contract)
+gen/                                Generated code (buf generate; do not edit)
+src/yfinance_grpc_server/           Server package
+  ticker.py search.py market.py sector.py   One servicer per service
+  convert.py                        yfinance/pandas values -> protobuf values
+  errors.py                         @rpc decorator: exceptions -> gRPC status codes
+  server.py  __main__.py            Server wiring and CLI entry point
+tests/                              Unit tests; test_integration.py needs a live server
 ```
 
-### Adding New Endpoints
+### Checks
 
-1. Define the RPC method in the appropriate `api/proto/yfinance_grpc/v1alpha1/*.proto` file (or add a new proto file for a new service)
-2. Add request/response message types
-3. Run `buf generate` or `make generate`
-4. Implement the method in the corresponding servicer in `src/`
-5. Add an example to `examples/client_example.py`
+```bash
+make check              # ruff lint + format check, buf lint, mypy, unit tests
+make format             # auto-fix lint and formatting
+make test-integration   # integration tests; start the server first with `make run`
+```
+
+### Changing the API
+
+1. Edit the RPC and its messages in `api/proto/yfinance_grpc/v1alpha1/*.proto`
+2. Regenerate the Python and Go code with `make generate`, then run `make breaking` to check compatibility
+3. Implement the method in the matching servicer in `src/yfinance_grpc_server/`, decorated with `@rpc`
+4. Add unit tests (mock `yf.Ticker`), an integration test, and a row in [docs/rpc-reference.md](docs/rpc-reference.md)
 
 ## Error Handling
 
-The server returns standard gRPC status codes:
-
-- `OK`: Request succeeded
-- `NOT_FOUND`: Ticker has no data or doesn't exist (e.g. invalid symbol passed to `DownloadHistory`)
-- `INVALID_ARGUMENT`: Bad request parameters (e.g. empty tickers list)
-- `INTERNAL`: Unexpected yfinance or data processing error
-
-Error details are included in the status message.
+Failures are returned as standard gRPC status codes (`INVALID_ARGUMENT`, `NOT_FOUND`, `RESOURCE_EXHAUSTED`, `UNIMPLEMENTED`, `INTERNAL`). Missing data is not an error: an RPC with nothing to report returns `OK` with an empty response. See [docs/rpc-reference.md#errors](docs/rpc-reference.md#errors) for when each code is returned.
 
 ## Limitations
 

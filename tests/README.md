@@ -1,93 +1,46 @@
-# Testing Guide
+# Tests
 
-This project includes comprehensive unit and integration tests for the yfinance-grpc service.
-
-## Test Structure
-
-- `tests/test_server.py` - Unit tests that mock yfinance calls
-- `tests/test_integration.py` - Integration tests that require a running server
-
-## Running Tests
-
-### Install Test Dependencies
+| File | Covers | Needs |
+|------|--------|-------|
+| `test_convert.py`, `test_errors.py` | Shared value conversion and status-code mapping | nothing |
+| `test_ticker.py`, `test_search.py`, `test_market.py`, `test_sector.py` | One servicer each, yfinance mocked | nothing |
+| `test_integration.py` | Every service over a real gRPC channel | a server on `localhost:50059` and network access |
 
 ```bash
-uv sync --extra dev
-# or
-uv add --dev pytest pytest-mock
+make test               # unit tests (the default `pytest` run)
+make test-integration   # integration tests; start the server first with `make run`
+make test-all           # both
+uv run pytest tests/test_ticker.py -k GetInfo   # a subset
 ```
 
-### Run Unit Tests
+Integration tests carry the `integration` marker, and `pyproject.toml` deselects that marker by default (`-m "not integration"`).
 
-Unit tests don't require a running server and use mocking:
+## Writing unit tests
 
-```bash
-make test-unit
-```
-
-### Run Integration Tests
-
-Integration tests require the server to be running:
-
-```bash
-# Terminal 1: Start the server
-make run
-
-# Terminal 2: Run integration tests
-make test-integration
-```
-
-### Run All Tests
-
-```bash
-make test-all
-```
-
-### Run Specific Test Classes or Methods
-
-```bash
-# Run a specific test file
-uv run pytest tests/test_server.py -v
-
-# Run a specific test class
-uv run pytest tests/test_server.py::TestTickerServiceGetInfo -v
-
-# Run a specific test method
-uv run pytest tests/test_server.py::TestTickerServiceGetInfo::test_get_info_success -v
-```
-
-## Writing New Tests
-
-### Unit Test Example
+Patch yfinance where the servicer module looks it up, call the servicer directly with a `Mock()` context, and assert on the response, or on `context.abort` for failures:
 
 ```python
-@patch('src.server.yf.Ticker')
-def test_new_endpoint(self, mock_ticker_class):
-    """Test description"""
-    # Setup mock
-    mock_ticker = Mock()
-    mock_ticker_class.return_value = mock_ticker
-    mock_ticker.some_method.return_value = "data"
+from unittest.mock import ANY, Mock, patch
 
-    # Create servicer and call
-    servicer = TickerServiceServicer()
+import grpc
+from yfinance_grpc.v1alpha1 import ticker_pb2
+
+from yfinance_grpc_server.ticker import TickerServiceServicer
+
+
+@patch("yfinance_grpc_server.ticker.yf.Ticker")
+def test_get_isin(mock_ticker_class):
+    mock_ticker_class.return_value.get_isin.return_value = "US0378331005"
+
+    response = TickerServiceServicer().GetIsin(ticker_pb2.GetIsinRequest(ticker="AAPL"), Mock())
+
+    assert response.isin == "US0378331005"
+
+
+def test_get_isin_empty_ticker():
     context = Mock()
-    request = ticker_pb2.SomeRequest(ticker="AAPL")
-
-    response = servicer.SomeMethod(request, context)
-
-    # Assertions
-    assert response.some_field == "expected"
+    TickerServiceServicer().GetIsin(ticker_pb2.GetIsinRequest(ticker=""), context)
+    context.abort.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT, ANY)
 ```
 
-### Integration Test Example
-
-```python
-def test_new_endpoint_integration(self, stub):
-    """Test description"""
-    request = ticker_pb2.SomeRequest(ticker="AAPL")
-    response = stub.SomeMethod(request)
-
-    assert len(response.items) > 0
-    assert response.items[0].field == "expected"
-```
+A real `ServicerContext.abort` raises; a `Mock()` one returns, so the call above returns `None` after aborting. Tests that need the real control flow give the mock `abort.side_effect` (see `test_errors.py`).
