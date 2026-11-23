@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: yfinance-grpc
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: yfinance-grpc
+      app.kubernetes.io/part-of: yfinance-grpc
+    includeSelectors: false
+
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+  - networkpolicy.yaml
+  # Expose through a Gateway API Gateway: set parentRefs and hostnames in
+  # grpcroute.yaml first, then uncomment.
+  # - grpcroute.yaml
+
+images:
+  - name: ghcr.io/idebeijer/yfinance-grpc
+    # Tracks the newest release. To pin, set a version here (e.g. 0.5.0),
+    # optionally with `digest: sha256:...`.
+    newTag: latest

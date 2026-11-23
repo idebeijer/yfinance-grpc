@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yfinance-grpc
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: yfinance-grpc
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: yfinance-grpc
+    spec:
+      serviceAccountName: yfinance-grpc
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      # The server drains in-flight RPCs for 10s after SIGTERM; the preStop
+      # sleep below runs first, so this leaves headroom for both.
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532 # distroless "nonroot"
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: yfinance-grpc
+      containers:
+        - name: server
+          # Tag set by the kustomization's `images:` entry (latest by default).
+          # Always pull, so a restart picks up a newly released `latest`.
+          image: ghcr.io/idebeijer/yfinance-grpc
+          imagePullPolicy: Always
+          ports:
+            - name: grpc
+              containerPort: 50059
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "50059"
+            - name: LOG_LEVEL
+              value: INFO
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              # No CPU limit: throttling hurts latency more than it protects
+              # neighbours; the request already reserves a fair share.
+              memory: 512Mi
+          # The server has no grpc.health.v1 service yet, so probe the port.
+          startupProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 20
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              # Keep serving while endpoints/gateways drop this pod, before
+              # SIGTERM starts the drain. Needs no shell in the image.
+              sleep:
+                seconds: 5
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: yfinance-cache
+              # yfinance keeps its cookie and timezone caches here; without
+              # it every request re-authenticates against Yahoo.
+              mountPath: /home/nonroot/.cache
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 16Mi
+        - name: yfinance-cache
+          emptyDir:
+            sizeLimit: 64Mi
