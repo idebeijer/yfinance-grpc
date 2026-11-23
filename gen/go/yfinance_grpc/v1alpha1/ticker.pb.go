@@ -1423,11 +1423,12 @@ func (x *ActionRow) GetCapitalGains() float64 {
 }
 
 type GetFinancialsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ticker        string                 `protobuf:"bytes,1,opt,name=ticker,proto3" json:"ticker,omitempty"`
-	Freq          string                 `protobuf:"bytes,2,opt,name=freq,proto3" json:"freq,omitempty"`                    // "yearly", "quarterly", or "trailing" (default: "yearly")
-	AsDict        bool                   `protobuf:"varint,3,opt,name=as_dict,json=asDict,proto3" json:"as_dict,omitempty"` // Return as dictionary format
-	Pretty        bool                   `protobuf:"varint,4,opt,name=pretty,proto3" json:"pretty,omitempty"`               // Format row names nicely for readability
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Ticker string                 `protobuf:"bytes,1,opt,name=ticker,proto3" json:"ticker,omitempty"`
+	Freq   string                 `protobuf:"bytes,2,opt,name=freq,proto3" json:"freq,omitempty"` // "yearly", "quarterly", or "trailing" (default: "yearly")
+	// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
+	AsDict        bool `protobuf:"varint,3,opt,name=as_dict,json=asDict,proto3" json:"as_dict,omitempty"` // Ignored: responses are always structured messages
+	Pretty        bool `protobuf:"varint,4,opt,name=pretty,proto3" json:"pretty,omitempty"`               // Format row names nicely for readability
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1476,6 +1477,7 @@ func (x *GetFinancialsRequest) GetFreq() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
 func (x *GetFinancialsRequest) GetAsDict() bool {
 	if x != nil {
 		return x.AsDict
@@ -1587,11 +1589,12 @@ func (x *FinancialStatement) GetValues() map[string]float64 {
 }
 
 type GetBalanceSheetRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ticker        string                 `protobuf:"bytes,1,opt,name=ticker,proto3" json:"ticker,omitempty"`
-	Freq          string                 `protobuf:"bytes,2,opt,name=freq,proto3" json:"freq,omitempty"` // "yearly" or "quarterly" (default: "yearly")
-	AsDict        bool                   `protobuf:"varint,3,opt,name=as_dict,json=asDict,proto3" json:"as_dict,omitempty"`
-	Pretty        bool                   `protobuf:"varint,4,opt,name=pretty,proto3" json:"pretty,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Ticker string                 `protobuf:"bytes,1,opt,name=ticker,proto3" json:"ticker,omitempty"`
+	Freq   string                 `protobuf:"bytes,2,opt,name=freq,proto3" json:"freq,omitempty"` // "yearly" or "quarterly" (default: "yearly")
+	// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
+	AsDict        bool `protobuf:"varint,3,opt,name=as_dict,json=asDict,proto3" json:"as_dict,omitempty"` // Ignored: responses are always structured messages
+	Pretty        bool `protobuf:"varint,4,opt,name=pretty,proto3" json:"pretty,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1640,6 +1643,7 @@ func (x *GetBalanceSheetRequest) GetFreq() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
 func (x *GetBalanceSheetRequest) GetAsDict() bool {
 	if x != nil {
 		return x.AsDict
@@ -1751,11 +1755,12 @@ func (x *BalanceSheetStatement) GetValues() map[string]float64 {
 }
 
 type GetCashFlowRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ticker        string                 `protobuf:"bytes,1,opt,name=ticker,proto3" json:"ticker,omitempty"`
-	Freq          string                 `protobuf:"bytes,2,opt,name=freq,proto3" json:"freq,omitempty"` // "yearly" or "quarterly" (default: "yearly")
-	AsDict        bool                   `protobuf:"varint,3,opt,name=as_dict,json=asDict,proto3" json:"as_dict,omitempty"`
-	Pretty        bool                   `protobuf:"varint,4,opt,name=pretty,proto3" json:"pretty,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Ticker string                 `protobuf:"bytes,1,opt,name=ticker,proto3" json:"ticker,omitempty"`
+	Freq   string                 `protobuf:"bytes,2,opt,name=freq,proto3" json:"freq,omitempty"` // "yearly", "quarterly", or "trailing" (default: "yearly")
+	// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
+	AsDict        bool `protobuf:"varint,3,opt,name=as_dict,json=asDict,proto3" json:"as_dict,omitempty"` // Ignored: responses are always structured messages
+	Pretty        bool `protobuf:"varint,4,opt,name=pretty,proto3" json:"pretty,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1804,6 +1809,7 @@ func (x *GetCashFlowRequest) GetFreq() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
 func (x *GetCashFlowRequest) GetAsDict() bool {
 	if x != nil {
 		return x.AsDict
@@ -1914,6 +1920,9 @@ func (x *CashFlowStatement) GetValues() map[string]float64 {
 	return nil
 }
 
+// Deprecated with the GetEarnings RPC.
+//
+// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
 type GetEarningsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ticker        string                 `protobuf:"bytes,1,opt,name=ticker,proto3" json:"ticker,omitempty"`
@@ -1974,6 +1983,7 @@ func (x *GetEarningsRequest) GetAsDict() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
 type GetEarningsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Rows          []*EarningsRow         `protobuf:"bytes,1,rep,name=rows,proto3" json:"rows,omitempty"`
@@ -2018,6 +2028,7 @@ func (x *GetEarningsResponse) GetRows() []*EarningsRow {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in yfinance_grpc/v1alpha1/ticker.proto.
 type EarningsRow struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Date          *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
@@ -3227,7 +3238,7 @@ type InstitutionalHolder struct {
 	Holder        string                 `protobuf:"bytes,1,opt,name=holder,proto3" json:"holder,omitempty"`
 	Shares        int64                  `protobuf:"varint,2,opt,name=shares,proto3" json:"shares,omitempty"`
 	DateReported  *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=date_reported,json=dateReported,proto3" json:"date_reported,omitempty"`
-	PctOut        float64                `protobuf:"fixed64,4,opt,name=pct_out,json=pctOut,proto3" json:"pct_out,omitempty"` // Percentage of shares outstanding
+	PctOut        float64                `protobuf:"fixed64,4,opt,name=pct_out,json=pctOut,proto3" json:"pct_out,omitempty"` // Fraction of shares outstanding held (0.05 = 5%)
 	Value         float64                `protobuf:"fixed64,5,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3391,7 +3402,7 @@ type MutualFundHolder struct {
 	Holder        string                 `protobuf:"bytes,1,opt,name=holder,proto3" json:"holder,omitempty"`
 	Shares        int64                  `protobuf:"varint,2,opt,name=shares,proto3" json:"shares,omitempty"`
 	DateReported  *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=date_reported,json=dateReported,proto3" json:"date_reported,omitempty"`
-	PctOut        float64                `protobuf:"fixed64,4,opt,name=pct_out,json=pctOut,proto3" json:"pct_out,omitempty"`
+	PctOut        float64                `protobuf:"fixed64,4,opt,name=pct_out,json=pctOut,proto3" json:"pct_out,omitempty"` // Fraction of shares outstanding held (0.05 = 5%)
 	Value         float64                `protobuf:"fixed64,5,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -7143,11 +7154,11 @@ const file_yfinance_grpc_v1alpha1_ticker_proto_rawDesc = "" +
 	"\n" +
 	"_dividendsB\x0f\n" +
 	"\r_stock_splitsB\x10\n" +
-	"\x0e_capital_gains\"s\n" +
+	"\x0e_capital_gains\"w\n" +
 	"\x14GetFinancialsRequest\x12\x16\n" +
 	"\x06ticker\x18\x01 \x01(\tR\x06ticker\x12\x12\n" +
-	"\x04freq\x18\x02 \x01(\tR\x04freq\x12\x17\n" +
-	"\aas_dict\x18\x03 \x01(\bR\x06asDict\x12\x16\n" +
+	"\x04freq\x18\x02 \x01(\tR\x04freq\x12\x1b\n" +
+	"\aas_dict\x18\x03 \x01(\bB\x02\x18\x01R\x06asDict\x12\x16\n" +
 	"\x06pretty\x18\x04 \x01(\bR\x06pretty\"c\n" +
 	"\x15GetFinancialsResponse\x12J\n" +
 	"\n" +
@@ -7158,11 +7169,11 @@ const file_yfinance_grpc_v1alpha1_ticker_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v26.yfinance_grpc.v1alpha1.FinancialStatement.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"u\n" +
+	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"y\n" +
 	"\x16GetBalanceSheetRequest\x12\x16\n" +
 	"\x06ticker\x18\x01 \x01(\tR\x06ticker\x12\x12\n" +
-	"\x04freq\x18\x02 \x01(\tR\x04freq\x12\x17\n" +
-	"\aas_dict\x18\x03 \x01(\bR\x06asDict\x12\x16\n" +
+	"\x04freq\x18\x02 \x01(\tR\x04freq\x12\x1b\n" +
+	"\aas_dict\x18\x03 \x01(\bB\x02\x18\x01R\x06asDict\x12\x16\n" +
 	"\x06pretty\x18\x04 \x01(\bR\x06pretty\"h\n" +
 	"\x17GetBalanceSheetResponse\x12M\n" +
 	"\n" +
@@ -7173,11 +7184,11 @@ const file_yfinance_grpc_v1alpha1_ticker_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v29.yfinance_grpc.v1alpha1.BalanceSheetStatement.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"q\n" +
+	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"u\n" +
 	"\x12GetCashFlowRequest\x12\x16\n" +
 	"\x06ticker\x18\x01 \x01(\tR\x06ticker\x12\x12\n" +
-	"\x04freq\x18\x02 \x01(\tR\x04freq\x12\x17\n" +
-	"\aas_dict\x18\x03 \x01(\bR\x06asDict\x12\x16\n" +
+	"\x04freq\x18\x02 \x01(\tR\x04freq\x12\x1b\n" +
+	"\aas_dict\x18\x03 \x01(\bB\x02\x18\x01R\x06asDict\x12\x16\n" +
 	"\x06pretty\x18\x04 \x01(\bR\x06pretty\"`\n" +
 	"\x13GetCashFlowResponse\x12I\n" +
 	"\n" +
@@ -7188,17 +7199,17 @@ const file_yfinance_grpc_v1alpha1_ticker_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v25.yfinance_grpc.v1alpha1.CashFlowStatement.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"Y\n" +
+	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"]\n" +
 	"\x12GetEarningsRequest\x12\x16\n" +
 	"\x06ticker\x18\x01 \x01(\tR\x06ticker\x12\x12\n" +
 	"\x04freq\x18\x02 \x01(\tR\x04freq\x12\x17\n" +
-	"\aas_dict\x18\x03 \x01(\bR\x06asDict\"N\n" +
+	"\aas_dict\x18\x03 \x01(\bR\x06asDict:\x02\x18\x01\"R\n" +
 	"\x13GetEarningsResponse\x127\n" +
-	"\x04rows\x18\x01 \x03(\v2#.yfinance_grpc.v1alpha1.EarningsRowR\x04rows\"\x96\x01\n" +
+	"\x04rows\x18\x01 \x03(\v2#.yfinance_grpc.v1alpha1.EarningsRowR\x04rows:\x02\x18\x01\"\x9a\x01\n" +
 	"\vEarningsRow\x12.\n" +
 	"\x04date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x04date\x12\x1d\n" +
 	"\arevenue\x18\x02 \x01(\x01H\x00R\arevenue\x88\x01\x01\x12\x1f\n" +
-	"\bearnings\x18\x03 \x01(\x01H\x01R\bearnings\x88\x01\x01B\n" +
+	"\bearnings\x18\x03 \x01(\x01H\x01R\bearnings\x88\x01\x01:\x02\x18\x01B\n" +
 	"\n" +
 	"\b_revenueB\v\n" +
 	"\t_earnings\"3\n" +
@@ -7586,7 +7597,7 @@ const file_yfinance_grpc_v1alpha1_ticker_proto_rawDesc = "" +
 	"\x04date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x04date\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x10\n" +
-	"\x03url\x18\x04 \x01(\tR\x03url2\xcc\"\n" +
+	"\x03url\x18\x04 \x01(\tR\x03url2\xd1\"\n" +
 	"\rTickerService\x12Z\n" +
 	"\aGetInfo\x12&.yfinance_grpc.v1alpha1.GetInfoRequest\x1a'.yfinance_grpc.v1alpha1.GetInfoResponse\x12c\n" +
 	"\n" +
@@ -7597,8 +7608,8 @@ const file_yfinance_grpc_v1alpha1_ticker_proto_rawDesc = "" +
 	"GetActions\x12).yfinance_grpc.v1alpha1.GetActionsRequest\x1a*.yfinance_grpc.v1alpha1.GetActionsResponse\x12l\n" +
 	"\rGetFinancials\x12,.yfinance_grpc.v1alpha1.GetFinancialsRequest\x1a-.yfinance_grpc.v1alpha1.GetFinancialsResponse\x12r\n" +
 	"\x0fGetBalanceSheet\x12..yfinance_grpc.v1alpha1.GetBalanceSheetRequest\x1a/.yfinance_grpc.v1alpha1.GetBalanceSheetResponse\x12f\n" +
-	"\vGetCashFlow\x12*.yfinance_grpc.v1alpha1.GetCashFlowRequest\x1a+.yfinance_grpc.v1alpha1.GetCashFlowResponse\x12f\n" +
-	"\vGetEarnings\x12*.yfinance_grpc.v1alpha1.GetEarningsRequest\x1a+.yfinance_grpc.v1alpha1.GetEarningsResponse\x12{\n" +
+	"\vGetCashFlow\x12*.yfinance_grpc.v1alpha1.GetCashFlowRequest\x1a+.yfinance_grpc.v1alpha1.GetCashFlowResponse\x12k\n" +
+	"\vGetEarnings\x12*.yfinance_grpc.v1alpha1.GetEarningsRequest\x1a+.yfinance_grpc.v1alpha1.GetEarningsResponse\"\x03\x88\x02\x01\x12{\n" +
 	"\x12GetRecommendations\x121.yfinance_grpc.v1alpha1.GetRecommendationsRequest\x1a2.yfinance_grpc.v1alpha1.GetRecommendationsResponse\x12c\n" +
 	"\n" +
 	"GetOptions\x12).yfinance_grpc.v1alpha1.GetOptionsRequest\x1a*.yfinance_grpc.v1alpha1.GetOptionsResponse\x12o\n" +

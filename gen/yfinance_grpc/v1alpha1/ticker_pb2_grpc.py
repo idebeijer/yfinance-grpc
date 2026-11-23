@@ -268,7 +268,9 @@ class TickerServiceServicer:
         raise NotImplementedError('Method not implemented!')
 
     def GetEarnings(self, request, context):
-        """GetEarnings returns earnings data
+        """GetEarnings is deprecated: Yahoo Finance no longer serves this data and the
+        RPC always returns UNIMPLEMENTED. Use GetFinancials ("Net Income",
+        "Total Revenue") or GetEarningsHistory instead.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -331,14 +333,19 @@ class TickerServiceServicer:
         raise NotImplementedError('Method not implemented!')
 
     def GetMultipleInfo(self, request, context):
-        """GetMultipleInfo returns information for multiple tickers at once
+        """GetMultipleInfo returns information for multiple tickers at once.
+        Tickers that fail are omitted from the map and listed, comma-separated, in
+        the "missing-tickers" trailing metadata.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def DownloadHistory(self, request, context):
-        """DownloadHistory streams historical data for multiple tickers
+        """DownloadHistory streams historical data for multiple tickers, one ticker
+        at a time. Returns NOT_FOUND if no requested ticker has data; otherwise
+        tickers without data are listed, comma-separated, in the
+        "missing-tickers" trailing metadata.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

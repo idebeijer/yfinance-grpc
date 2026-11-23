@@ -30,8 +30,12 @@ service TickerService {
   // GetCashFlow returns cash flow statement data
   rpc GetCashFlow(GetCashFlowRequest) returns (GetCashFlowResponse);
 
-  // GetEarnings returns earnings data
-  rpc GetEarnings(GetEarningsRequest) returns (GetEarningsResponse);
+  // GetEarnings is deprecated: Yahoo Finance no longer serves this data and the
+  // RPC always returns UNIMPLEMENTED. Use GetFinancials ("Net Income",
+  // "Total Revenue") or GetEarningsHistory instead.
+  rpc GetEarnings(GetEarningsRequest) returns (GetEarningsResponse) {
+    option deprecated = true;
+  }
 
   // GetRecommendations returns analyst recommendations
   rpc GetRecommendations(GetRecommendationsRequest) returns (GetRecommendationsResponse);
@@ -57,10 +61,15 @@ service TickerService {
   // GetMutualFundHolders returns mutual fund holders information
   rpc GetMutualFundHolders(GetMutualFundHoldersRequest) returns (GetMutualFundHoldersResponse);
 
-  // GetMultipleInfo returns information for multiple tickers at once
+  // GetMultipleInfo returns information for multiple tickers at once.
+  // Tickers that fail are omitted from the map and listed, comma-separated, in
+  // the "missing-tickers" trailing metadata.
   rpc GetMultipleInfo(GetMultipleInfoRequest) returns (GetMultipleInfoResponse);
 
-  // DownloadHistory streams historical data for multiple tickers
+  // DownloadHistory streams historical data for multiple tickers, one ticker
+  // at a time. Returns NOT_FOUND if no requested ticker has data; otherwise
+  // tickers without data are listed, comma-separated, in the
+  // "missing-tickers" trailing metadata.
   rpc DownloadHistory(DownloadHistoryRequest) returns (stream DownloadHistoryResponse);
 
   // GetCapitalGains returns capital gains distributions for a ticker
@@ -310,7 +319,7 @@ message ActionRow {
 message GetFinancialsRequest {
   string ticker = 1;
   string freq = 2; // "yearly", "quarterly", or "trailing" (default: "yearly")
-  bool as_dict = 3; // Return as dictionary format
+  bool as_dict = 3 [deprecated = true]; // Ignored: responses are always structured messages
   bool pretty = 4; // Format row names nicely for readability
 }
 
@@ -328,7 +337,7 @@ message FinancialStatement {
 message GetBalanceSheetRequest {
   string ticker = 1;
   string freq = 2; // "yearly" or "quarterly" (default: "yearly")
-  bool as_dict = 3;
+  bool as_dict = 3 [deprecated = true]; // Ignored: responses are always structured messages
   bool pretty = 4;
 }
 
@@ -345,8 +354,8 @@ message BalanceSheetStatement {
 
 message GetCashFlowRequest {
   string ticker = 1;
-  string freq = 2; // "yearly" or "quarterly" (default: "yearly")
-  bool as_dict = 3;
+  string freq = 2; // "yearly", "quarterly", or "trailing" (default: "yearly")
+  bool as_dict = 3 [deprecated = true]; // Ignored: responses are always structured messages
   bool pretty = 4;
 }
 
@@ -361,17 +370,21 @@ message CashFlowStatement {
 
 // ========== GetEarnings ==========
 
+// Deprecated with the GetEarnings RPC.
 message GetEarningsRequest {
+  option deprecated = true;
   string ticker = 1;
   string freq = 2; // "yearly", "quarterly", or "trailing" (default: "yearly")
   bool as_dict = 3;
 }
 
 message GetEarningsResponse {
+  option deprecated = true;
   repeated EarningsRow rows = 1;
 }
 
 message EarningsRow {
+  option deprecated = true;
   google.protobuf.Timestamp date = 1;
   optional double revenue = 2;
   optional double earnings = 3;
@@ -508,7 +521,7 @@ message InstitutionalHolder {
   string holder = 1;
   int64 shares = 2;
   google.protobuf.Timestamp date_reported = 3;
-  double pct_out = 4; // Percentage of shares outstanding
+  double pct_out = 4; // Fraction of shares outstanding held (0.05 = 5%)
   double value = 5;
 }
 
@@ -526,7 +539,7 @@ message MutualFundHolder {
   string holder = 1;
   int64 shares = 2;
   google.protobuf.Timestamp date_reported = 3;
-  double pct_out = 4;
+  double pct_out = 4; // Fraction of shares outstanding held (0.05 = 5%)
   double value = 5;
 }
 
