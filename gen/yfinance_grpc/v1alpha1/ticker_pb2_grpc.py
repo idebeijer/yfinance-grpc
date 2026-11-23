@@ -5,7 +5,7 @@ import grpc
 from yfinance_grpc.v1alpha1 import ticker_pb2 as yfinance__grpc_dot_v1alpha1_dot_ticker__pb2
 
 
-class TickerServiceStub(object):
+class TickerServiceStub:
     """TickerService provides access to Yahoo Finance ticker data
     """
 
@@ -207,7 +207,7 @@ class TickerServiceStub(object):
                 _registered_method=True)
 
 
-class TickerServiceServicer(object):
+class TickerServiceServicer:
     """TickerService provides access to Yahoo Finance ticker data
     """
 
@@ -678,7 +678,7 @@ def add_TickerServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-class TickerService(object):
+class TickerService:
     """TickerService provides access to Yahoo Finance ticker data
     """
 

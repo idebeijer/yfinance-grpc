@@ -7,7 +7,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class DomainOverview(_message.Message):
-    __slots__ = ()
+    __slots__ = ("companies_count", "market_cap", "description", "industries_count", "market_weight", "employee_count")
     COMPANIES_COUNT_FIELD_NUMBER: _ClassVar[int]
     MARKET_CAP_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
@@ -23,7 +23,7 @@ class DomainOverview(_message.Message):
     def __init__(self, companies_count: _Optional[int] = ..., market_cap: _Optional[float] = ..., description: _Optional[str] = ..., industries_count: _Optional[int] = ..., market_weight: _Optional[float] = ..., employee_count: _Optional[float] = ...) -> None: ...
 
 class DomainCompany(_message.Message):
-    __slots__ = ()
+    __slots__ = ("symbol", "name", "rating", "market_weight")
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     RATING_FIELD_NUMBER: _ClassVar[int]
@@ -35,13 +35,13 @@ class DomainCompany(_message.Message):
     def __init__(self, symbol: _Optional[str] = ..., name: _Optional[str] = ..., rating: _Optional[str] = ..., market_weight: _Optional[float] = ...) -> None: ...
 
 class GetSectorRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("key",)
     KEY_FIELD_NUMBER: _ClassVar[int]
     key: str
     def __init__(self, key: _Optional[str] = ...) -> None: ...
 
 class IndustryInfo(_message.Message):
-    __slots__ = ()
+    __slots__ = ("key", "name", "symbol", "market_weight")
     KEY_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
@@ -53,16 +53,16 @@ class IndustryInfo(_message.Message):
     def __init__(self, key: _Optional[str] = ..., name: _Optional[str] = ..., symbol: _Optional[str] = ..., market_weight: _Optional[float] = ...) -> None: ...
 
 class GetSectorResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("key", "name", "symbol", "overview", "top_companies", "top_etfs", "top_mutual_funds", "industries")
     class TopEtfsEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     class TopMutualFundsEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -87,13 +87,13 @@ class GetSectorResponse(_message.Message):
     def __init__(self, key: _Optional[str] = ..., name: _Optional[str] = ..., symbol: _Optional[str] = ..., overview: _Optional[_Union[DomainOverview, _Mapping]] = ..., top_companies: _Optional[_Iterable[_Union[DomainCompany, _Mapping]]] = ..., top_etfs: _Optional[_Mapping[str, str]] = ..., top_mutual_funds: _Optional[_Mapping[str, str]] = ..., industries: _Optional[_Iterable[_Union[IndustryInfo, _Mapping]]] = ...) -> None: ...
 
 class GetIndustryRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("key",)
     KEY_FIELD_NUMBER: _ClassVar[int]
     key: str
     def __init__(self, key: _Optional[str] = ...) -> None: ...
 
 class TopPerformingCompany(_message.Message):
-    __slots__ = ()
+    __slots__ = ("symbol", "name", "ytd_return", "last_price", "target_price")
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     YTD_RETURN_FIELD_NUMBER: _ClassVar[int]
@@ -107,7 +107,7 @@ class TopPerformingCompany(_message.Message):
     def __init__(self, symbol: _Optional[str] = ..., name: _Optional[str] = ..., ytd_return: _Optional[float] = ..., last_price: _Optional[float] = ..., target_price: _Optional[float] = ...) -> None: ...
 
 class TopGrowthCompany(_message.Message):
-    __slots__ = ()
+    __slots__ = ("symbol", "name", "ytd_return", "growth_estimate")
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     YTD_RETURN_FIELD_NUMBER: _ClassVar[int]
@@ -119,7 +119,7 @@ class TopGrowthCompany(_message.Message):
     def __init__(self, symbol: _Optional[str] = ..., name: _Optional[str] = ..., ytd_return: _Optional[float] = ..., growth_estimate: _Optional[float] = ...) -> None: ...
 
 class GetIndustryResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("key", "name", "symbol", "sector_key", "sector_name", "overview", "top_companies", "top_performing_companies", "top_growth_companies")
     KEY_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SYMBOL_FIELD_NUMBER: _ClassVar[int]

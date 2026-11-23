@@ -10,19 +10,19 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class GetInfoRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetInfoResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("info",)
     INFO_FIELD_NUMBER: _ClassVar[int]
     info: TickerInfo
     def __init__(self, info: _Optional[_Union[TickerInfo, _Mapping]] = ...) -> None: ...
 
 class TickerInfo(_message.Message):
-    __slots__ = ()
+    __slots__ = ("symbol", "short_name", "long_name", "industry", "sector", "country", "city", "state", "zip", "website", "long_business_summary", "previous_close", "open", "day_low", "day_high", "regular_market_previous_close", "regular_market_open", "regular_market_day_low", "regular_market_day_high", "current_price", "volume", "regular_market_volume", "average_volume", "average_volume_10days", "shares_outstanding", "float_shares", "market_cap", "enterprise_value", "trailing_pe", "forward_pe", "price_to_book", "price_to_sales_trailing_12months", "enterprise_to_revenue", "enterprise_to_ebitda", "dividend_rate", "dividend_yield", "ex_dividend_date", "payout_ratio", "five_year_avg_dividend_yield", "beta", "trailing_eps", "forward_eps", "book_value", "profit_margins", "revenue_per_share", "return_on_assets", "return_on_equity", "revenue_growth", "earnings_growth", "operating_margins", "ebitda_margins", "fifty_two_week_low", "fifty_two_week_high", "fifty_day_average", "two_hundred_day_average", "target_high_price", "target_low_price", "target_mean_price", "target_median_price", "number_of_analyst_opinions", "currency", "exchange", "quote_type", "financial_currency", "price_hint")
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
     SHORT_NAME_FIELD_NUMBER: _ClassVar[int]
     LONG_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -156,7 +156,7 @@ class TickerInfo(_message.Message):
     def __init__(self, symbol: _Optional[str] = ..., short_name: _Optional[str] = ..., long_name: _Optional[str] = ..., industry: _Optional[str] = ..., sector: _Optional[str] = ..., country: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., zip: _Optional[str] = ..., website: _Optional[str] = ..., long_business_summary: _Optional[str] = ..., previous_close: _Optional[float] = ..., open: _Optional[float] = ..., day_low: _Optional[float] = ..., day_high: _Optional[float] = ..., regular_market_previous_close: _Optional[float] = ..., regular_market_open: _Optional[float] = ..., regular_market_day_low: _Optional[float] = ..., regular_market_day_high: _Optional[float] = ..., current_price: _Optional[float] = ..., volume: _Optional[int] = ..., regular_market_volume: _Optional[int] = ..., average_volume: _Optional[int] = ..., average_volume_10days: _Optional[int] = ..., shares_outstanding: _Optional[int] = ..., float_shares: _Optional[int] = ..., market_cap: _Optional[int] = ..., enterprise_value: _Optional[float] = ..., trailing_pe: _Optional[float] = ..., forward_pe: _Optional[float] = ..., price_to_book: _Optional[float] = ..., price_to_sales_trailing_12months: _Optional[float] = ..., enterprise_to_revenue: _Optional[float] = ..., enterprise_to_ebitda: _Optional[float] = ..., dividend_rate: _Optional[float] = ..., dividend_yield: _Optional[float] = ..., ex_dividend_date: _Optional[int] = ..., payout_ratio: _Optional[float] = ..., five_year_avg_dividend_yield: _Optional[float] = ..., beta: _Optional[float] = ..., trailing_eps: _Optional[float] = ..., forward_eps: _Optional[float] = ..., book_value: _Optional[float] = ..., profit_margins: _Optional[float] = ..., revenue_per_share: _Optional[float] = ..., return_on_assets: _Optional[float] = ..., return_on_equity: _Optional[float] = ..., revenue_growth: _Optional[float] = ..., earnings_growth: _Optional[float] = ..., operating_margins: _Optional[float] = ..., ebitda_margins: _Optional[float] = ..., fifty_two_week_low: _Optional[float] = ..., fifty_two_week_high: _Optional[float] = ..., fifty_day_average: _Optional[float] = ..., two_hundred_day_average: _Optional[float] = ..., target_high_price: _Optional[float] = ..., target_low_price: _Optional[float] = ..., target_mean_price: _Optional[float] = ..., target_median_price: _Optional[float] = ..., number_of_analyst_opinions: _Optional[int] = ..., currency: _Optional[str] = ..., exchange: _Optional[str] = ..., quote_type: _Optional[str] = ..., financial_currency: _Optional[str] = ..., price_hint: _Optional[int] = ...) -> None: ...
 
 class GetHistoryRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "period", "start", "end", "interval", "prepost", "actions", "auto_adjust", "back_adjust", "repair", "keepna", "rounding")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     START_FIELD_NUMBER: _ClassVar[int]
@@ -184,13 +184,13 @@ class GetHistoryRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., period: _Optional[str] = ..., start: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., interval: _Optional[str] = ..., prepost: _Optional[bool] = ..., actions: _Optional[bool] = ..., auto_adjust: _Optional[bool] = ..., back_adjust: _Optional[bool] = ..., repair: _Optional[bool] = ..., keepna: _Optional[bool] = ..., rounding: _Optional[bool] = ...) -> None: ...
 
 class GetHistoryResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[HistoryRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[HistoryRow, _Mapping]]] = ...) -> None: ...
 
 class HistoryRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "open", "high", "low", "close", "volume", "dividends", "stock_splits", "capital_gains")
     DATE_FIELD_NUMBER: _ClassVar[int]
     OPEN_FIELD_NUMBER: _ClassVar[int]
     HIGH_FIELD_NUMBER: _ClassVar[int]
@@ -212,7 +212,7 @@ class HistoryRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., open: _Optional[float] = ..., high: _Optional[float] = ..., low: _Optional[float] = ..., close: _Optional[float] = ..., volume: _Optional[int] = ..., dividends: _Optional[float] = ..., stock_splits: _Optional[float] = ..., capital_gains: _Optional[float] = ...) -> None: ...
 
 class GetDividendsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "period")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     ticker: str
@@ -220,13 +220,13 @@ class GetDividendsRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., period: _Optional[str] = ...) -> None: ...
 
 class GetDividendsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[DividendRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[DividendRow, _Mapping]]] = ...) -> None: ...
 
 class DividendRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "amount")
     DATE_FIELD_NUMBER: _ClassVar[int]
     AMOUNT_FIELD_NUMBER: _ClassVar[int]
     date: _timestamp_pb2.Timestamp
@@ -234,7 +234,7 @@ class DividendRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., amount: _Optional[float] = ...) -> None: ...
 
 class GetSplitsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "period")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     ticker: str
@@ -242,13 +242,13 @@ class GetSplitsRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., period: _Optional[str] = ...) -> None: ...
 
 class GetSplitsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[SplitRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[SplitRow, _Mapping]]] = ...) -> None: ...
 
 class SplitRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "ratio")
     DATE_FIELD_NUMBER: _ClassVar[int]
     RATIO_FIELD_NUMBER: _ClassVar[int]
     date: _timestamp_pb2.Timestamp
@@ -256,7 +256,7 @@ class SplitRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., ratio: _Optional[float] = ...) -> None: ...
 
 class GetActionsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "period")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     ticker: str
@@ -264,13 +264,13 @@ class GetActionsRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., period: _Optional[str] = ...) -> None: ...
 
 class GetActionsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[ActionRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[ActionRow, _Mapping]]] = ...) -> None: ...
 
 class ActionRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "dividends", "stock_splits", "capital_gains")
     DATE_FIELD_NUMBER: _ClassVar[int]
     DIVIDENDS_FIELD_NUMBER: _ClassVar[int]
     STOCK_SPLITS_FIELD_NUMBER: _ClassVar[int]
@@ -282,7 +282,7 @@ class ActionRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., dividends: _Optional[float] = ..., stock_splits: _Optional[float] = ..., capital_gains: _Optional[float] = ...) -> None: ...
 
 class GetFinancialsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "freq", "as_dict", "pretty")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     FREQ_FIELD_NUMBER: _ClassVar[int]
     AS_DICT_FIELD_NUMBER: _ClassVar[int]
@@ -294,15 +294,15 @@ class GetFinancialsRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., freq: _Optional[str] = ..., as_dict: _Optional[bool] = ..., pretty: _Optional[bool] = ...) -> None: ...
 
 class GetFinancialsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("statements",)
     STATEMENTS_FIELD_NUMBER: _ClassVar[int]
     statements: _containers.RepeatedCompositeFieldContainer[FinancialStatement]
     def __init__(self, statements: _Optional[_Iterable[_Union[FinancialStatement, _Mapping]]] = ...) -> None: ...
 
 class FinancialStatement(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "values")
     class ValuesEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -315,7 +315,7 @@ class FinancialStatement(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., values: _Optional[_Mapping[str, float]] = ...) -> None: ...
 
 class GetBalanceSheetRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "freq", "as_dict", "pretty")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     FREQ_FIELD_NUMBER: _ClassVar[int]
     AS_DICT_FIELD_NUMBER: _ClassVar[int]
@@ -327,15 +327,15 @@ class GetBalanceSheetRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., freq: _Optional[str] = ..., as_dict: _Optional[bool] = ..., pretty: _Optional[bool] = ...) -> None: ...
 
 class GetBalanceSheetResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("statements",)
     STATEMENTS_FIELD_NUMBER: _ClassVar[int]
     statements: _containers.RepeatedCompositeFieldContainer[BalanceSheetStatement]
     def __init__(self, statements: _Optional[_Iterable[_Union[BalanceSheetStatement, _Mapping]]] = ...) -> None: ...
 
 class BalanceSheetStatement(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "values")
     class ValuesEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -348,7 +348,7 @@ class BalanceSheetStatement(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., values: _Optional[_Mapping[str, float]] = ...) -> None: ...
 
 class GetCashFlowRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "freq", "as_dict", "pretty")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     FREQ_FIELD_NUMBER: _ClassVar[int]
     AS_DICT_FIELD_NUMBER: _ClassVar[int]
@@ -360,15 +360,15 @@ class GetCashFlowRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., freq: _Optional[str] = ..., as_dict: _Optional[bool] = ..., pretty: _Optional[bool] = ...) -> None: ...
 
 class GetCashFlowResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("statements",)
     STATEMENTS_FIELD_NUMBER: _ClassVar[int]
     statements: _containers.RepeatedCompositeFieldContainer[CashFlowStatement]
     def __init__(self, statements: _Optional[_Iterable[_Union[CashFlowStatement, _Mapping]]] = ...) -> None: ...
 
 class CashFlowStatement(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "values")
     class ValuesEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -381,7 +381,7 @@ class CashFlowStatement(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., values: _Optional[_Mapping[str, float]] = ...) -> None: ...
 
 class GetEarningsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "freq", "as_dict")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     FREQ_FIELD_NUMBER: _ClassVar[int]
     AS_DICT_FIELD_NUMBER: _ClassVar[int]
@@ -391,13 +391,13 @@ class GetEarningsRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., freq: _Optional[str] = ..., as_dict: _Optional[bool] = ...) -> None: ...
 
 class GetEarningsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[EarningsRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[EarningsRow, _Mapping]]] = ...) -> None: ...
 
 class EarningsRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "revenue", "earnings")
     DATE_FIELD_NUMBER: _ClassVar[int]
     REVENUE_FIELD_NUMBER: _ClassVar[int]
     EARNINGS_FIELD_NUMBER: _ClassVar[int]
@@ -407,19 +407,19 @@ class EarningsRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., revenue: _Optional[float] = ..., earnings: _Optional[float] = ...) -> None: ...
 
 class GetRecommendationsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetRecommendationsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[RecommendationRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[RecommendationRow, _Mapping]]] = ...) -> None: ...
 
 class RecommendationRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "firm", "to_grade", "from_grade", "action")
     DATE_FIELD_NUMBER: _ClassVar[int]
     FIRM_FIELD_NUMBER: _ClassVar[int]
     TO_GRADE_FIELD_NUMBER: _ClassVar[int]
@@ -433,19 +433,19 @@ class RecommendationRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., firm: _Optional[str] = ..., to_grade: _Optional[str] = ..., from_grade: _Optional[str] = ..., action: _Optional[str] = ...) -> None: ...
 
 class GetOptionsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetOptionsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("expiration_dates",)
     EXPIRATION_DATES_FIELD_NUMBER: _ClassVar[int]
     expiration_dates: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, expiration_dates: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetOptionChainRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "date", "tz")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     DATE_FIELD_NUMBER: _ClassVar[int]
     TZ_FIELD_NUMBER: _ClassVar[int]
@@ -455,7 +455,7 @@ class GetOptionChainRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., date: _Optional[str] = ..., tz: _Optional[str] = ...) -> None: ...
 
 class GetOptionChainResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("calls", "puts")
     CALLS_FIELD_NUMBER: _ClassVar[int]
     PUTS_FIELD_NUMBER: _ClassVar[int]
     calls: _containers.RepeatedCompositeFieldContainer[OptionContract]
@@ -463,7 +463,7 @@ class GetOptionChainResponse(_message.Message):
     def __init__(self, calls: _Optional[_Iterable[_Union[OptionContract, _Mapping]]] = ..., puts: _Optional[_Iterable[_Union[OptionContract, _Mapping]]] = ...) -> None: ...
 
 class OptionContract(_message.Message):
-    __slots__ = ()
+    __slots__ = ("contract_symbol", "strike", "currency", "last_price", "bid", "ask", "change", "percent_change", "volume", "open_interest", "implied_volatility", "in_the_money", "contract_size", "last_trade_date")
     CONTRACT_SYMBOL_FIELD_NUMBER: _ClassVar[int]
     STRIKE_FIELD_NUMBER: _ClassVar[int]
     CURRENCY_FIELD_NUMBER: _ClassVar[int]
@@ -495,13 +495,13 @@ class OptionContract(_message.Message):
     def __init__(self, contract_symbol: _Optional[str] = ..., strike: _Optional[float] = ..., currency: _Optional[str] = ..., last_price: _Optional[float] = ..., bid: _Optional[float] = ..., ask: _Optional[float] = ..., change: _Optional[float] = ..., percent_change: _Optional[float] = ..., volume: _Optional[int] = ..., open_interest: _Optional[int] = ..., implied_volatility: _Optional[float] = ..., in_the_money: _Optional[bool] = ..., contract_size: _Optional[str] = ..., last_trade_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class GetCalendarRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetCalendarResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("earnings", "ex_dividend_date", "events")
     EARNINGS_FIELD_NUMBER: _ClassVar[int]
     EX_DIVIDEND_DATE_FIELD_NUMBER: _ClassVar[int]
     EVENTS_FIELD_NUMBER: _ClassVar[int]
@@ -511,7 +511,7 @@ class GetCalendarResponse(_message.Message):
     def __init__(self, earnings: _Optional[_Union[EarningsDate, _Mapping]] = ..., ex_dividend_date: _Optional[_Union[DividendDate, _Mapping]] = ..., events: _Optional[_Iterable[_Union[CalendarEvent, _Mapping]]] = ...) -> None: ...
 
 class EarningsDate(_message.Message):
-    __slots__ = ()
+    __slots__ = ("start", "end")
     START_FIELD_NUMBER: _ClassVar[int]
     END_FIELD_NUMBER: _ClassVar[int]
     start: _timestamp_pb2.Timestamp
@@ -519,13 +519,13 @@ class EarningsDate(_message.Message):
     def __init__(self, start: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class DividendDate(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date",)
     DATE_FIELD_NUMBER: _ClassVar[int]
     date: _timestamp_pb2.Timestamp
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CalendarEvent(_message.Message):
-    __slots__ = ()
+    __slots__ = ("event_type", "date", "description")
     EVENT_TYPE_FIELD_NUMBER: _ClassVar[int]
     DATE_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
@@ -535,7 +535,7 @@ class CalendarEvent(_message.Message):
     def __init__(self, event_type: _Optional[str] = ..., date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., description: _Optional[str] = ...) -> None: ...
 
 class GetNewsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "count")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
     ticker: str
@@ -543,13 +543,13 @@ class GetNewsRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class GetNewsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("articles",)
     ARTICLES_FIELD_NUMBER: _ClassVar[int]
     articles: _containers.RepeatedCompositeFieldContainer[NewsArticle]
     def __init__(self, articles: _Optional[_Iterable[_Union[NewsArticle, _Mapping]]] = ...) -> None: ...
 
 class NewsArticle(_message.Message):
-    __slots__ = ()
+    __slots__ = ("uuid", "title", "publisher", "link", "provider_publish_time", "type", "thumbnail", "related_tickers")
     UUID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     PUBLISHER_FIELD_NUMBER: _ClassVar[int]
@@ -569,15 +569,15 @@ class NewsArticle(_message.Message):
     def __init__(self, uuid: _Optional[str] = ..., title: _Optional[str] = ..., publisher: _Optional[str] = ..., link: _Optional[str] = ..., provider_publish_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., type: _Optional[str] = ..., thumbnail: _Optional[str] = ..., related_tickers: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetMajorHoldersRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetMajorHoldersResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("holders",)
     class HoldersEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -588,19 +588,19 @@ class GetMajorHoldersResponse(_message.Message):
     def __init__(self, holders: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class GetInstitutionalHoldersRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetInstitutionalHoldersResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("holders",)
     HOLDERS_FIELD_NUMBER: _ClassVar[int]
     holders: _containers.RepeatedCompositeFieldContainer[InstitutionalHolder]
     def __init__(self, holders: _Optional[_Iterable[_Union[InstitutionalHolder, _Mapping]]] = ...) -> None: ...
 
 class InstitutionalHolder(_message.Message):
-    __slots__ = ()
+    __slots__ = ("holder", "shares", "date_reported", "pct_out", "value")
     HOLDER_FIELD_NUMBER: _ClassVar[int]
     SHARES_FIELD_NUMBER: _ClassVar[int]
     DATE_REPORTED_FIELD_NUMBER: _ClassVar[int]
@@ -614,19 +614,19 @@ class InstitutionalHolder(_message.Message):
     def __init__(self, holder: _Optional[str] = ..., shares: _Optional[int] = ..., date_reported: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., pct_out: _Optional[float] = ..., value: _Optional[float] = ...) -> None: ...
 
 class GetMutualFundHoldersRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetMutualFundHoldersResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("holders",)
     HOLDERS_FIELD_NUMBER: _ClassVar[int]
     holders: _containers.RepeatedCompositeFieldContainer[MutualFundHolder]
     def __init__(self, holders: _Optional[_Iterable[_Union[MutualFundHolder, _Mapping]]] = ...) -> None: ...
 
 class MutualFundHolder(_message.Message):
-    __slots__ = ()
+    __slots__ = ("holder", "shares", "date_reported", "pct_out", "value")
     HOLDER_FIELD_NUMBER: _ClassVar[int]
     SHARES_FIELD_NUMBER: _ClassVar[int]
     DATE_REPORTED_FIELD_NUMBER: _ClassVar[int]
@@ -640,15 +640,15 @@ class MutualFundHolder(_message.Message):
     def __init__(self, holder: _Optional[str] = ..., shares: _Optional[int] = ..., date_reported: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., pct_out: _Optional[float] = ..., value: _Optional[float] = ...) -> None: ...
 
 class GetMultipleInfoRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("tickers",)
     TICKERS_FIELD_NUMBER: _ClassVar[int]
     tickers: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, tickers: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetMultipleInfoResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("info",)
     class InfoEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -659,7 +659,7 @@ class GetMultipleInfoResponse(_message.Message):
     def __init__(self, info: _Optional[_Mapping[str, TickerInfo]] = ...) -> None: ...
 
 class DownloadHistoryRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("tickers", "period", "interval", "start", "end", "auto_adjust")
     TICKERS_FIELD_NUMBER: _ClassVar[int]
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     INTERVAL_FIELD_NUMBER: _ClassVar[int]
@@ -675,7 +675,7 @@ class DownloadHistoryRequest(_message.Message):
     def __init__(self, tickers: _Optional[_Iterable[str]] = ..., period: _Optional[str] = ..., interval: _Optional[str] = ..., start: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., auto_adjust: _Optional[bool] = ...) -> None: ...
 
 class DownloadHistoryResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "rows")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ROWS_FIELD_NUMBER: _ClassVar[int]
     ticker: str
@@ -683,7 +683,7 @@ class DownloadHistoryResponse(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., rows: _Optional[_Iterable[_Union[HistoryRow, _Mapping]]] = ...) -> None: ...
 
 class GetCapitalGainsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "period")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     ticker: str
@@ -691,13 +691,13 @@ class GetCapitalGainsRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., period: _Optional[str] = ...) -> None: ...
 
 class GetCapitalGainsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[CapitalGainsRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[CapitalGainsRow, _Mapping]]] = ...) -> None: ...
 
 class CapitalGainsRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "amount")
     DATE_FIELD_NUMBER: _ClassVar[int]
     AMOUNT_FIELD_NUMBER: _ClassVar[int]
     date: _timestamp_pb2.Timestamp
@@ -705,7 +705,7 @@ class CapitalGainsRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., amount: _Optional[float] = ...) -> None: ...
 
 class GetSharesHistoryRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "start", "end")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     START_FIELD_NUMBER: _ClassVar[int]
     END_FIELD_NUMBER: _ClassVar[int]
@@ -715,13 +715,13 @@ class GetSharesHistoryRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., start: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class GetSharesHistoryResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[SharesHistoryRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[SharesHistoryRow, _Mapping]]] = ...) -> None: ...
 
 class SharesHistoryRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "shares")
     DATE_FIELD_NUMBER: _ClassVar[int]
     SHARES_FIELD_NUMBER: _ClassVar[int]
     date: _timestamp_pb2.Timestamp
@@ -729,31 +729,31 @@ class SharesHistoryRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., shares: _Optional[int] = ...) -> None: ...
 
 class GetIsinRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetIsinResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("isin",)
     ISIN_FIELD_NUMBER: _ClassVar[int]
     isin: str
     def __init__(self, isin: _Optional[str] = ...) -> None: ...
 
 class GetFastInfoRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetFastInfoResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("info",)
     INFO_FIELD_NUMBER: _ClassVar[int]
     info: FastInfo
     def __init__(self, info: _Optional[_Union[FastInfo, _Mapping]] = ...) -> None: ...
 
 class FastInfo(_message.Message):
-    __slots__ = ()
+    __slots__ = ("currency", "exchange", "exchange_data_delayed_by", "exchange_timezone_name", "last_price", "last_volume", "market_cap", "open", "previous_close", "quote_type", "regular_market_day_high", "regular_market_day_low", "regular_market_previous_close", "regular_market_price", "shares", "three_month_average_volume", "timezone", "fifty_day_average", "two_hundred_day_average", "year_change", "year_high", "year_low")
     CURRENCY_FIELD_NUMBER: _ClassVar[int]
     EXCHANGE_FIELD_NUMBER: _ClassVar[int]
     EXCHANGE_DATA_DELAYED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -801,13 +801,13 @@ class FastInfo(_message.Message):
     def __init__(self, currency: _Optional[str] = ..., exchange: _Optional[str] = ..., exchange_data_delayed_by: _Optional[int] = ..., exchange_timezone_name: _Optional[str] = ..., last_price: _Optional[float] = ..., last_volume: _Optional[int] = ..., market_cap: _Optional[int] = ..., open: _Optional[float] = ..., previous_close: _Optional[float] = ..., quote_type: _Optional[str] = ..., regular_market_day_high: _Optional[float] = ..., regular_market_day_low: _Optional[float] = ..., regular_market_previous_close: _Optional[float] = ..., regular_market_price: _Optional[float] = ..., shares: _Optional[int] = ..., three_month_average_volume: _Optional[float] = ..., timezone: _Optional[str] = ..., fifty_day_average: _Optional[float] = ..., two_hundred_day_average: _Optional[float] = ..., year_change: _Optional[float] = ..., year_high: _Optional[float] = ..., year_low: _Optional[float] = ...) -> None: ...
 
 class GetSustainabilityRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetSustainabilityResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("total_esg", "esg_performance", "environment_score", "social_score", "governance_score", "percentile", "peer_group", "adult", "alcoholic", "animal_testing", "catholic", "controversial_weapons", "small_arms", "fur_leather", "gambling", "gmo", "military_contract", "nuclear", "pesticides", "palm_oil", "coal", "tobacco")
     TOTAL_ESG_FIELD_NUMBER: _ClassVar[int]
     ESG_PERFORMANCE_FIELD_NUMBER: _ClassVar[int]
     ENVIRONMENT_SCORE_FIELD_NUMBER: _ClassVar[int]
@@ -855,21 +855,21 @@ class GetSustainabilityResponse(_message.Message):
     def __init__(self, total_esg: _Optional[float] = ..., esg_performance: _Optional[str] = ..., environment_score: _Optional[float] = ..., social_score: _Optional[float] = ..., governance_score: _Optional[float] = ..., percentile: _Optional[float] = ..., peer_group: _Optional[str] = ..., adult: _Optional[bool] = ..., alcoholic: _Optional[bool] = ..., animal_testing: _Optional[bool] = ..., catholic: _Optional[bool] = ..., controversial_weapons: _Optional[bool] = ..., small_arms: _Optional[bool] = ..., fur_leather: _Optional[bool] = ..., gambling: _Optional[bool] = ..., gmo: _Optional[bool] = ..., military_contract: _Optional[bool] = ..., nuclear: _Optional[bool] = ..., pesticides: _Optional[bool] = ..., palm_oil: _Optional[bool] = ..., coal: _Optional[bool] = ..., tobacco: _Optional[bool] = ...) -> None: ...
 
 class GetInsiderPurchasesRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetInsiderPurchasesResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[InsiderPurchaseSummaryRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[InsiderPurchaseSummaryRow, _Mapping]]] = ...) -> None: ...
 
 class InsiderPurchaseSummaryRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("label", "values")
     class ValuesEntry(_message.Message):
-        __slots__ = ()
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -882,19 +882,19 @@ class InsiderPurchaseSummaryRow(_message.Message):
     def __init__(self, label: _Optional[str] = ..., values: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class GetInsiderTransactionsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetInsiderTransactionsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("transactions",)
     TRANSACTIONS_FIELD_NUMBER: _ClassVar[int]
     transactions: _containers.RepeatedCompositeFieldContainer[InsiderTransaction]
     def __init__(self, transactions: _Optional[_Iterable[_Union[InsiderTransaction, _Mapping]]] = ...) -> None: ...
 
 class InsiderTransaction(_message.Message):
-    __slots__ = ()
+    __slots__ = ("start_date", "insider", "position", "transaction", "shares", "value", "text", "url")
     START_DATE_FIELD_NUMBER: _ClassVar[int]
     INSIDER_FIELD_NUMBER: _ClassVar[int]
     POSITION_FIELD_NUMBER: _ClassVar[int]
@@ -914,19 +914,19 @@ class InsiderTransaction(_message.Message):
     def __init__(self, start_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., insider: _Optional[str] = ..., position: _Optional[str] = ..., transaction: _Optional[str] = ..., shares: _Optional[int] = ..., value: _Optional[float] = ..., text: _Optional[str] = ..., url: _Optional[str] = ...) -> None: ...
 
 class GetInsiderRosterHoldersRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetInsiderRosterHoldersResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("holders",)
     HOLDERS_FIELD_NUMBER: _ClassVar[int]
     holders: _containers.RepeatedCompositeFieldContainer[InsiderRosterHolder]
     def __init__(self, holders: _Optional[_Iterable[_Union[InsiderRosterHolder, _Mapping]]] = ...) -> None: ...
 
 class InsiderRosterHolder(_message.Message):
-    __slots__ = ()
+    __slots__ = ("name", "position", "url", "most_recent_transaction", "latest_transaction_shares")
     NAME_FIELD_NUMBER: _ClassVar[int]
     POSITION_FIELD_NUMBER: _ClassVar[int]
     URL_FIELD_NUMBER: _ClassVar[int]
@@ -940,13 +940,13 @@ class InsiderRosterHolder(_message.Message):
     def __init__(self, name: _Optional[str] = ..., position: _Optional[str] = ..., url: _Optional[str] = ..., most_recent_transaction: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., latest_transaction_shares: _Optional[int] = ...) -> None: ...
 
 class GetAnalystPriceTargetsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetAnalystPriceTargetsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("current", "low", "high", "mean", "median")
     CURRENT_FIELD_NUMBER: _ClassVar[int]
     LOW_FIELD_NUMBER: _ClassVar[int]
     HIGH_FIELD_NUMBER: _ClassVar[int]
@@ -960,19 +960,19 @@ class GetAnalystPriceTargetsResponse(_message.Message):
     def __init__(self, current: _Optional[float] = ..., low: _Optional[float] = ..., high: _Optional[float] = ..., mean: _Optional[float] = ..., median: _Optional[float] = ...) -> None: ...
 
 class GetRecommendationsSummaryRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetRecommendationsSummaryResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[RecommendationSummaryRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[RecommendationSummaryRow, _Mapping]]] = ...) -> None: ...
 
 class RecommendationSummaryRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("period", "strong_buy", "buy", "hold", "sell", "strong_sell")
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     STRONG_BUY_FIELD_NUMBER: _ClassVar[int]
     BUY_FIELD_NUMBER: _ClassVar[int]
@@ -988,19 +988,19 @@ class RecommendationSummaryRow(_message.Message):
     def __init__(self, period: _Optional[str] = ..., strong_buy: _Optional[int] = ..., buy: _Optional[int] = ..., hold: _Optional[int] = ..., sell: _Optional[int] = ..., strong_sell: _Optional[int] = ...) -> None: ...
 
 class GetEarningsEstimateRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetEarningsEstimateResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[EarningsEstimateRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[EarningsEstimateRow, _Mapping]]] = ...) -> None: ...
 
 class EarningsEstimateRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("period", "number_of_analysts", "avg", "low", "high", "year_ago_eps", "growth")
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     NUMBER_OF_ANALYSTS_FIELD_NUMBER: _ClassVar[int]
     AVG_FIELD_NUMBER: _ClassVar[int]
@@ -1018,19 +1018,19 @@ class EarningsEstimateRow(_message.Message):
     def __init__(self, period: _Optional[str] = ..., number_of_analysts: _Optional[int] = ..., avg: _Optional[float] = ..., low: _Optional[float] = ..., high: _Optional[float] = ..., year_ago_eps: _Optional[float] = ..., growth: _Optional[float] = ...) -> None: ...
 
 class GetRevenueEstimateRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetRevenueEstimateResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[RevenueEstimateRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[RevenueEstimateRow, _Mapping]]] = ...) -> None: ...
 
 class RevenueEstimateRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("period", "number_of_analysts", "avg", "low", "high", "year_ago_revenue", "growth")
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     NUMBER_OF_ANALYSTS_FIELD_NUMBER: _ClassVar[int]
     AVG_FIELD_NUMBER: _ClassVar[int]
@@ -1048,19 +1048,19 @@ class RevenueEstimateRow(_message.Message):
     def __init__(self, period: _Optional[str] = ..., number_of_analysts: _Optional[int] = ..., avg: _Optional[float] = ..., low: _Optional[float] = ..., high: _Optional[float] = ..., year_ago_revenue: _Optional[float] = ..., growth: _Optional[float] = ...) -> None: ...
 
 class GetEarningsHistoryRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetEarningsHistoryResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[EarningsHistoryRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[EarningsHistoryRow, _Mapping]]] = ...) -> None: ...
 
 class EarningsHistoryRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "eps_estimate", "eps_actual", "eps_difference", "surprise_percent")
     DATE_FIELD_NUMBER: _ClassVar[int]
     EPS_ESTIMATE_FIELD_NUMBER: _ClassVar[int]
     EPS_ACTUAL_FIELD_NUMBER: _ClassVar[int]
@@ -1074,19 +1074,19 @@ class EarningsHistoryRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., eps_estimate: _Optional[float] = ..., eps_actual: _Optional[float] = ..., eps_difference: _Optional[float] = ..., surprise_percent: _Optional[float] = ...) -> None: ...
 
 class GetEpsTrendRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetEpsTrendResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[EpsTrendRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[EpsTrendRow, _Mapping]]] = ...) -> None: ...
 
 class EpsTrendRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("period", "current", "seven_days_ago", "thirty_days_ago", "sixty_days_ago", "ninety_days_ago")
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     CURRENT_FIELD_NUMBER: _ClassVar[int]
     SEVEN_DAYS_AGO_FIELD_NUMBER: _ClassVar[int]
@@ -1102,19 +1102,19 @@ class EpsTrendRow(_message.Message):
     def __init__(self, period: _Optional[str] = ..., current: _Optional[float] = ..., seven_days_ago: _Optional[float] = ..., thirty_days_ago: _Optional[float] = ..., sixty_days_ago: _Optional[float] = ..., ninety_days_ago: _Optional[float] = ...) -> None: ...
 
 class GetEpsRevisionsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetEpsRevisionsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[EpsRevisionsRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[EpsRevisionsRow, _Mapping]]] = ...) -> None: ...
 
 class EpsRevisionsRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("period", "up_last_7days", "up_last_30days", "down_last_7days", "down_last_30days")
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     UP_LAST_7DAYS_FIELD_NUMBER: _ClassVar[int]
     UP_LAST_30DAYS_FIELD_NUMBER: _ClassVar[int]
@@ -1128,19 +1128,19 @@ class EpsRevisionsRow(_message.Message):
     def __init__(self, period: _Optional[str] = ..., up_last_7days: _Optional[int] = ..., up_last_30days: _Optional[int] = ..., down_last_7days: _Optional[int] = ..., down_last_30days: _Optional[int] = ...) -> None: ...
 
 class GetGrowthEstimatesRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetGrowthEstimatesResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[GrowthEstimatesRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[GrowthEstimatesRow, _Mapping]]] = ...) -> None: ...
 
 class GrowthEstimatesRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("period", "stock", "industry", "sector", "index")
     PERIOD_FIELD_NUMBER: _ClassVar[int]
     STOCK_FIELD_NUMBER: _ClassVar[int]
     INDUSTRY_FIELD_NUMBER: _ClassVar[int]
@@ -1154,7 +1154,7 @@ class GrowthEstimatesRow(_message.Message):
     def __init__(self, period: _Optional[str] = ..., stock: _Optional[float] = ..., industry: _Optional[float] = ..., sector: _Optional[float] = ..., index: _Optional[float] = ...) -> None: ...
 
 class GetEarningsDatesRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker", "limit")
     TICKER_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     ticker: str
@@ -1162,13 +1162,13 @@ class GetEarningsDatesRequest(_message.Message):
     def __init__(self, ticker: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
 
 class GetEarningsDatesResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rows",)
     ROWS_FIELD_NUMBER: _ClassVar[int]
     rows: _containers.RepeatedCompositeFieldContainer[EarningsDateRow]
     def __init__(self, rows: _Optional[_Iterable[_Union[EarningsDateRow, _Mapping]]] = ...) -> None: ...
 
 class EarningsDateRow(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "eps_estimate", "reported_eps", "surprise_pct")
     DATE_FIELD_NUMBER: _ClassVar[int]
     EPS_ESTIMATE_FIELD_NUMBER: _ClassVar[int]
     REPORTED_EPS_FIELD_NUMBER: _ClassVar[int]
@@ -1180,13 +1180,13 @@ class EarningsDateRow(_message.Message):
     def __init__(self, date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., eps_estimate: _Optional[float] = ..., reported_eps: _Optional[float] = ..., surprise_pct: _Optional[float] = ...) -> None: ...
 
 class GetHistoryMetadataRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetHistoryMetadataResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("currency", "symbol", "exchange_name", "full_exchange_name", "instrument_type", "first_trade_date", "regular_market_time", "has_pre_post_market_data", "gmt_offset", "timezone", "exchange_timezone_name", "regular_market_price", "fifty_two_week_high", "fifty_two_week_low", "data_granularity", "range", "valid_ranges")
     CURRENCY_FIELD_NUMBER: _ClassVar[int]
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
     EXCHANGE_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -1224,19 +1224,19 @@ class GetHistoryMetadataResponse(_message.Message):
     def __init__(self, currency: _Optional[str] = ..., symbol: _Optional[str] = ..., exchange_name: _Optional[str] = ..., full_exchange_name: _Optional[str] = ..., instrument_type: _Optional[str] = ..., first_trade_date: _Optional[int] = ..., regular_market_time: _Optional[int] = ..., has_pre_post_market_data: _Optional[bool] = ..., gmt_offset: _Optional[int] = ..., timezone: _Optional[str] = ..., exchange_timezone_name: _Optional[str] = ..., regular_market_price: _Optional[float] = ..., fifty_two_week_high: _Optional[float] = ..., fifty_two_week_low: _Optional[float] = ..., data_granularity: _Optional[str] = ..., range: _Optional[str] = ..., valid_ranges: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetSecFilingsRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("ticker",)
     TICKER_FIELD_NUMBER: _ClassVar[int]
     ticker: str
     def __init__(self, ticker: _Optional[str] = ...) -> None: ...
 
 class GetSecFilingsResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("filings",)
     FILINGS_FIELD_NUMBER: _ClassVar[int]
     filings: _containers.RepeatedCompositeFieldContainer[SecFiling]
     def __init__(self, filings: _Optional[_Iterable[_Union[SecFiling, _Mapping]]] = ...) -> None: ...
 
 class SecFiling(_message.Message):
-    __slots__ = ()
+    __slots__ = ("date", "type", "title", "url")
     DATE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]

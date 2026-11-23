@@ -5,13 +5,13 @@ managed:
     - file_option: go_package_prefix
       value: github.com/idebeijer/yfinance-grpc/gen/go
 plugins:
-  - remote: buf.build/protocolbuffers/python:v33.2
+  - remote: buf.build/protocolbuffers/python:v36.2
     out: gen
   - remote: buf.build/grpc/python
     out: gen
     opt:
       - grpc_2_0
-  - remote: buf.build/protocolbuffers/pyi:v33.2
+  - remote: buf.build/protocolbuffers/pyi:v36.2
     out: gen
   - remote: buf.build/protocolbuffers/go
     out: gen/go

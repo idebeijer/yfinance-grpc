@@ -5,7 +5,7 @@ import grpc
 from yfinance_grpc.v1alpha1 import sector_pb2 as yfinance__grpc_dot_v1alpha1_dot_sector__pb2
 
 
-class SectorServiceStub(object):
+class SectorServiceStub:
     """SectorService provides sector- and industry-level data.
     """
 
@@ -27,7 +27,7 @@ class SectorServiceStub(object):
                 _registered_method=True)
 
 
-class SectorServiceServicer(object):
+class SectorServiceServicer:
     """SectorService provides sector- and industry-level data.
     """
 
@@ -66,7 +66,7 @@ def add_SectorServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-class SectorService(object):
+class SectorService:
     """SectorService provides sector- and industry-level data.
     """
 

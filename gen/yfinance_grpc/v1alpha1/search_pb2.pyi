@@ -32,7 +32,7 @@ LOOKUP_TYPE_CURRENCY: LookupType
 LOOKUP_TYPE_CRYPTOCURRENCY: LookupType
 
 class SearchRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("query", "max_results", "news_count", "enable_fuzzy_query")
     QUERY_FIELD_NUMBER: _ClassVar[int]
     MAX_RESULTS_FIELD_NUMBER: _ClassVar[int]
     NEWS_COUNT_FIELD_NUMBER: _ClassVar[int]
@@ -44,7 +44,7 @@ class SearchRequest(_message.Message):
     def __init__(self, query: _Optional[str] = ..., max_results: _Optional[int] = ..., news_count: _Optional[int] = ..., enable_fuzzy_query: _Optional[bool] = ...) -> None: ...
 
 class SearchQuote(_message.Message):
-    __slots__ = ()
+    __slots__ = ("symbol", "short_name", "long_name", "exchange", "quote_type", "sector", "industry", "type_disp", "score")
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
     SHORT_NAME_FIELD_NUMBER: _ClassVar[int]
     LONG_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -66,7 +66,7 @@ class SearchQuote(_message.Message):
     def __init__(self, symbol: _Optional[str] = ..., short_name: _Optional[str] = ..., long_name: _Optional[str] = ..., exchange: _Optional[str] = ..., quote_type: _Optional[str] = ..., sector: _Optional[str] = ..., industry: _Optional[str] = ..., type_disp: _Optional[str] = ..., score: _Optional[float] = ...) -> None: ...
 
 class SearchNewsItem(_message.Message):
-    __slots__ = ()
+    __slots__ = ("uuid", "title", "publisher", "link", "provider_publish_time", "type")
     UUID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     PUBLISHER_FIELD_NUMBER: _ClassVar[int]
@@ -82,7 +82,7 @@ class SearchNewsItem(_message.Message):
     def __init__(self, uuid: _Optional[str] = ..., title: _Optional[str] = ..., publisher: _Optional[str] = ..., link: _Optional[str] = ..., provider_publish_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., type: _Optional[str] = ...) -> None: ...
 
 class SearchResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("quotes", "news")
     QUOTES_FIELD_NUMBER: _ClassVar[int]
     NEWS_FIELD_NUMBER: _ClassVar[int]
     quotes: _containers.RepeatedCompositeFieldContainer[SearchQuote]
@@ -90,7 +90,7 @@ class SearchResponse(_message.Message):
     def __init__(self, quotes: _Optional[_Iterable[_Union[SearchQuote, _Mapping]]] = ..., news: _Optional[_Iterable[_Union[SearchNewsItem, _Mapping]]] = ...) -> None: ...
 
 class LookupRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("query", "type", "count")
     QUERY_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
@@ -100,7 +100,7 @@ class LookupRequest(_message.Message):
     def __init__(self, query: _Optional[str] = ..., type: _Optional[_Union[LookupType, str]] = ..., count: _Optional[int] = ...) -> None: ...
 
 class LookupResult(_message.Message):
-    __slots__ = ()
+    __slots__ = ("symbol", "name", "exchange", "quote_type", "score")
     SYMBOL_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     EXCHANGE_FIELD_NUMBER: _ClassVar[int]
@@ -114,7 +114,7 @@ class LookupResult(_message.Message):
     def __init__(self, symbol: _Optional[str] = ..., name: _Optional[str] = ..., exchange: _Optional[str] = ..., quote_type: _Optional[str] = ..., score: _Optional[float] = ...) -> None: ...
 
 class LookupResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("results",)
     RESULTS_FIELD_NUMBER: _ClassVar[int]
     results: _containers.RepeatedCompositeFieldContainer[LookupResult]
     def __init__(self, results: _Optional[_Iterable[_Union[LookupResult, _Mapping]]] = ...) -> None: ...

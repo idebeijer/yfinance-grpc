@@ -5,7 +5,7 @@ import grpc
 from yfinance_grpc.v1alpha1 import market_pb2 as yfinance__grpc_dot_v1alpha1_dot_market__pb2
 
 
-class MarketServiceStub(object):
+class MarketServiceStub:
     """MarketService provides market-level trading status and price summaries.
     """
 
@@ -27,7 +27,7 @@ class MarketServiceStub(object):
                 _registered_method=True)
 
 
-class MarketServiceServicer(object):
+class MarketServiceServicer:
     """MarketService provides market-level trading status and price summaries.
     """
 
@@ -66,7 +66,7 @@ def add_MarketServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-class MarketService(object):
+class MarketService:
     """MarketService provides market-level trading status and price summaries.
     """
 

@@ -5,7 +5,7 @@ import grpc
 from yfinance_grpc.v1alpha1 import search_pb2 as yfinance__grpc_dot_v1alpha1_dot_search__pb2
 
 
-class SearchServiceStub(object):
+class SearchServiceStub:
     """SearchService provides full-text search and typed lookup of financial instruments.
     """
 
@@ -27,7 +27,7 @@ class SearchServiceStub(object):
                 _registered_method=True)
 
 
-class SearchServiceServicer(object):
+class SearchServiceServicer:
     """SearchService provides full-text search and typed lookup of financial instruments.
     """
 
@@ -66,7 +66,7 @@ def add_SearchServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-class SearchService(object):
+class SearchService:
     """SearchService provides full-text search and typed lookup of financial instruments.
     """
 
