@@ -1,0 +1,27 @@
+# Gateway API route for gRPC traffic. The Gateway terminates TLS; point
+# parentRefs and hostnames at your own Gateway and DNS name.
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: yfinance-grpc
+spec:
+  parentRefs:
+    - name: gateway
+      namespace: gateway-system
+      sectionName: https
+  hostnames:
+    - yfinance-grpc.example.com
+  rules:
+    - matches:
+        # Only the API services; reflection stays cluster-internal.
+        - method:
+            service: yfinance_grpc.v1alpha1.TickerService
+        - method:
+            service: yfinance_grpc.v1alpha1.SearchService
+        - method:
+            service: yfinance_grpc.v1alpha1.MarketService
+        - method:
+            service: yfinance_grpc.v1alpha1.SectorService
+      backendRefs:
+        - name: yfinance-grpc
+          port: 50059

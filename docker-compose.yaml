@@ -14,7 +14,7 @@ services:
       test:
         [
           "CMD",
-          "python",
+          "/app/.venv/bin/python",
           "-c",
           "import socket; s = socket.socket(); s.connect(('localhost', 50059)); s.close()",
         ]

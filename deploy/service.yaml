@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yfinance-grpc
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: yfinance-grpc
+  ports:
+    - name: grpc
+      port: 50059
+      targetPort: grpc
+      protocol: TCP
+      # Tells gateways and meshes to speak cleartext HTTP/2 to the pods.
+      appProtocol: kubernetes.io/h2c

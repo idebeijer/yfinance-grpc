@@ -115,9 +115,13 @@ docker run -p 50059:50059 ghcr.io/idebeijer/yfinance-grpc:latest
 
 The server listens on `localhost:50059`.
 
+### On Kubernetes
+
+[`deploy/`](deploy/) holds hardened Kustomize manifests (Deployment, Service, NetworkPolicy, and an optional GRPCRoute). Run `kubectl apply -k deploy/`; see [deploy/README.md](deploy/README.md) for configuration.
+
 ### From Source
 
-Prerequisites: Python 3.14+ and [uv](https://github.com/astral-sh/uv). The generated protobuf code is committed, so [buf](https://buf.build/) is only needed if you change the `.proto` files.
+Prerequisites: Python 3.13+ and [uv](https://github.com/astral-sh/uv). The generated protobuf code is committed, so [buf](https://buf.build/) is only needed if you change the `.proto` files.
 
 ```bash
 git clone https://github.com/idebeijer/yfinance-grpc.git
@@ -292,6 +296,7 @@ src/yfinance_grpc_server/           Server package
   convert.py                        yfinance/pandas values -> protobuf values
   errors.py                         @rpc decorator: exceptions -> gRPC status codes
   server.py  __main__.py            Server wiring and CLI entry point
+deploy/                             Kubernetes manifests (kubectl apply -k deploy/)
 tests/                              Unit tests; test_integration.py needs a live server
 ```
 

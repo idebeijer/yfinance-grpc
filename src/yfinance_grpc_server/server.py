@@ -1,7 +1,9 @@
 """Build and run the gRPC server: all four services plus reflection."""
 
 import logging
+import signal
 from concurrent import futures
+from types import FrameType
 
 import grpc
 from grpc_reflection.v1alpha import reflection
@@ -45,14 +47,23 @@ def build_server(max_workers: int = 10) -> grpc.Server:
     return server
 
 
-def serve(port: int = DEFAULT_PORT, max_workers: int = 10) -> None:
-    """Start the server and block until interrupted."""
+def serve(port: int = DEFAULT_PORT, max_workers: int = 10, grace: float = 10.0) -> None:
+    """Start the server and block until SIGTERM or SIGINT.
+
+    Either signal stops accepting new RPCs and gives in-flight ones ``grace``
+    seconds to finish, so rolling updates don't cut requests off. Keep
+    ``grace`` below the orchestrator's kill timeout (Kubernetes: 30s default).
+    """
     server = build_server(max_workers)
     server.add_insecure_port(f"0.0.0.0:{port}")
     server.start()
     logger.info("Server listening on port %d with reflection enabled", port)
-    try:
-        server.wait_for_termination()
-    except KeyboardInterrupt:
-        logger.info("Shutting down")
-        server.stop(grace=5)
+
+    def shutdown(signum: int, _frame: FrameType | None) -> None:
+        logger.info("Received %s; draining for up to %.0fs", signal.Signals(signum).name, grace)
+        server.stop(grace)
+
+    signal.signal(signal.SIGTERM, shutdown)
+    signal.signal(signal.SIGINT, shutdown)
+    server.wait_for_termination()
+    logger.info("Server stopped")
