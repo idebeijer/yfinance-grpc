@@ -24,10 +24,10 @@ jobs:
         run: uv python install 3.14
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Run unit tests
-        run: uv run pytest tests/test_server.py -v --tb=short
+        run: uv run pytest -v
 
   integration-tests:
     name: Integration Tests
@@ -46,14 +46,17 @@ jobs:
         run: uv python install 3.14
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Start gRPC server in background
         run: |
-          uv run python -m src.main &
+          uv run yfinance-grpc &
           echo $! > server.pid
-          # Wait for server to start
-          sleep 5
+          # Wait until the port accepts connections (max ~30s)
+          for _ in $(seq 30); do
+            nc -z localhost 50059 && break
+            sleep 1
+          done
 
       - name: Check if server is running
         run: |
@@ -64,7 +67,7 @@ jobs:
           echo "Server is running with PID $(cat server.pid)"
 
       - name: Run integration tests
-        run: uv run pytest tests/test_integration.py -v --tb=short
+        run: uv run pytest -m integration -v
 
       - name: Stop server
         if: always()
@@ -73,6 +76,34 @@ jobs:
             kill $(cat server.pid) || true
             rm server.pid
           fi
+
+  python-lint:
+    name: Lint and Type-check Python
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Ruff lint
+        run: uv run ruff check --output-format=github .
+
+      - name: Ruff format
+        run: uv run ruff format --check .
+
+      - name: Mypy
+        run: uv run mypy
 
   lint:
     name: Lint Proto Files

@@ -15,7 +15,7 @@ The server exposes four gRPC services:
 |-----|----------|---------|-------|
 | `GetInfo` | `ticker.info` | `TickerInfo` | 50+ typed fields covering price, valuation, dividends, financial metrics, targets |
 | `GetFastInfo` | `ticker.get_fast_info()` | `FastInfo` | Lightweight snapshot — fewer fields but faster than `GetInfo` |
-| `GetMultipleInfo` | `yf.Tickers(...).tickers` | `map<string, TickerInfo>` | Fetches info for all requested tickers; failures on individual tickers are logged and skipped |
+| `GetMultipleInfo` | `yf.Tickers(...).tickers` | `map<string, TickerInfo>` | One symbol per list entry; symbols that fail are omitted from the map and listed in `missing-tickers` trailing metadata |
 | `GetIsin` | `ticker.get_isin()` | `string` | Returns empty string when no ISIN is available |
 | `GetHistoryMetadata` | `ticker.get_history_metadata()` | `GetHistoryMetadataResponse` | Exchange name, timezone, first trade date, valid intervals, current market price |
 
@@ -24,7 +24,7 @@ The server exposes four gRPC services:
 | RPC | yfinance | Returns | Notes |
 |-----|----------|---------|-------|
 | `GetHistory` | `ticker.history(...)` | `repeated HistoryRow` | Supports `period` or `start`/`end`; all yfinance options (prepost, auto_adjust, repair, etc.) are forwarded |
-| `DownloadHistory` | `yf.download(...)` | `stream DownloadHistoryResponse` | Server-streaming; yields batches of 500 rows per ticker; uses threading internally |
+| `DownloadHistory` | `yf.download(...)` | `stream DownloadHistoryResponse` | Server-streaming; batches of up to 500 rows, one ticker at a time; `NOT_FOUND` if no ticker has data, otherwise symbols without data are listed in `missing-tickers` trailing metadata |
 
 ## Corporate Actions
 
@@ -39,10 +39,10 @@ The server exposes four gRPC services:
 
 | RPC | yfinance | Returns | Notes |
 |-----|----------|---------|-------|
-| `GetFinancials` | `ticker.get_financials(freq, pretty)` | `repeated FinancialStatement` | Income statement; `freq`: `yearly` (default), `quarterly`, `trailing` |
+| `GetFinancials` | `ticker.get_income_stmt(freq, pretty)` | `repeated FinancialStatement` | Income statement; `freq`: `yearly` (default), `quarterly`, `trailing` |
 | `GetBalanceSheet` | `ticker.get_balance_sheet(freq, pretty)` | `repeated BalanceSheetStatement` | `freq`: `yearly` (default), `quarterly` |
 | `GetCashFlow` | `ticker.get_cash_flow(freq, pretty)` | `repeated CashFlowStatement` | `freq`: `yearly` (default), `quarterly`, `trailing` |
-| `GetEarnings` | `ticker.get_earnings(freq)` | `repeated EarningsRow` | Revenue and EPS per period; `freq`: `yearly` (default), `quarterly`, `trailing` |
+| `GetEarnings` | — | — | **Deprecated.** Always `UNIMPLEMENTED`: Yahoo Finance no longer serves this data. Use `GetFinancials` (`Net Income`, `Total Revenue`) or `GetEarningsHistory` |
 
 ## Analyst Data & Estimates
 
@@ -77,7 +77,7 @@ The server exposes four gRPC services:
 | RPC | yfinance | Returns | Notes |
 |-----|----------|---------|-------|
 | `GetMajorHolders` | `ticker.get_major_holders(as_dict=True)` | `map<string, string>` | Percentage breakdown (insiders held, institutions held, float held, etc.) |
-| `GetInstitutionalHolders` | `ticker.get_institutional_holders()` | `repeated InstitutionalHolder` | Top institutional holders with shares, value, % outstanding, date reported |
+| `GetInstitutionalHolders` | `ticker.get_institutional_holders()` | `repeated InstitutionalHolder` | Top institutional holders with shares, value, date reported and `pct_out` (fraction of shares outstanding, 0.05 = 5%) |
 | `GetMutualFundHolders` | `ticker.get_mutualfund_holders()` | `repeated MutualFundHolder` | Top mutual fund holders; same fields as `GetInstitutionalHolders` |
 | `GetInsiderPurchases` | `ticker.get_insider_purchases()` | `repeated InsiderPurchaseSummaryRow` | Summary table of insider activity; each row has a label and a `map<string,string>` of column values |
 | `GetInsiderTransactions` | `ticker.get_insider_transactions()` | `repeated InsiderTransaction` | Individual insider transactions with insider name, position, shares, value, and SEC URL |
@@ -109,7 +109,7 @@ The server exposes four gRPC services:
 | RPC | yfinance | Returns | Notes |
 |-----|----------|---------|-------|
 | `Search` | `yf.Search(query, ...)` | `repeated SearchQuote`, `repeated SearchNewsItem` | Full-text search returning matching quotes and news; `max_results` and `news_count` default to 8; optional fuzzy matching |
-| `Lookup` | `yf.Lookup(query).get_*()` | `repeated LookupResult` | Typed instrument lookup; `type` enum filters to equity/etf/index/future/currency/cryptocurrency/mutualfund; `count` defaults to 25 |
+| `Lookup` | `yf.Lookup(query).get_<type>(count)` | `repeated LookupResult` | Typed instrument lookup; `type` enum filters to equity/etf/index/future/currency/cryptocurrency/mutualfund; `count` defaults to 25 |
 
 ---
 
@@ -117,8 +117,8 @@ The server exposes four gRPC services:
 
 | RPC | yfinance | Returns | Notes |
 |-----|----------|---------|-------|
-| `GetMarketStatus` | `yf.Market(market).status` | `MarketStatus` | Current session type (REGULAR/PRE/POST), open/close timestamps, and timezone; `market` is a Yahoo Finance market ID e.g. `US` |
-| `GetMarketSummary` | `yf.Market(market).summary` | `map<string, MarketSummaryItem>` | Price snapshot of major instruments keyed by exchange symbol (e.g. `^GSPC`); includes price, change, and change % |
+| `GetMarketStatus` | `yf.Market(market).status` | `MarketStatus` | Current session type (REGULAR/PRE/POST), open/close timestamps, and timezone; `market` is a Yahoo Finance market ID e.g. `US`; `NOT_FOUND` for an unknown market |
+| `GetMarketSummary` | `yf.Market(market).summary` | `map<string, MarketSummaryItem>` | Price snapshot of major instruments keyed by exchange symbol (e.g. `^GSPC`); includes price, change, and change %; `NOT_FOUND` for an unknown market |
 
 ---
 
@@ -128,3 +128,19 @@ The server exposes four gRPC services:
 |-----|----------|---------|-------|
 | `GetSector` | `yf.Sector(key)` | `GetSectorResponse` | Overview, top companies, top ETFs (`map<string,string>`), top mutual funds (`map<string,string>`), and industries list; `key` e.g. `technology`, `financial-services` |
 | `GetIndustry` | `yf.Industry(key)` | `GetIndustryResponse` | Overview, top companies, top performing companies (YTD return, last price, target price), and top growth companies (YTD return, growth estimate); `key` e.g. `consumer-electronics` |
+
+---
+
+## Errors
+
+Every RPC reports failures as a gRPC status code. "No data" is not an error: a valid ticker with no dividends returns `OK` with an empty list, and so does an unknown symbol on most single-ticker RPCs, because Yahoo Finance answers it with empty data rather than an error.
+
+| Code | When |
+|------|------|
+| `INVALID_ARGUMENT` | A required field is empty (`ticker`, `tickers`, `query`, `market`, `key`); a `tickers` entry holds more than one symbol (`"AAPL MSFT"`); yfinance rejects a `period` |
+| `NOT_FOUND` | `DownloadHistory` finds no data for any requested ticker; `GetMarketStatus` / `GetMarketSummary` get no data for the market; yfinance reports the ticker missing |
+| `RESOURCE_EXHAUSTED` | Yahoo Finance rate-limited the server; retry later |
+| `UNIMPLEMENTED` | The deprecated `GetEarnings` RPC |
+| `INTERNAL` | Any other failure. The message names the RPC; details stay in the server log |
+
+`GetMultipleInfo` and `DownloadHistory` succeed partially: symbols that returned no data are listed, comma-separated, in the `missing-tickers` trailing metadata.

@@ -14,7 +14,9 @@ dockers_v2:
       - "{{ if and (not .Prerelease) (not .IsNightly) (not .IsSnapshot) }}latest{{ end }}"
     extra_files:
       - pyproject.toml
-      - gen/
+      - uv.lock
+      - README.md
+      - gen/yfinance_grpc/
       - src/
     labels:
       "org.opencontainers.image.created": "{{ .Date }}"

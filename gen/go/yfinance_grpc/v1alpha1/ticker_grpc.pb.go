@@ -81,7 +81,10 @@ type TickerServiceClient interface {
 	GetBalanceSheet(ctx context.Context, in *GetBalanceSheetRequest, opts ...grpc.CallOption) (*GetBalanceSheetResponse, error)
 	// GetCashFlow returns cash flow statement data
 	GetCashFlow(ctx context.Context, in *GetCashFlowRequest, opts ...grpc.CallOption) (*GetCashFlowResponse, error)
-	// GetEarnings returns earnings data
+	// Deprecated: Do not use.
+	// GetEarnings is deprecated: Yahoo Finance no longer serves this data and the
+	// RPC always returns UNIMPLEMENTED. Use GetFinancials ("Net Income",
+	// "Total Revenue") or GetEarningsHistory instead.
 	GetEarnings(ctx context.Context, in *GetEarningsRequest, opts ...grpc.CallOption) (*GetEarningsResponse, error)
 	// GetRecommendations returns analyst recommendations
 	GetRecommendations(ctx context.Context, in *GetRecommendationsRequest, opts ...grpc.CallOption) (*GetRecommendationsResponse, error)
@@ -99,9 +102,14 @@ type TickerServiceClient interface {
 	GetInstitutionalHolders(ctx context.Context, in *GetInstitutionalHoldersRequest, opts ...grpc.CallOption) (*GetInstitutionalHoldersResponse, error)
 	// GetMutualFundHolders returns mutual fund holders information
 	GetMutualFundHolders(ctx context.Context, in *GetMutualFundHoldersRequest, opts ...grpc.CallOption) (*GetMutualFundHoldersResponse, error)
-	// GetMultipleInfo returns information for multiple tickers at once
+	// GetMultipleInfo returns information for multiple tickers at once.
+	// Tickers that fail are omitted from the map and listed, comma-separated, in
+	// the "missing-tickers" trailing metadata.
 	GetMultipleInfo(ctx context.Context, in *GetMultipleInfoRequest, opts ...grpc.CallOption) (*GetMultipleInfoResponse, error)
-	// DownloadHistory streams historical data for multiple tickers
+	// DownloadHistory streams historical data for multiple tickers, one ticker
+	// at a time. Returns NOT_FOUND if no requested ticker has data; otherwise
+	// tickers without data are listed, comma-separated, in the
+	// "missing-tickers" trailing metadata.
 	DownloadHistory(ctx context.Context, in *DownloadHistoryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadHistoryResponse], error)
 	// GetCapitalGains returns capital gains distributions for a ticker
 	GetCapitalGains(ctx context.Context, in *GetCapitalGainsRequest, opts ...grpc.CallOption) (*GetCapitalGainsResponse, error)
@@ -231,6 +239,7 @@ func (c *tickerServiceClient) GetCashFlow(ctx context.Context, in *GetCashFlowRe
 	return out, nil
 }
 
+// Deprecated: Do not use.
 func (c *tickerServiceClient) GetEarnings(ctx context.Context, in *GetEarningsRequest, opts ...grpc.CallOption) (*GetEarningsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetEarningsResponse)
@@ -562,7 +571,10 @@ type TickerServiceServer interface {
 	GetBalanceSheet(context.Context, *GetBalanceSheetRequest) (*GetBalanceSheetResponse, error)
 	// GetCashFlow returns cash flow statement data
 	GetCashFlow(context.Context, *GetCashFlowRequest) (*GetCashFlowResponse, error)
-	// GetEarnings returns earnings data
+	// Deprecated: Do not use.
+	// GetEarnings is deprecated: Yahoo Finance no longer serves this data and the
+	// RPC always returns UNIMPLEMENTED. Use GetFinancials ("Net Income",
+	// "Total Revenue") or GetEarningsHistory instead.
 	GetEarnings(context.Context, *GetEarningsRequest) (*GetEarningsResponse, error)
 	// GetRecommendations returns analyst recommendations
 	GetRecommendations(context.Context, *GetRecommendationsRequest) (*GetRecommendationsResponse, error)
@@ -580,9 +592,14 @@ type TickerServiceServer interface {
 	GetInstitutionalHolders(context.Context, *GetInstitutionalHoldersRequest) (*GetInstitutionalHoldersResponse, error)
 	// GetMutualFundHolders returns mutual fund holders information
 	GetMutualFundHolders(context.Context, *GetMutualFundHoldersRequest) (*GetMutualFundHoldersResponse, error)
-	// GetMultipleInfo returns information for multiple tickers at once
+	// GetMultipleInfo returns information for multiple tickers at once.
+	// Tickers that fail are omitted from the map and listed, comma-separated, in
+	// the "missing-tickers" trailing metadata.
 	GetMultipleInfo(context.Context, *GetMultipleInfoRequest) (*GetMultipleInfoResponse, error)
-	// DownloadHistory streams historical data for multiple tickers
+	// DownloadHistory streams historical data for multiple tickers, one ticker
+	// at a time. Returns NOT_FOUND if no requested ticker has data; otherwise
+	// tickers without data are listed, comma-separated, in the
+	// "missing-tickers" trailing metadata.
 	DownloadHistory(*DownloadHistoryRequest, grpc.ServerStreamingServer[DownloadHistoryResponse]) error
 	// GetCapitalGains returns capital gains distributions for a ticker
 	GetCapitalGains(context.Context, *GetCapitalGainsRequest) (*GetCapitalGainsResponse, error)

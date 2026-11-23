@@ -44,10 +44,15 @@ examples/
 # Other
 Makefile
 Dockerfile
-docker-compose.yml
+docker-compose.yaml
 .dockerignore
 
 # Keep only what's needed
 !gen/
 !src/
 !pyproject.toml
+!uv.lock
+!README.md
+
+# Generated Go code is not needed in the image
+gen/go/

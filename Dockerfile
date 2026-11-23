@@ -1,38 +1,37 @@
-# Build stage
+# Build stage: resolve dependencies from uv.lock into a self-contained venv.
 FROM python:3.14-alpine AS builder
 
-WORKDIR /app
-
-# Install build dependencies
 RUN apk add --no-cache gcc musl-dev libffi-dev
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.13.9 /uv /usr/local/bin/uv
 
-# Install Python dependencies
-COPY pyproject.toml ./
-RUN uv pip install --python=/usr/local/bin/python3.14 --target=/app/deps -r pyproject.toml
-
-# Final stage
-FROM python:3.14-alpine
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never
 
 WORKDIR /app
 
-# Install runtime dependencies
+# Dependencies first, so source edits reuse this layer.
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --locked --no-dev --no-install-project
+
+COPY gen/yfinance_grpc gen/yfinance_grpc
+COPY src src
+RUN uv sync --locked --no-dev --no-editable
+
+# Runtime stage
+FROM python:3.14-alpine
+
 RUN apk add --no-cache libstdc++ && \
     adduser -D -u 1000 appuser
 
-# Copy dependencies and code
-COPY --from=builder /app/deps /app/deps
-COPY gen/ ./gen/
-COPY src/ ./src/
+COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
 
-ENV PYTHONPATH=/app/deps
-ENV PYTHONUNBUFFERED=1
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1
 
-RUN chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 50059
 
-CMD ["python", "-m", "src.main"]
+CMD ["yfinance-grpc"]

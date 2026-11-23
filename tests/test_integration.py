@@ -1,32 +1,32 @@
 """
 Integration tests for yfinance-grpc server
 
-These tests require a running server instance and test the full gRPC communication.
-Run with: pytest tests/test_integration.py
+These need a running server on localhost:50059 (`make run`) and live Yahoo
+Finance access. They are skipped by default; run them with `make test-integration`.
 """
 
-import sys
-from pathlib import Path
-from datetime import datetime
+from datetime import UTC, datetime
 
-import pytest
 import grpc
+import pytest
+from yfinance_grpc.v1alpha1 import (
+    market_pb2,
+    market_pb2_grpc,
+    search_pb2,
+    search_pb2_grpc,
+    sector_pb2,
+    sector_pb2_grpc,
+    ticker_pb2,
+    ticker_pb2_grpc,
+)
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / "gen"))
-
-from yfinance_grpc.v1alpha1 import ticker_pb2, ticker_pb2_grpc
-from yfinance_grpc.v1alpha1 import search_pb2, search_pb2_grpc
-from yfinance_grpc.v1alpha1 import market_pb2, market_pb2_grpc
-from yfinance_grpc.v1alpha1 import sector_pb2, sector_pb2_grpc
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture(scope="module")
 def grpc_channel():
     """Create a gRPC channel for testing"""
-    channel = grpc.insecure_channel('localhost:50059')
+    channel = grpc.insecure_channel("localhost:50059")
     yield channel
     channel.close()
 
@@ -44,7 +44,7 @@ class TestIntegrationGetInfo:
         """Test GetInfo with AAPL ticker"""
         request = ticker_pb2.GetInfoRequest(ticker="AAPL")
         response = stub.GetInfo(request)
-        
+
         assert response.info.symbol == "AAPL"
         assert "Apple" in response.info.long_name
         assert response.info.sector == "Technology"
@@ -54,11 +54,11 @@ class TestIntegrationGetInfo:
     def test_get_info_multiple_tickers(self, stub):
         """Test GetInfo with multiple different tickers"""
         tickers = ["AAPL", "MSFT", "GOOGL"]
-        
+
         for ticker_symbol in tickers:
             request = ticker_pb2.GetInfoRequest(ticker=ticker_symbol)
             response = stub.GetInfo(request)
-            
+
             assert response.info.symbol == ticker_symbol
             assert len(response.info.long_name) > 0
 
@@ -68,13 +68,9 @@ class TestIntegrationGetHistory:
 
     def test_get_history_default_period(self, stub):
         """Test GetHistory with default period"""
-        request = ticker_pb2.GetHistoryRequest(
-            ticker="AAPL",
-            period="5d",
-            interval="1d"
-        )
+        request = ticker_pb2.GetHistoryRequest(ticker="AAPL", period="5d", interval="1d")
         response = stub.GetHistory(request)
-        
+
         assert len(response.rows) > 0
         # Check that all required fields are present
         for row in response.rows:
@@ -87,15 +83,11 @@ class TestIntegrationGetHistory:
     def test_get_history_different_intervals(self, stub):
         """Test GetHistory with different time intervals"""
         intervals = ["1d", "1wk", "1mo"]
-        
+
         for interval in intervals:
-            request = ticker_pb2.GetHistoryRequest(
-                ticker="AAPL",
-                period="1mo",
-                interval=interval
-            )
+            request = ticker_pb2.GetHistoryRequest(ticker="AAPL", period="1mo", interval=interval)
             response = stub.GetHistory(request)
-            
+
             assert len(response.rows) > 0
 
 
@@ -104,12 +96,9 @@ class TestIntegrationGetDividends:
 
     def test_get_dividends(self, stub):
         """Test GetDividends endpoint"""
-        request = ticker_pb2.GetDividendsRequest(
-            ticker="AAPL",
-            period="1y"
-        )
+        request = ticker_pb2.GetDividendsRequest(ticker="AAPL", period="1y")
         response = stub.GetDividends(request)
-        
+
         # Apple pays dividends, so we should get some data
         assert len(response.rows) > 0
         for row in response.rows:
@@ -123,14 +112,14 @@ class TestIntegrationGetRecommendations:
         """Test GetRecommendations endpoint"""
         request = ticker_pb2.GetRecommendationsRequest(ticker="AAPL")
         response = stub.GetRecommendations(request)
-        
+
         # Apple should have analyst recommendations
         assert len(response.rows) > 0
-        
+
         # Check that data is sorted by date descending (newest first)
         dates = [row.date.seconds for row in response.rows]
         assert dates == sorted(dates, reverse=True), "Recommendations should be sorted newest first"
-        
+
         # Check first recommendation has required fields
         first_rec = response.rows[0]
         assert len(first_rec.firm) > 0
@@ -144,11 +133,11 @@ class TestIntegrationGetNews:
         """Test GetNews with default count"""
         request = ticker_pb2.GetNewsRequest(ticker="AAPL")
         response = stub.GetNews(request)
-        
+
         # Should get some news articles
         assert len(response.articles) > 0
         assert len(response.articles) <= 10  # Default count
-        
+
         # Check first article has required fields
         first_article = response.articles[0]
         assert len(first_article.title) > 0
@@ -160,7 +149,7 @@ class TestIntegrationGetNews:
         """Test GetNews with custom count"""
         request = ticker_pb2.GetNewsRequest(ticker="AAPL", count=3)
         response = stub.GetNews(request)
-        
+
         # Should respect the count parameter
         assert len(response.articles) == 3
 
@@ -172,15 +161,15 @@ class TestIntegrationGetOptions:
         """Test GetOptions endpoint"""
         request = ticker_pb2.GetOptionsRequest(ticker="AAPL")
         response = stub.GetOptions(request)
-        
+
         # Apple should have options available
         assert len(response.expiration_dates) > 0
-        
+
         # Dates should be in YYYY-MM-DD format
         for date_str in response.expiration_dates:
             assert len(date_str) == 10
-            assert date_str[4] == '-'
-            assert date_str[7] == '-'
+            assert date_str[4] == "-"
+            assert date_str[7] == "-"
 
 
 class TestIntegrationGetOptionChain:
@@ -191,20 +180,20 @@ class TestIntegrationGetOptionChain:
         # First get available dates
         options_request = ticker_pb2.GetOptionsRequest(ticker="AAPL")
         options_response = stub.GetOptions(options_request)
-        
+
         assert len(options_response.expiration_dates) > 0
-        
+
         # Get option chain for first available date
         request = ticker_pb2.GetOptionChainRequest(
             ticker="AAPL",
-            date=options_response.expiration_dates[0]  # Field name is 'date'
+            date=options_response.expiration_dates[0],  # Field name is 'date'
         )
         response = stub.GetOptionChain(request)
-        
+
         # Should have both calls and puts
         assert len(response.calls) > 0
         assert len(response.puts) > 0
-        
+
         # Check first call option
         first_call = response.calls[0]
         assert first_call.strike > 0
@@ -218,10 +207,10 @@ class TestIntegrationGetInstitutionalHolders:
         """Test GetInstitutionalHolders endpoint"""
         request = ticker_pb2.GetInstitutionalHoldersRequest(ticker="AAPL")
         response = stub.GetInstitutionalHolders(request)
-        
+
         # Apple should have institutional holders
         assert len(response.holders) > 0
-        
+
         # Check first holder
         first_holder = response.holders[0]
         assert len(first_holder.holder) > 0
@@ -235,12 +224,12 @@ class TestIntegrationGetMultipleInfo:
         """Test GetMultipleInfo with two tech stocks"""
         request = ticker_pb2.GetMultipleInfoRequest(tickers=["AAPL", "MSFT"])
         response = stub.GetMultipleInfo(request)
-        
+
         # Should have info for both tickers
         assert len(response.info) == 2
         assert "AAPL" in response.info
         assert "MSFT" in response.info
-        
+
         # Validate AAPL data
         aapl_info = response.info["AAPL"]
         assert aapl_info.symbol == "AAPL"
@@ -248,7 +237,7 @@ class TestIntegrationGetMultipleInfo:
         assert aapl_info.sector == "Technology"
         assert aapl_info.current_price > 0
         assert aapl_info.market_cap > 0
-        
+
         # Validate MSFT data
         msft_info = response.info["MSFT"]
         assert msft_info.symbol == "MSFT"
@@ -261,13 +250,13 @@ class TestIntegrationGetMultipleInfo:
         """Test GetMultipleInfo with three different sector stocks"""
         request = ticker_pb2.GetMultipleInfoRequest(tickers=["AAPL", "JPM", "JNJ"])
         response = stub.GetMultipleInfo(request)
-        
+
         # Should have info for all three tickers
         assert len(response.info) == 3
         assert "AAPL" in response.info
         assert "JPM" in response.info
         assert "JNJ" in response.info
-        
+
         # Each should have basic data
         for symbol in ["AAPL", "JPM", "JNJ"]:
             info = response.info[symbol]
@@ -279,10 +268,10 @@ class TestIntegrationGetMultipleInfo:
         """Test GetMultipleInfo with a single ticker"""
         request = ticker_pb2.GetMultipleInfoRequest(tickers=["GOOGL"])
         response = stub.GetMultipleInfo(request)
-        
+
         assert len(response.info) == 1
         assert "GOOGL" in response.info
-        
+
         info = response.info["GOOGL"]
         assert info.symbol == "GOOGL"
         assert "Alphabet" in info.long_name or "Google" in info.long_name
@@ -294,22 +283,18 @@ class TestIntegrationDownloadHistory:
 
     def test_download_history_single_ticker(self, stub):
         """Test DownloadHistory with a single ticker"""
-        request = ticker_pb2.DownloadHistoryRequest(
-            tickers=["AAPL"],
-            period="1mo",
-            interval="1d"
-        )
-        
+        request = ticker_pb2.DownloadHistoryRequest(tickers=["AAPL"], period="1mo", interval="1d")
+
         responses = list(stub.DownloadHistory(request))
-        
+
         # Should have at least one response
         assert len(responses) > 0
-        
+
         # Check response structure
         for response in responses:
             assert response.ticker == "AAPL"
             assert len(response.rows) > 0
-            
+
             # Verify we get rows with valid price data
             valid_rows = 0
             for row in response.rows:
@@ -320,51 +305,47 @@ class TestIntegrationDownloadHistory:
                     # Basic sanity checks on prices
                     assert row.high >= row.low
                     assert row.volume >= 0
-            
+
             # Should have at least some valid trading data
-            assert valid_rows > 0, f"No valid price data returned for AAPL"
+            assert valid_rows > 0, "No valid price data returned for AAPL"
 
     def test_download_history_multiple_tickers(self, stub):
         """Test DownloadHistory with multiple tickers"""
-        request = ticker_pb2.DownloadHistoryRequest(
-            tickers=["AAPL", "MSFT"],
-            period="5d",
-            interval="1d"
-        )
-        
+        request = ticker_pb2.DownloadHistoryRequest(tickers=["AAPL", "MSFT"], period="5d", interval="1d")
+
         responses = list(stub.DownloadHistory(request))
-        
+
         # Should have responses for both tickers
         assert len(responses) > 0
-        
+
         # Collect tickers from responses
         tickers_seen = set()
         for response in responses:
             tickers_seen.add(response.ticker)
             assert response.ticker in ["AAPL", "MSFT"]
             assert len(response.rows) > 0
-            
+
             # Check rows have valid data
             valid_rows = 0
             for row in response.rows:
                 assert row.date.seconds > 0
                 if row.close > 0:
                     valid_rows += 1
-            
+
             assert valid_rows > 0, f"No valid price data for {response.ticker}"
-        
+
         # Should have seen both tickers
         assert "AAPL" in tickers_seen
         assert "MSFT" in tickers_seen
 
     def test_download_history_with_dates(self, stub):
         """Test DownloadHistory with start/end dates"""
+
         from google.protobuf.timestamp_pb2 import Timestamp
-        from datetime import timezone
 
         # Use a fixed historical month that is always in the past
-        start_dt = datetime(2024, 1, 1, tzinfo=timezone.utc)
-        end_dt = datetime(2024, 1, 31, 23, 59, 59, tzinfo=timezone.utc)
+        start_dt = datetime(2024, 1, 1, tzinfo=UTC)
+        end_dt = datetime(2024, 1, 31, 23, 59, 59, tzinfo=UTC)
 
         start_ts = Timestamp()
         start_ts.FromDatetime(start_dt)
@@ -373,10 +354,7 @@ class TestIntegrationDownloadHistory:
         end_ts.FromDatetime(end_dt)
 
         request = ticker_pb2.DownloadHistoryRequest(
-            tickers=["AAPL"],
-            start=start_ts,
-            end=end_ts,
-            interval="1d"
+            tickers=["AAPL"], start=start_ts, end=end_ts, interval="1d"
         )
 
         responses = list(stub.DownloadHistory(request))
@@ -385,8 +363,8 @@ class TestIntegrationDownloadHistory:
         assert len(responses) > 0
 
         total_rows = sum(len(r.rows) for r in responses)
-        assert total_rows > 15   # at least 15 trading days in January 2024
-        assert total_rows < 25   # but no more than 25
+        assert total_rows > 15  # at least 15 trading days in January 2024
+        assert total_rows < 25  # but no more than 25
 
         start_bound = int(start_dt.timestamp())
         end_bound = int(end_dt.timestamp())
@@ -400,21 +378,18 @@ class TestIntegrationDownloadHistory:
     def test_download_history_auto_adjust(self, stub):
         """Test DownloadHistory with auto_adjust flag"""
         request = ticker_pb2.DownloadHistoryRequest(
-            tickers=["AAPL"],
-            period="3mo",
-            interval="1d",
-            auto_adjust=True
+            tickers=["AAPL"], period="3mo", interval="1d", auto_adjust=True
         )
-        
+
         responses = list(stub.DownloadHistory(request))
-        
+
         # Should have data
         assert len(responses) > 0
-        
+
         for response in responses:
             assert response.ticker == "AAPL"
             assert len(response.rows) > 0
-            
+
             # Verify valid price data exists
             valid_rows = [row for row in response.rows if row.close > 0]
             assert len(valid_rows) > 0, "No valid price data in response"
@@ -423,51 +398,39 @@ class TestIntegrationDownloadHistory:
 class TestIntegrationErrorHandling:
     """Integration tests for error handling"""
 
-    def test_invalid_ticker(self, stub):
-        """Test handling of invalid ticker"""
-        request = ticker_pb2.GetInfoRequest(ticker="INVALID_TICKER_XYZ123")
-        
-        try:
-            response = stub.GetInfo(request)
-            # If it doesn't raise an error, check that response is empty/default
-            # Some invalid tickers might return empty data instead of error
-        except grpc.RpcError as e:
-            # Server should return an appropriate error
-            assert e.code() == grpc.StatusCode.INTERNAL
+    def test_empty_ticker_returns_invalid_argument(self, stub):
+        with pytest.raises(grpc.RpcError) as exc_info:
+            stub.GetInfo(ticker_pb2.GetInfoRequest(ticker=""))
+        assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
+
+    def test_get_earnings_is_unimplemented(self, stub):
+        with pytest.raises(grpc.RpcError) as exc_info:
+            stub.GetEarnings(ticker_pb2.GetEarningsRequest(ticker="AAPL"))
+        assert exc_info.value.code() == grpc.StatusCode.UNIMPLEMENTED
 
     def test_download_history_invalid_ticker(self, stub):
-        """Test DownloadHistory with invalid ticker returns NOT_FOUND"""
         request = ticker_pb2.DownloadHistoryRequest(
-            tickers=["INVALID_TICKER_XYZ123"],
-            period="1mo",
-            interval="1d"
+            tickers=["INVALID_TICKER_XYZ123"], period="1mo", interval="1d"
         )
-
         with pytest.raises(grpc.RpcError) as exc_info:
             list(stub.DownloadHistory(request))
         assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND
 
-    def test_download_history_malformed_ticker(self, stub):
-        """Test DownloadHistory with malformed ticker string (space-separated instead of array)"""
-        # This simulates the user error: ["AAPL TSLA"] instead of ["AAPL", "TSLA"]
+    def test_download_history_partial_reports_missing_tickers(self, stub):
         request = ticker_pb2.DownloadHistoryRequest(
-            tickers=["AAPL MSFT"],  # Wrong: space-separated in one string
-            period="1mo",
-            interval="1d"
+            tickers=["AAPL", "INVALID_TICKER_XYZ123"], period="5d", interval="1d"
         )
-        
-        try:
-            responses = list(stub.DownloadHistory(request))
-            # Should either error or return no data
-            if len(responses) > 0:
-                # If it returns data, it should be invalid (all zeros)
-                for response in responses:
-                    valid_rows = [r for r in response.rows if r.close > 0]
-                    # Should have no valid data for malformed ticker
-                    assert len(valid_rows) == 0, "Malformed ticker should not return valid price data"
-        except grpc.RpcError as e:
-            # Or it should return a proper error
-            assert e.code() in [grpc.StatusCode.NOT_FOUND, grpc.StatusCode.INTERNAL]
+        call = stub.DownloadHistory(request)
+        tickers = {r.ticker for r in call}
+        assert tickers == {"AAPL"}
+        assert dict(call.trailing_metadata())["missing-tickers"] == "INVALID_TICKER_XYZ123"
+
+    def test_download_history_space_separated_ticker_is_rejected(self, stub):
+        # Common mistake: ["AAPL MSFT"] instead of ["AAPL", "MSFT"].
+        request = ticker_pb2.DownloadHistoryRequest(tickers=["AAPL MSFT"], period="1mo", interval="1d")
+        with pytest.raises(grpc.RpcError) as exc_info:
+            list(stub.DownloadHistory(request))
+        assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
 
 
 @pytest.fixture(scope="module")
@@ -493,9 +456,7 @@ class TestIntegrationSearch:
         assert "AAPL" in symbols
 
     def test_search_returns_news(self, search_stub):
-        response = search_stub.Search(
-            search_pb2.SearchRequest(query="Apple", news_count=3)
-        )
+        response = search_stub.Search(search_pb2.SearchRequest(query="Apple", news_count=3))
         # News may occasionally be empty; just verify the RPC succeeds and titles are strings
         for item in response.news:
             assert isinstance(item.title, str)
@@ -525,15 +486,11 @@ class TestIntegrationSearch:
 class TestIntegrationMarket:
     def test_get_market_status_succeeds(self, market_stub):
         # Market may be closed; just verify the RPC completes without error
-        response = market_stub.GetMarketStatus(
-            market_pb2.GetMarketStatusRequest(market="US")
-        )
+        response = market_stub.GetMarketStatus(market_pb2.GetMarketStatusRequest(market="US"))
         assert isinstance(response, market_pb2.GetMarketStatusResponse)
 
     def test_get_market_summary_returns_instruments(self, market_stub):
-        response = market_stub.GetMarketSummary(
-            market_pb2.GetMarketSummaryRequest(market="US")
-        )
+        response = market_stub.GetMarketSummary(market_pb2.GetMarketSummaryRequest(market="US"))
         # Summary keyed by exchange symbol; prices should be positive when populated
         for exchange, item in response.summary.items():
             assert isinstance(exchange, str)
@@ -547,26 +504,20 @@ class TestIntegrationMarket:
 
 class TestIntegrationSector:
     def test_get_sector_technology(self, sector_stub):
-        response = sector_stub.GetSector(
-            sector_pb2.GetSectorRequest(key="technology")
-        )
+        response = sector_stub.GetSector(sector_pb2.GetSectorRequest(key="technology"))
         assert response.key == "technology"
         assert len(response.name) > 0
         assert len(response.symbol) > 0
 
     def test_get_sector_has_industries(self, sector_stub):
-        response = sector_stub.GetSector(
-            sector_pb2.GetSectorRequest(key="technology")
-        )
+        response = sector_stub.GetSector(sector_pb2.GetSectorRequest(key="technology"))
         assert len(response.industries) > 0
         for industry in response.industries:
             assert len(industry.key) > 0
             assert len(industry.name) > 0
 
     def test_get_industry_consumer_electronics(self, sector_stub):
-        response = sector_stub.GetIndustry(
-            sector_pb2.GetIndustryRequest(key="consumer-electronics")
-        )
+        response = sector_stub.GetIndustry(sector_pb2.GetIndustryRequest(key="consumer-electronics"))
         assert response.key == "consumer-electronics"
         assert len(response.name) > 0
         assert response.sector_key == "technology"
@@ -582,5 +533,5 @@ class TestIntegrationSector:
         assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
