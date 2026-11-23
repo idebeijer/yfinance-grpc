@@ -1,23 +1,17 @@
 """Unit tests for SearchService (Search and Lookup RPCs)."""
 
-import sys
-from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
-import pytest
-import pandas as pd
 import grpc
-
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / "gen"))
-
-from src.search_server import SearchServiceServicer
+import pandas as pd
+import pytest
 from yfinance_grpc.v1alpha1 import search_pb2
+
+from yfinance_grpc_server.search import SearchServiceServicer
 
 
 class TestSearchServiceSearch:
-    @patch("src.search_server.yf.Search")
+    @patch("yfinance_grpc_server.search.yf.Search")
     def test_search_success(self, mock_search_cls):
         mock_result = Mock()
         mock_result.quotes = [
@@ -68,7 +62,7 @@ class TestSearchServiceSearch:
         assert response.news[0].publisher == "Reuters"
         assert response.news[0].provider_publish_time.seconds == 1704067200
 
-    @patch("src.search_server.yf.Search")
+    @patch("yfinance_grpc_server.search.yf.Search")
     def test_search_defaults_max_results_and_news_count(self, mock_search_cls):
         mock_result = Mock()
         mock_result.quotes = []
@@ -84,43 +78,35 @@ class TestSearchServiceSearch:
 
     def test_search_empty_query_returns_invalid_argument(self):
         context = Mock()
-        response = SearchServiceServicer().Search(
-            search_pb2.SearchRequest(query=""), context
-        )
-        context.set_code.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT)
-        assert isinstance(response, search_pb2.SearchResponse)
+        SearchServiceServicer().Search(search_pb2.SearchRequest(query=""), context)
+        context.abort.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT, ANY)
 
-    @patch("src.search_server.yf.Search")
+    @patch("yfinance_grpc_server.search.yf.Search")
     def test_search_exception_returns_internal_error(self, mock_search_cls):
         mock_search_cls.side_effect = Exception("network error")
         context = Mock()
-        response = SearchServiceServicer().Search(
-            search_pb2.SearchRequest(query="Apple"), context
-        )
-        context.set_code.assert_called_once_with(grpc.StatusCode.INTERNAL)
-        assert isinstance(response, search_pb2.SearchResponse)
+        SearchServiceServicer().Search(search_pb2.SearchRequest(query="Apple"), context)
+        context.abort.assert_called_once_with(grpc.StatusCode.INTERNAL, ANY)
 
-    @patch("src.search_server.yf.Search")
+    @patch("yfinance_grpc_server.search.yf.Search")
     def test_search_empty_results(self, mock_search_cls):
         mock_result = Mock()
         mock_result.quotes = []
         mock_result.news = []
         mock_search_cls.return_value = mock_result
 
-        response = SearchServiceServicer().Search(
-            search_pb2.SearchRequest(query="xyzxyzxyz"), Mock()
-        )
+        response = SearchServiceServicer().Search(search_pb2.SearchRequest(query="xyzxyzxyz"), Mock())
 
         assert response.quotes == []
         assert response.news == []
 
 
 class TestSearchServiceLookup:
-    @patch("src.search_server.yf.Lookup")
+    @patch("yfinance_grpc_server.search.yf.Lookup")
     def test_lookup_success(self, mock_lookup_cls):
         mock_lookup = Mock()
         mock_lookup_cls.return_value = mock_lookup
-        mock_lookup._get_data.return_value = pd.DataFrame(
+        mock_lookup.get_stock.return_value = pd.DataFrame(
             {
                 "shortName": ["Apple Inc."],
                 "exchange": ["NMS"],
@@ -131,13 +117,11 @@ class TestSearchServiceLookup:
         )
 
         context = Mock()
-        request = search_pb2.LookupRequest(
-            query="Apple", type=search_pb2.LOOKUP_TYPE_EQUITY, count=10
-        )
+        request = search_pb2.LookupRequest(query="Apple", type=search_pb2.LOOKUP_TYPE_EQUITY, count=10)
 
         response = SearchServiceServicer().Lookup(request, context)
 
-        mock_lookup._get_data.assert_called_once_with("equity", 10)
+        mock_lookup.get_stock.assert_called_once_with(count=10)
         assert len(response.results) == 1
         assert response.results[0].symbol == "AAPL"
         assert response.results[0].name == "Apple Inc."
@@ -145,52 +129,46 @@ class TestSearchServiceLookup:
         assert response.results[0].quote_type == "EQUITY"
         assert response.results[0].score == 1893881.0
 
-    @patch("src.search_server.yf.Lookup")
+    @patch("yfinance_grpc_server.search.yf.Lookup")
     def test_lookup_type_all_is_default(self, mock_lookup_cls):
         mock_lookup = Mock()
         mock_lookup_cls.return_value = mock_lookup
-        mock_lookup._get_data.return_value = pd.DataFrame()
+        mock_lookup.get_all.return_value = pd.DataFrame()
 
-        SearchServiceServicer().Lookup(
-            search_pb2.LookupRequest(query="Apple"), Mock()
-        )
+        SearchServiceServicer().Lookup(search_pb2.LookupRequest(query="Apple"), Mock())
 
-        mock_lookup._get_data.assert_called_once_with("all", 25)
+        mock_lookup.get_all.assert_called_once_with(count=25)
 
-    @patch("src.search_server.yf.Lookup")
-    def test_lookup_all_type_variants(self, mock_lookup_cls):
-        mock_lookup = Mock()
-        mock_lookup_cls.return_value = mock_lookup
-        mock_lookup._get_data.return_value = pd.DataFrame()
-        servicer = SearchServiceServicer()
+    @pytest.mark.parametrize(
+        ("pb_type", "method"),
+        [
+            (search_pb2.LOOKUP_TYPE_ALL, "get_all"),
+            (search_pb2.LOOKUP_TYPE_EQUITY, "get_stock"),
+            (search_pb2.LOOKUP_TYPE_MUTUALFUND, "get_mutualfund"),
+            (search_pb2.LOOKUP_TYPE_ETF, "get_etf"),
+            (search_pb2.LOOKUP_TYPE_INDEX, "get_index"),
+            (search_pb2.LOOKUP_TYPE_FUTURE, "get_future"),
+            (search_pb2.LOOKUP_TYPE_CURRENCY, "get_currency"),
+            (search_pb2.LOOKUP_TYPE_CRYPTOCURRENCY, "get_cryptocurrency"),
+        ],
+    )
+    @patch("yfinance_grpc_server.search.yf.Lookup")
+    def test_lookup_type_calls_public_method(self, mock_lookup_cls, pb_type, method):
+        mock_lookup = mock_lookup_cls.return_value
+        getattr(mock_lookup, method).return_value = pd.DataFrame()
 
-        type_map = {
-            search_pb2.LOOKUP_TYPE_ALL: "all",
-            search_pb2.LOOKUP_TYPE_EQUITY: "equity",
-            search_pb2.LOOKUP_TYPE_MUTUALFUND: "mutualfund",
-            search_pb2.LOOKUP_TYPE_ETF: "etf",
-            search_pb2.LOOKUP_TYPE_INDEX: "index",
-            search_pb2.LOOKUP_TYPE_FUTURE: "future",
-            search_pb2.LOOKUP_TYPE_CURRENCY: "currency",
-            search_pb2.LOOKUP_TYPE_CRYPTOCURRENCY: "cryptocurrency",
-        }
-        for pb_type, yf_str in type_map.items():
-            mock_lookup._get_data.reset_mock()
-            servicer.Lookup(
-                search_pb2.LookupRequest(query="test", type=pb_type, count=5), Mock()
-            )
-            mock_lookup._get_data.assert_called_once_with(yf_str, 5)
+        SearchServiceServicer().Lookup(search_pb2.LookupRequest(query="test", type=pb_type, count=5), Mock())
+
+        getattr(mock_lookup, method).assert_called_once_with(count=5)
 
     def test_lookup_empty_query_returns_invalid_argument(self):
         context = Mock()
         SearchServiceServicer().Lookup(search_pb2.LookupRequest(query=""), context)
-        context.set_code.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT)
+        context.abort.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT, ANY)
 
-    @patch("src.search_server.yf.Lookup")
+    @patch("yfinance_grpc_server.search.yf.Lookup")
     def test_lookup_exception_returns_internal_error(self, mock_lookup_cls):
         mock_lookup_cls.side_effect = Exception("API error")
         context = Mock()
-        SearchServiceServicer().Lookup(
-            search_pb2.LookupRequest(query="Apple"), context
-        )
-        context.set_code.assert_called_once_with(grpc.StatusCode.INTERNAL)
+        SearchServiceServicer().Lookup(search_pb2.LookupRequest(query="Apple"), context)
+        context.abort.assert_called_once_with(grpc.StatusCode.INTERNAL, ANY)

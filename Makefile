@@ -28,7 +28,7 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: install
-install: ## Install Python dependencies using uv
+install: ## Install the package and dev dependencies
 	uv sync
 
 .PHONY: generate
@@ -39,49 +39,58 @@ generate: ## Generate protobuf code from .proto files
 proto: generate ## Alias for generate
 
 .PHONY: run
-run: ## Run the gRPC server locally
-	uv run python -m src.main
+run: ## Run the gRPC server locally (port: GRPC_PORT, default 50059)
+	uv run yfinance-grpc --port $(GRPC_PORT)
+
+.PHONY: example
+example: ## Run the Python client example (needs a running server)
+	uv run python examples/client_example.py
+
+##@ Testing
 
 .PHONY: test
-test: ## Run the client example
-	uv run python -m examples.client_example
-
-.PHONY: test-unit
-test-unit: ## Run unit tests
-	uv run pytest tests/test_server.py -v
+test: ## Run unit tests (no server or network needed)
+	uv run pytest
 
 .PHONY: test-integration
-test-integration: ## Run integration tests (requires running server)
-	uv run pytest tests/test_integration.py -v
+test-integration: ## Run integration tests (needs `make run` in another terminal)
+	uv run pytest -m integration
 
 .PHONY: test-all
-test-all: ## Run all tests
-	uv run pytest tests/ -v
+test-all: ## Run unit and integration tests
+	uv run pytest -m ""
+
+##@ Quality
 
 .PHONY: lint
-lint: ## Run buf lint on proto files
+lint: ## Lint Python (ruff) and protos (buf)
+	uv run ruff check .
+	uv run ruff format --check .
 	buf lint
 
+.PHONY: typecheck
+typecheck: ## Type-check Python (mypy)
+	uv run mypy
+
 .PHONY: format
-format: ## Format proto files
+format: ## Format Python and proto files
+	uv run ruff check --fix .
+	uv run ruff format .
 	buf format -w
+
+.PHONY: check
+check: lint typecheck test ## Run every check CI runs except integration tests
 
 .PHONY: breaking
 breaking: ## Check for breaking changes in proto files
 	buf breaking --against '.git#branch=main'
 
 .PHONY: clean
-clean: ## Clean generated files and cache
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	find . -type f -name "*.pyc" -delete
-	find . -type f -name "*.pyo" -delete
-	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+clean: ## Remove caches and build artifacts
+	find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+	rm -rf .pytest_cache .mypy_cache .ruff_cache build dist
 
 ##@ Build
-
-.PHONY: build
-build: generate ## Generate proto files (no compilation needed for Python)
 
 .PHONY: docker-build
 docker-build: ## Build docker image
@@ -121,4 +130,4 @@ logs: ## View docker-compose logs
 ##@ All
 
 .PHONY: all
-all: install generate ## Install dependencies and generate proto files
+all: install generate check ## Install, generate and run all checks

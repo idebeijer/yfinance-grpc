@@ -1,30 +1,23 @@
 """Unit tests for MarketService (GetMarketStatus and GetMarketSummary RPCs)."""
 
-import sys
-from pathlib import Path
-from unittest.mock import Mock, patch
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from unittest.mock import ANY, Mock, patch
 
-import pytest
 import grpc
-
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / "gen"))
-
-from src.market_server import MarketServiceServicer
 from yfinance_grpc.v1alpha1 import market_pb2
+
+from yfinance_grpc_server.market import MarketServiceServicer
 
 
 class TestMarketServiceGetMarketStatus:
-    @patch("src.market_server.yf.Market")
+    @patch("yfinance_grpc_server.market.yf.Market")
     def test_get_market_status_success(self, mock_market_cls):
         mock_market = Mock()
         mock_market_cls.return_value = mock_market
         mock_market.status = {
             "type": "REGULAR",
-            "open": datetime(2025, 1, 15, 9, 30, tzinfo=timezone.utc),
-            "close": datetime(2025, 1, 15, 16, 0, tzinfo=timezone.utc),
+            "open": datetime(2025, 1, 15, 9, 30, tzinfo=UTC),
+            "close": datetime(2025, 1, 15, 16, 0, tzinfo=UTC),
             "timezone": {"short": "EST", "gmtoffset": -18000000},
         }
 
@@ -41,12 +34,10 @@ class TestMarketServiceGetMarketStatus:
 
     def test_get_market_status_empty_market_returns_invalid_argument(self):
         context = Mock()
-        MarketServiceServicer().GetMarketStatus(
-            market_pb2.GetMarketStatusRequest(market=""), context
-        )
-        context.set_code.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT)
+        MarketServiceServicer().GetMarketStatus(market_pb2.GetMarketStatusRequest(market=""), context)
+        context.abort.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT, ANY)
 
-    @patch("src.market_server.yf.Market")
+    @patch("yfinance_grpc_server.market.yf.Market")
     def test_get_market_status_no_data_returns_not_found(self, mock_market_cls):
         mock_market = Mock()
         mock_market_cls.return_value = mock_market
@@ -56,20 +47,20 @@ class TestMarketServiceGetMarketStatus:
         MarketServiceServicer().GetMarketStatus(
             market_pb2.GetMarketStatusRequest(market="xx_market"), context
         )
-        context.set_code.assert_called_once_with(grpc.StatusCode.NOT_FOUND)
+        context.abort.assert_called_once_with(grpc.StatusCode.NOT_FOUND, ANY)
 
-    @patch("src.market_server.yf.Market")
+    @patch("yfinance_grpc_server.market.yf.Market")
     def test_get_market_status_exception_returns_internal_error(self, mock_market_cls):
         mock_market_cls.side_effect = Exception("API error")
         context = Mock()
         MarketServiceServicer().GetMarketStatus(
             market_pb2.GetMarketStatusRequest(market="us_market"), context
         )
-        context.set_code.assert_called_once_with(grpc.StatusCode.INTERNAL)
+        context.abort.assert_called_once_with(grpc.StatusCode.INTERNAL, ANY)
 
 
 class TestMarketServiceGetMarketSummary:
-    @patch("src.market_server.yf.Market")
+    @patch("yfinance_grpc_server.market.yf.Market")
     def test_get_market_summary_success(self, mock_market_cls):
         mock_market = Mock()
         mock_market_cls.return_value = mock_market
@@ -103,40 +94,45 @@ class TestMarketServiceGetMarketSummary:
 
     def test_get_market_summary_empty_market_returns_invalid_argument(self):
         context = Mock()
-        MarketServiceServicer().GetMarketSummary(
-            market_pb2.GetMarketSummaryRequest(market=""), context
-        )
-        context.set_code.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT)
+        MarketServiceServicer().GetMarketSummary(market_pb2.GetMarketSummaryRequest(market=""), context)
+        context.abort.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT, ANY)
 
-    @patch("src.market_server.yf.Market")
-    def test_get_market_summary_no_data_returns_empty_response(self, mock_market_cls):
+    @patch("yfinance_grpc_server.market.yf.Market")
+    def test_get_market_summary_no_data_returns_not_found(self, mock_market_cls):
         mock_market = Mock()
         mock_market_cls.return_value = mock_market
         mock_market.summary = None
 
-        response = MarketServiceServicer().GetMarketSummary(
-            market_pb2.GetMarketSummaryRequest(market="us_market"), Mock()
+        context = Mock()
+        MarketServiceServicer().GetMarketSummary(
+            market_pb2.GetMarketSummaryRequest(market="us_market"), context
         )
 
-        assert len(response.summary) == 0
+        context.abort.assert_called_once_with(grpc.StatusCode.NOT_FOUND, ANY)
 
-    @patch("src.market_server.yf.Market")
-    def test_get_market_summary_finance_error_key_returns_empty_response(self, mock_market_cls):
+    @patch("yfinance_grpc_server.market.yf.Market")
+    def test_get_market_summary_finance_error_key_returns_not_found(self, mock_market_cls):
         mock_market = Mock()
         mock_market_cls.return_value = mock_market
-        mock_market.summary = {"finance": {"result": None, "error": {"code": "Bad Request", "description": "invalid broad market region"}}}
+        mock_market.summary = {
+            "finance": {
+                "result": None,
+                "error": {"code": "Bad Request", "description": "invalid broad market region"},
+            }
+        }
 
-        response = MarketServiceServicer().GetMarketSummary(
-            market_pb2.GetMarketSummaryRequest(market="us_market"), Mock()
+        context = Mock()
+        MarketServiceServicer().GetMarketSummary(
+            market_pb2.GetMarketSummaryRequest(market="us_market"), context
         )
 
-        assert len(response.summary) == 0
+        context.abort.assert_called_once_with(grpc.StatusCode.NOT_FOUND, ANY)
 
-    @patch("src.market_server.yf.Market")
+    @patch("yfinance_grpc_server.market.yf.Market")
     def test_get_market_summary_exception_returns_internal_error(self, mock_market_cls):
         mock_market_cls.side_effect = Exception("API error")
         context = Mock()
         MarketServiceServicer().GetMarketSummary(
             market_pb2.GetMarketSummaryRequest(market="us_market"), context
         )
-        context.set_code.assert_called_once_with(grpc.StatusCode.INTERNAL)
+        context.abort.assert_called_once_with(grpc.StatusCode.INTERNAL, ANY)
