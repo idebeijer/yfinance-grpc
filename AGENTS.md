@@ -17,7 +17,8 @@ Unit tests call servicers directly with a `Mock()` context and patch yfinance wh
 
 ## Gotchas
 
-- **yfinance renames DataFrame columns silently** (`% Out` became `pctHeld`; `Ticker.earnings` now always returns `None`). A wrong column name reads as missing data and yields zeros, with no test failure against mocks. When bumping yfinance, check the column names each handler reads against the installed source in `.venv/lib/python3.14/site-packages/yfinance/`, and run the integration tests.
+- **yfinance renames DataFrame columns silently** (`% Out` became `pctHeld`; `Ticker.earnings` now always returns `None`). A wrong column name reads as missing data and yields zeros, with no test failure against mocks. When bumping yfinance, check the column names each handler reads against the installed source in `.venv/lib/python3.*/site-packages/yfinance/`, and run the integration tests.
 - **The protobuf runtime and the buf Python plugins move together.** `protobuf` 7.36 needs `buf.build/protocolbuffers/python:v36.x` (and `pyi`) in `buf.gen.yaml`; grpcio-reflection pins the protobuf major. Bump both, then `make generate`.
+- **Python is pinned to 3.13 on purpose.** yfinance supports up to 3.13, and the runtime image is `gcr.io/distroless/python3-debian13`, whose interpreter is Debian's 3.13. The Dockerfile's builder builds the venv against Debian 13's `/usr/bin/python3.13` so its symlink resolves in the runtime image. Move `.python-version`, `requires-python`, ruff's `target-version`, mypy's `python_version` and both Dockerfile stages together. Ruff formats for the target version, so a 3.14 target produces 3.14-only syntax.
 - **`astral-sh/setup-uv` publishes no floating major tag.** Pin it to a commit SHA with the version in a comment, as `release.yml` does for every action.
 - **Python gRPC reflection cannot resolve method symbols**, so `grpcurl describe Service.Method` fails. Describe the service or the message.

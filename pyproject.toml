@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "gRPC server exposing Yahoo Finance data via the yfinance library"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "grpcio==1.85.3",
     "grpcio-reflection==1.85.3",
@@ -43,7 +43,7 @@ markers = [
 
 [tool.ruff]
 line-length = 110
-target-version = "py314"
+target-version = "py313"
 extend-exclude = ["gen"]
 
 [tool.ruff.lint]
@@ -60,7 +60,7 @@ known-first-party = ["yfinance_grpc_server"]
 known-third-party = ["yfinance_grpc"]
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.13"
 files = ["src"]
 mypy_path = "gen"
 check_untyped_defs = true
